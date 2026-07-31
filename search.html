@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Matrix | Search</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Share+Tech+Mono&display=swap');
+
+  :root {
+    --bg: #000000;
+    --card: #0a0a0a;
+    --card-hover: #111111;
+    --border: #1a1a1a;
+    --border-hover: #f97316;
+    --orange: #f97316;
+    --orange-dark: #ea580c;
+    --gold: #fbbf24;
+    --gold-dim: #b45309;
+    --text: #e5e5e5;
+    --text-dim: #737373;
+    --text-muted: #404040;
+    --glow-orange: 0 0 20px rgba(249,115,22,0.15);
+    --glow-gold: 0 0 30px rgba(251,191,36,0.1);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Share Tech Mono', monospace;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  #matrix-canvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.25;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 20px 40px;
+  }
+
+  /* Header */
+  header {
+    text-align: center;
+    padding: 40px 20px 30px;
+    position: relative;
+  }
+
+  header::before {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 600px; height: 200px;
+    background: radial-gradient(ellipse, rgba(249,115,22,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  h1 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 3.5rem;
+    font-weight: 900;
+    color: var(--orange);
+    text-transform: uppercase;
+    letter-spacing: 12px;
+    text-shadow: 0 0 40px rgba(249,115,22,0.4), 0 0 80px rgba(249,115,22,0.1);
+    position: relative;
+    animation: flicker 4s infinite alternate;
+  }
+
+  @keyframes flicker {
+    0%, 100% { opacity: 1; text-shadow: 0 0 40px rgba(249,115,22,0.4), 0 0 80px rgba(249,115,22,0.1); }
+    50% { opacity: 0.92; text-shadow: 0 0 30px rgba(249,115,22,0.3), 0 0 60px rgba(249,115,22,0.05); }
+  }
+
+  .subtitle {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 1rem;
+    color: var(--gold);
+    margin-top: 10px;
+    letter-spacing: 3px;
+    opacity: 0.8;
+  }
+
+  .glitch-line {
+    width: 200px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--orange), var(--gold), transparent);
+    margin: 20px auto;
+    opacity: 0.5;
+  }
+
+  /* Navigation */
+  nav {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 30px;
+    padding: 0 20px;
+  }
+
+  nav a {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-dim);
+    text-decoration: none;
+    padding: 10px 18px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    transition: all 0.3s;
+    background: var(--card);
+  }
+
+  nav a:hover, nav a.active {
+    border-color: var(--orange);
+    color: var(--orange);
+    box-shadow: var(--glow-orange);
+    background: rgba(249,115,22,0.05);
+  }
+
+  /* Page title */
+  .page-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.6rem;
+    color: var(--orange);
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    margin-bottom: 8px;
+  }
+
+  .page-desc {
+    color: var(--text-dim);
+    font-size: 0.9rem;
+    margin-bottom: 30px;
+    letter-spacing: 0.5px;
+  }
+
+  /* Cards */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 24px;
+    margin-bottom: 16px;
+    transition: all 0.3s;
+  }
+
+  .card:hover {
+    border-color: var(--gold-dim);
+    box-shadow: 0 0 15px rgba(249,115,22,0.05);
+  }
+
+  .card h3 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.95rem;
+    color: var(--gold);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 12px;
+  }
+
+  .card p {
+    color: var(--text-dim);
+    font-size: 0.85rem;
+    line-height: 1.6;
+  }
+
+  /* Buttons */
+  .btn {
+    display: inline-block;
+    padding: 10px 22px;
+    background: linear-gradient(135deg, var(--orange), var(--orange-dark));
+    border: none;
+    border-radius: 4px;
+    color: #000;
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 700;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-decoration: none;
+  }
+
+  .btn:hover {
+    background: linear-gradient(135deg, var(--gold), var(--orange));
+    box-shadow: 0 0 20px rgba(249,115,22,0.3);
+    transform: translateY(-1px);
+  }
+
+  .btn-outline {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+  }
+
+  .btn-outline:hover {
+    border-color: var(--gold);
+    color: var(--gold);
+    background: rgba(251,191,36,0.05);
+    box-shadow: var(--glow-gold);
+  }
+
+  /* Code blocks */
+  .code-block {
+    background: #050505;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 14px 18px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.82rem;
+    color: var(--gold);
+    overflow-x: auto;
+    white-space: pre-wrap;
+    line-height: 1.6;
+    margin: 8px 0;
+  }
+
+  /* Link tags */
+  .link-tag {
+    display: inline-block;
+    padding: 6px 14px;
+    background: rgba(249,115,22,0.08);
+    border: 1px solid rgba(249,115,22,0.2);
+    border-radius: 20px;
+    color: var(--orange);
+    font-size: 0.78rem;
+    text-decoration: none;
+    transition: all 0.3s;
+    letter-spacing: 0.5px;
+    margin: 4px 4px 4px 0;
+  }
+
+  .link-tag:hover {
+    background: rgba(249,115,22,0.2);
+    border-color: var(--orange);
+    box-shadow: var(--glow-orange);
+  }
+
+  /* Grid */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+
+  @media (max-width: 900px) {
+    .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+    h1 { font-size: 2.2rem; letter-spacing: 6px; }
+    nav a { padding: 8px 12px; font-size: 0.7rem; }
+  }
+
+  /* Footer */
+  footer {
+    text-align: center;
+    padding: 50px 20px 30px;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    letter-spacing: 2px;
+  }
+
+  .footer-line {
+    width: 100px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
+    margin: 0 auto 16px;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--orange); }
+
+  .hidden { display: none !important; }
+
+  .search-hub { max-width: 700px; margin: 0 auto 40px; }
+  .search-input-wrap { display: flex; gap: 0; border: 1px solid var(--border); border-radius: 4px; overflow: hidden; background: var(--card); margin-bottom: 30px; }
+  .search-input-wrap:focus-within { border-color: var(--orange); box-shadow: var(--glow-orange); }
+  .search-input-wrap input { flex: 1; background: transparent; border: none; padding: 16px 20px; color: var(--text); font-family: 'Share Tech Mono', monospace; font-size: 0.95rem; outline: none; }
+  .search-input-wrap input::placeholder { color: var(--text-muted); }
+  .search-input-wrap button { padding: 0 28px; background: linear-gradient(135deg, var(--orange), var(--orange-dark)); border: none; color: #000; font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; transition: all 0.3s; }
+  .search-input-wrap button:hover { background: linear-gradient(135deg, var(--gold), var(--orange)); box-shadow: 0 0 20px rgba(249,115,22,0.3); }
+
+  .results-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .result-col { border: 1px solid var(--border); border-radius: 6px; background: var(--card); overflow: hidden; }
+  .result-col-header { padding: 14px 18px; background: rgba(249,115,22,0.05); border-bottom: 1px solid var(--border); font-family: 'Orbitron', sans-serif; font-size: 0.8rem; color: var(--orange); letter-spacing: 1.5px; text-transform: uppercase; }
+  .result-col-body { padding: 16px; max-height: 500px; overflow-y: auto; }
+  .result-item { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.03); transition: background 0.2s; }
+  .result-item:last-child { border-bottom: none; }
+  .result-item:hover { background: rgba(249,115,22,0.03); }
+  .result-item a { color: var(--text); text-decoration: none; font-size: 0.85rem; display: block; margin-bottom: 4px; }
+  .result-item a:hover { color: var(--orange); }
+  .result-meta { font-size: 0.72rem; color: var(--text-muted); }
+
+  .quick-links { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 30px; justify-content: center; }
+  .quick-tag { padding: 6px 14px; background: rgba(249,115,22,0.05); border: 1px solid rgba(249,115,22,0.15); border-radius: 20px; color: var(--text-dim); font-size: 0.78rem; cursor: pointer; transition: all 0.3s; }
+  .quick-tag:hover { border-color: var(--orange); color: var(--orange); background: rgba(249,115,22,0.1); }
+
+  .history-list { margin-top: 20px; }
+  .history-item { padding: 8px 12px; background: rgba(251,191,36,0.03); border: 1px solid rgba(251,191,36,0.1); border-radius: 4px; margin-bottom: 6px; font-size: 0.8rem; color: var(--text-dim); cursor: pointer; transition: all 0.2s; display: flex; justify-content: space-between; align-items: center; }
+  .history-item:hover { border-color: var(--gold); color: var(--gold); }
+  .history-item span { color: var(--text-muted); font-size: 0.7rem; }
+</style>
+</head>
+<body>
+<canvas id="matrix-canvas"></canvas>
+<div class="container">
+
+  <header>
+    <h1>MATRIX</h1>
+    <div class="subtitle">There is no spoon. Only infrastructure.</div>
+    <div class="glitch-line"></div>
+  </header>
+
+  <nav>
+    <a href="index.html">Mind Map</a>
+    <a href="arch.html">Architecture</a>
+    <a href="search.html">Search</a>
+    <a href="blog.html">Blog & Tech</a>
+    <a href="about.html">About</a>
+  </nav>
+
+
+<div style="margin-bottom:30px; text-align:center;">
+  <div class="page-title">Search Hub</div>
+  <div class="page-desc">Search GitHub repositories and StackOverflow questions. No API key required.</div>
+</div>
+
+<div class="search-hub">
+  <div class="search-input-wrap">
+    <input type="text" id="searchQuery" placeholder="Search repositories and questions..." autocomplete="off" onkeydown="if(event.key==='Enter')doSearch()">
+    <button onclick="doSearch()">Search</button>
+  </div>
+
+  <div class="quick-links">
+    <span class="quick-tag" onclick="quickSearch('kubernetes')">Kubernetes</span>
+    <span class="quick-tag" onclick="quickSearch('terraform')">Terraform</span>
+    <span class="quick-tag" onclick="quickSearch('docker')">Docker</span>
+    <span class="quick-tag" onclick="quickSearch('aws lambda')">AWS Lambda</span>
+    <span class="quick-tag" onclick="quickSearch('prometheus grafana')">Monitoring</span>
+    <span class="quick-tag" onclick="quickSearch('ci/cd pipeline')">CI/CD</span>
+    <span class="quick-tag" onclick="quickSearch('zero trust')">Zero Trust</span>
+    <span class="quick-tag" onclick="quickSearch('llm rag')">LLM / RAG</span>
+  </div>
+</div>
+
+<div class="results-grid" id="resultsGrid" style="display:none;">
+  <div class="result-col">
+    <div class="result-col-header">GitHub Repositories</div>
+    <div class="result-col-body" id="githubResults"></div>
+  </div>
+  <div class="result-col">
+    <div class="result-col-header">StackOverflow</div>
+    <div class="result-col-body" id="soResults"></div>
+  </div>
+</div>
+
+<div class="card" id="historyCard" style="display:none; max-width:700px; margin:30px auto;">
+  <h3>Recent Searches</h3>
+  <div class="history-list" id="historyList"></div>
+  <button class="btn btn-outline" style="margin-top:12px;" onclick="clearHistory()">Clear History</button>
+</div>
+
+
+  <footer>
+    <div class="footer-line"></div>
+    <div>Matrix &mdash; Built for GitHub Pages</div>
+    <div style="margin-top:6px; font-size:0.7rem; color:#333;">Wake up, Neo...</div>
+  </footer>
+
+</div>
+
+<script>
+
+// Matrix rain
+(function initMatrix() {
+  const canvas = document.getElementById('matrix-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+  resize(); window.addEventListener('resize', resize);
+  const chars = '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
+  const fontSize = 14;
+  const columns = Math.floor(canvas.width / fontSize);
+  const drops = Array(columns).fill(1);
+  function draw() {
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#f97316';
+    ctx.font = fontSize + 'px monospace';
+    for (let i = 0; i < drops.length; i++) {
+      const text = chars[Math.floor(Math.random() * chars.length)];
+      ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+      if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+      drops[i]++;
+    }
+  }
+  setInterval(draw, 50);
+})();
+
+// Active nav
+const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+document.querySelectorAll('nav a').forEach(a => {
+  if (a.getAttribute('href') === currentPage) a.classList.add('active');
+});
+
+
+function loadHistory() {
+  const history = JSON.parse(localStorage.getItem('matrix_search_history') || '[]');
+  const card = document.getElementById('historyCard');
+  const list = document.getElementById('historyList');
+  if (history.length === 0) { card.style.display = 'none'; return; }
+  card.style.display = 'block';
+  list.innerHTML = history.slice(0, 10).map(h => `
+    <div class="history-item" onclick="quickSearch('${h.query.replace(/'/g, "\'")}')">
+      <span>${h.query}</span>
+      <span>${new Date(h.time).toLocaleDateString()}</span>
+    </div>
+  `).join('');
+}
+
+function saveHistory(query) {
+  let history = JSON.parse(localStorage.getItem('matrix_search_history') || '[]');
+  history = history.filter(h => h.query !== query);
+  history.unshift({ query, time: Date.now() });
+  localStorage.setItem('matrix_search_history', JSON.stringify(history.slice(0, 20)));
+  loadHistory();
+}
+
+function clearHistory() {
+  localStorage.removeItem('matrix_search_history');
+  loadHistory();
+}
+
+function quickSearch(q) {
+  document.getElementById('searchQuery').value = q;
+  doSearch();
+}
+
+async function doSearch() {
+  const q = document.getElementById('searchQuery').value.trim();
+  if (!q) return;
+  saveHistory(q);
+
+  document.getElementById('resultsGrid').style.display = 'grid';
+  document.getElementById('githubResults').innerHTML = '<div style="color:var(--text-muted);font-size:0.8rem;padding:8px;">Searching GitHub...</div>';
+  document.getElementById('soResults').innerHTML = '<div style="color:var(--text-muted);font-size:0.8rem;padding:8px;">Searching StackOverflow...</div>';
+
+  // GitHub
+  try {
+    const gh = await fetch(`https://api.github.com/search/repositories?q=${encodeURIComponent(q)}&sort=stars&order=desc&per_page=10`);
+    const ghData = await gh.json();
+    document.getElementById('githubResults').innerHTML = (ghData.items || []).map(item => `
+      <div class="result-item">
+        <a href="${item.html_url}" target="_blank" rel="noopener">${item.full_name}</a>
+        <div class="result-meta">⭐ ${item.stargazers_count.toLocaleString()} | ${item.language || 'N/A'} | ${(item.description || '').substring(0,80)}</div>
+      </div>
+    `).join('') || '<div style="color:var(--text-muted);font-size:0.8rem;">No results found</div>';
+  } catch {
+    document.getElementById('githubResults').innerHTML = '<div style="color:var(--text-muted);font-size:0.8rem;">Search unavailable</div>';
+  }
+
+  // StackOverflow
+  try {
+    const so = await fetch(`https://api.stackexchange.com/2.3/search/advanced?order=desc&sort=relevance&q=${encodeURIComponent(q)}&site=stackoverflow&pagesize=10`);
+    const soData = await so.json();
+    document.getElementById('soResults').innerHTML = (soData.items || []).map(item => `
+      <div class="result-item">
+        <a href="${item.link}" target="_blank" rel="noopener">${item.title}</a>
+        <div class="result-meta">Score: ${item.score} | Answers: ${item.answer_count} | ${new Date(item.creation_date*1000).toLocaleDateString()}</div>
+      </div>
+    `).join('') || '<div style="color:var(--text-muted);font-size:0.8rem;">No results found</div>';
+  } catch {
+    document.getElementById('soResults').innerHTML = '<div style="color:var(--text-muted);font-size:0.8rem;">Search unavailable</div>';
+  }
+}
+
+document.addEventListener('DOMContentLoaded', loadHistory);
+</script>
+</body>
+</html>

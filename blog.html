@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Matrix | Blog & Tech</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Share+Tech+Mono&display=swap');
+
+  :root {
+    --bg: #000000;
+    --card: #0a0a0a;
+    --card-hover: #111111;
+    --border: #1a1a1a;
+    --border-hover: #f97316;
+    --orange: #f97316;
+    --orange-dark: #ea580c;
+    --gold: #fbbf24;
+    --gold-dim: #b45309;
+    --text: #e5e5e5;
+    --text-dim: #737373;
+    --text-muted: #404040;
+    --glow-orange: 0 0 20px rgba(249,115,22,0.15);
+    --glow-gold: 0 0 30px rgba(251,191,36,0.1);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Share Tech Mono', monospace;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  #matrix-canvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.25;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 20px 40px;
+  }
+
+  /* Header */
+  header {
+    text-align: center;
+    padding: 40px 20px 30px;
+    position: relative;
+  }
+
+  header::before {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 600px; height: 200px;
+    background: radial-gradient(ellipse, rgba(249,115,22,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  h1 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 3.5rem;
+    font-weight: 900;
+    color: var(--orange);
+    text-transform: uppercase;
+    letter-spacing: 12px;
+    text-shadow: 0 0 40px rgba(249,115,22,0.4), 0 0 80px rgba(249,115,22,0.1);
+    position: relative;
+    animation: flicker 4s infinite alternate;
+  }
+
+  @keyframes flicker {
+    0%, 100% { opacity: 1; text-shadow: 0 0 40px rgba(249,115,22,0.4), 0 0 80px rgba(249,115,22,0.1); }
+    50% { opacity: 0.92; text-shadow: 0 0 30px rgba(249,115,22,0.3), 0 0 60px rgba(249,115,22,0.05); }
+  }
+
+  .subtitle {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 1rem;
+    color: var(--gold);
+    margin-top: 10px;
+    letter-spacing: 3px;
+    opacity: 0.8;
+  }
+
+  .glitch-line {
+    width: 200px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--orange), var(--gold), transparent);
+    margin: 20px auto;
+    opacity: 0.5;
+  }
+
+  /* Navigation */
+  nav {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 30px;
+    padding: 0 20px;
+  }
+
+  nav a {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-dim);
+    text-decoration: none;
+    padding: 10px 18px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    transition: all 0.3s;
+    background: var(--card);
+  }
+
+  nav a:hover, nav a.active {
+    border-color: var(--orange);
+    color: var(--orange);
+    box-shadow: var(--glow-orange);
+    background: rgba(249,115,22,0.05);
+  }
+
+  /* Page title */
+  .page-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.6rem;
+    color: var(--orange);
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    margin-bottom: 8px;
+  }
+
+  .page-desc {
+    color: var(--text-dim);
+    font-size: 0.9rem;
+    margin-bottom: 30px;
+    letter-spacing: 0.5px;
+  }
+
+  /* Cards */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 24px;
+    margin-bottom: 16px;
+    transition: all 0.3s;
+  }
+
+  .card:hover {
+    border-color: var(--gold-dim);
+    box-shadow: 0 0 15px rgba(249,115,22,0.05);
+  }
+
+  .card h3 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.95rem;
+    color: var(--gold);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 12px;
+  }
+
+  .card p {
+    color: var(--text-dim);
+    font-size: 0.85rem;
+    line-height: 1.6;
+  }
+
+  /* Buttons */
+  .btn {
+    display: inline-block;
+    padding: 10px 22px;
+    background: linear-gradient(135deg, var(--orange), var(--orange-dark));
+    border: none;
+    border-radius: 4px;
+    color: #000;
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 700;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-decoration: none;
+  }
+
+  .btn:hover {
+    background: linear-gradient(135deg, var(--gold), var(--orange));
+    box-shadow: 0 0 20px rgba(249,115,22,0.3);
+    transform: translateY(-1px);
+  }
+
+  .btn-outline {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+  }
+
+  .btn-outline:hover {
+    border-color: var(--gold);
+    color: var(--gold);
+    background: rgba(251,191,36,0.05);
+    box-shadow: var(--glow-gold);
+  }
+
+  /* Code blocks */
+  .code-block {
+    background: #050505;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 14px 18px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.82rem;
+    color: var(--gold);
+    overflow-x: auto;
+    white-space: pre-wrap;
+    line-height: 1.6;
+    margin: 8px 0;
+  }
+
+  /* Link tags */
+  .link-tag {
+    display: inline-block;
+    padding: 6px 14px;
+    background: rgba(249,115,22,0.08);
+    border: 1px solid rgba(249,115,22,0.2);
+    border-radius: 20px;
+    color: var(--orange);
+    font-size: 0.78rem;
+    text-decoration: none;
+    transition: all 0.3s;
+    letter-spacing: 0.5px;
+    margin: 4px 4px 4px 0;
+  }
+
+  .link-tag:hover {
+    background: rgba(249,115,22,0.2);
+    border-color: var(--orange);
+    box-shadow: var(--glow-orange);
+  }
+
+  /* Grid */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+
+  @media (max-width: 900px) {
+    .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+    h1 { font-size: 2.2rem; letter-spacing: 6px; }
+    nav a { padding: 8px 12px; font-size: 0.7rem; }
+  }
+
+  /* Footer */
+  footer {
+    text-align: center;
+    padding: 50px 20px 30px;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    letter-spacing: 2px;
+  }
+
+  .footer-line {
+    width: 100px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
+    margin: 0 auto 16px;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--orange); }
+
+  .hidden { display: none !important; }
+
+  .resource-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-bottom: 30px; }
+  .resource-card { background: linear-gradient(145deg, #0d0d0d, #080808); border: 1px solid var(--border); border-radius: 6px; padding: 22px; transition: all 0.35s; position: relative; overflow: hidden; }
+  .resource-card::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--orange), var(--gold)); transform: scaleX(0); transform-origin: left; transition: transform 0.4s; }
+  .resource-card:hover { border-color: var(--orange); transform: translateY(-3px); box-shadow: var(--glow-orange); }
+  .resource-card:hover::after { transform: scaleX(1); }
+  .resource-card h4 { font-family: 'Orbitron', sans-serif; font-size: 0.9rem; color: var(--gold); margin-bottom: 8px; letter-spacing: 1px; }
+  .resource-card p { font-size: 0.78rem; color: var(--text-dim); line-height: 1.5; margin-bottom: 12px; }
+  .checklist { list-style: none; padding: 0; }
+  .checklist li { padding: 8px 0 8px 24px; position: relative; font-size: 0.84rem; color: var(--text-dim); border-bottom: 1px solid rgba(255,255,255,0.03); }
+  .checklist li::before { content: '☐'; position: absolute; left: 0; color: var(--orange); }
+  .checklist li.checked { color: var(--text); }
+  .checklist li.checked::before { content: '☑'; color: var(--gold); }
+  .platform-comparison { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.82rem; }
+  .platform-comparison th { text-align: left; padding: 10px 12px; background: rgba(249,115,22,0.08); color: var(--orange); font-family: 'Orbitron', sans-serif; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid var(--border); }
+  .platform-comparison td { padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,0.03); color: var(--text-dim); }
+  .platform-comparison tr:hover td { color: var(--text); background: rgba(249,115,22,0.02); }
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+  .badge-green { background: rgba(34,197,94,0.1); color: #22c55e; border: 1px solid rgba(34,197,94,0.2); }
+  .badge-orange { background: rgba(249,115,22,0.1); color: var(--orange); border: 1px solid rgba(249,115,22,0.2); }
+  .badge-blue { background: rgba(59,130,246,0.1); color: #3b82f6; border: 1px solid rgba(59,130,246,0.2); }
+</style>
+</head>
+<body>
+<canvas id="matrix-canvas"></canvas>
+<div class="container">
+
+  <header>
+    <h1>MATRIX</h1>
+    <div class="subtitle">There is no spoon. Only infrastructure.</div>
+    <div class="glitch-line"></div>
+  </header>
+
+  <nav>
+    <a href="index.html">Mind Map</a>
+    <a href="arch.html">Architecture</a>
+    <a href="search.html">Search</a>
+    <a href="blog.html">Blog & Tech</a>
+    <a href="about.html">About</a>
+  </nav>
+
+
+<div style="margin-bottom:30px;">
+  <div class="page-title">Blog & Tech</div>
+  <div class="page-desc">Resources for technical writing, blogging, open source, and developer productivity.</div>
+</div>
+
+<!-- Dev.to & Blogging -->
+<div class="card">
+  <h3>Developer Blogging Platforms</h3>
+  <p style="margin-bottom:16px;">Where to publish your technical content and build your audience.</p>
+  <table class="platform-comparison">
+    <tr><th>Platform</th><th>Audience</th><th>SEO</th><th>Monetization</th><th>Best For</th></tr>
+    <tr><td><strong>Dev.to</strong></td><td>Developers</td><td><span class="badge badge-green">Good</span></td><td><span class="badge badge-orange">Limited</span></td><td>Community engagement</td></tr>
+    <tr><td><strong>Hashnode</strong></td><td>Developers</td><td><span class="badge badge-green">Excellent</span></td><td><span class="badge badge-green">Yes</span></td><td>Personal branding</td></tr>
+    <tr><td><strong>Medium</strong></td><td>General</td><td><span class="badge badge-green">Excellent</span></td><td><span class="badge badge-green">Partner Program</span></td><td>Broad reach</td></tr>
+    <tr><td><strong>Substack</strong></td><td>Niche</td><td><span class="badge badge-orange">Moderate</span></td><td><span class="badge badge-green">Paid newsletters</span></td><td>Newsletter format</td></tr>
+    <tr><td><strong>GitHub Pages</strong></td><td>Technical</td><td><span class="badge badge-green">Good</span></td><td><span class="badge badge-orange">None</span></td><td>Portfolio / docs</td></tr>
+  </table>
+  <div style="margin-top:12px;">
+    <a href="https://dev.to" target="_blank" class="link-tag">Dev.to</a>
+    <a href="https://hashnode.com" target="_blank" class="link-tag">Hashnode</a>
+    <a href="https://medium.com" target="_blank" class="link-tag">Medium</a>
+    <a href="https://substack.com" target="_blank" class="link-tag">Substack</a>
+    <a href="https://pages.github.com" target="_blank" class="link-tag">GitHub Pages</a>
+  </div>
+</div>
+
+<!-- Technical Writing -->
+<div class="card">
+  <h3>Technical Writing Resources</h3>
+  <p style="margin-bottom:16px;">Tools and frameworks for creating documentation that developers actually read.</p>
+  <div class="resource-grid">
+    <div class="resource-card">
+      <h4>Docusaurus</h4>
+      <p>Facebook's documentation site generator. React-based, search, versioning, i18n.</p>
+      <a href="https://docusaurus.io" target="_blank" class="link-tag">docusaurus.io</a>
+    </div>
+    <div class="resource-card">
+      <h4>MkDocs</h4>
+      <p>Fast, simple static site generator for project documentation. Markdown-based.</p>
+      <a href="https://www.mkdocs.org" target="_blank" class="link-tag">mkdocs.org</a>
+    </div>
+    <div class="resource-card">
+      <h4>Vale Linter</h4>
+      <p>Prose linter for technical writing. Enforces style guides and catches errors.</p>
+      <a href="https://vale.sh" target="_blank" class="link-tag">vale.sh</a>
+    </div>
+    <div class="resource-card">
+      <h4>Read the Docs</h4>
+      <p>Documentation hosting with automatic builds from Git repositories.</p>
+      <a href="https://readthedocs.org" target="_blank" class="link-tag">readthedocs.org</a>
+    </div>
+  </div>
+</div>
+
+<!-- Writing Checklist -->
+<div class="card">
+  <h3>Technical Writing Checklist</h3>
+  <p style="margin-bottom:12px;">Before publishing your next technical article, run through this list.</p>
+  <ul class="checklist" id="writingChecklist">
+    <li onclick="this.classList.toggle('checked')">Define your target audience and their skill level</li>
+    <li onclick="this.classList.toggle('checked')">Start with a clear problem statement or hook</li>
+    <li onclick="this.classList.toggle('checked')">Include a table of contents for long articles</li>
+    <li onclick="this.classList.toggle('checked')">Add code examples that are copy-paste ready</li>
+    <li onclick="this.classList.toggle('checked')">Explain WHY, not just HOW</li>
+    <li onclick="this.classList.toggle('checked')">Use diagrams for complex architectures</li>
+    <li onclick="this.classList.toggle('checked')">Add a "Prerequisites" section</li>
+    <li onclick="this.classList.toggle('checked')">Include error handling and edge cases</li>
+    <li onclick="this.classList.toggle('checked')">Run spell check and grammar check (Vale)</li>
+    <li onclick="this.classList.toggle('checked')">Test all commands in a clean environment</li>
+    <li onclick="this.classList.toggle('checked')">Add alt text to all images</li>
+    <li onclick="this.classList.toggle('checked')">Include a conclusion with next steps</li>
+  </ul>
+</div>
+
+<!-- Open Source -->
+<div class="card">
+  <h3>Open Source Contribution Guide</h3>
+  <p style="margin-bottom:16px;">How to find, evaluate, and contribute to open source projects effectively.</p>
+  <div class="grid-2">
+    <div>
+      <h4 style="color:var(--gold);font-size:0.85rem;margin-bottom:10px;">Finding Projects</h4>
+      <ul class="checklist">
+        <li>Look for <code>good-first-issue</code> labels</li>
+        <li>Check recent commit activity</li>
+        <li>Review the CONTRIBUTING.md file</li>
+        <li>Assess community responsiveness</li>
+        <li>Start with documentation fixes</li>
+      </ul>
+    </div>
+    <div>
+      <h4 style="color:var(--gold);font-size:0.85rem;margin-bottom:10px;">Best Practices</h4>
+      <ul class="checklist">
+        <li>Fork and create a feature branch</li>
+        <li>Write clear commit messages</li>
+        <li>Include tests with your changes</li>
+        <li>Update documentation</li>
+        <li>Be patient with maintainers</li>
+      </ul>
+    </div>
+  </div>
+  <div style="margin-top:16px;">
+    <a href="https://github.com/explore" target="_blank" class="link-tag">GitHub Explore</a>
+    <a href="https://goodfirstissues.com" target="_blank" class="link-tag">Good First Issues</a>
+    <a href="https://opensource.guide" target="_blank" class="link-tag">Open Source Guide</a>
+    <a href="https://www.firsttimersonly.com" target="_blank" class="link-tag">First Timers Only</a>
+  </div>
+</div>
+
+<!-- Developer Tools -->
+<div class="card">
+  <h3>Essential Developer Tools</h3>
+  <p style="margin-bottom:16px;">Curated list of tools that boost productivity in cloud and DevOps workflows.</p>
+  <div class="resource-grid">
+    <div class="resource-card">
+      <h4>Terminal & Shell</h4>
+      <p>Warp, Fig (Amazon Q), Starship prompt, Zoxide, fzf, bat, exa</p>
+    </div>
+    <div class="resource-card">
+      <h4>Git Workflow</h4>
+      <p>GitHub CLI, Lazygit, GitKraken, delta (diff viewer), commitizen</p>
+    </div>
+    <div class="resource-card">
+      <h4>Cloud CLI</h4>
+      <p>awscli, azure-cli, gcloud, kubectl, helm, terraform, pulumi</p>
+    </div>
+    <div class="resource-card">
+      <h4>Containers</h4>
+      <p>Docker, Podman, BuildKit, dive (image explorer), trivy (scanner)</p>
+    </div>
+    <div class="resource-card">
+      <h4>Monitoring</h4>
+      <p>k9s (K8s TUI), lazydocker, btop, htop, glances</p>
+    </div>
+    <div class="resource-card">
+      <h4>Dotfiles</h4>
+      <p>Chezmoi, Stow, GNU Stow, yadm, bare git repos</p>
+    </div>
+  </div>
+</div>
+
+
+  <footer>
+    <div class="footer-line"></div>
+    <div>Matrix &mdash; Built for GitHub Pages</div>
+    <div style="margin-top:6px; font-size:0.7rem; color:#333;">Wake up, Neo...</div>
+  </footer>
+
+</div>
+<script>
+// Matrix rain
+(function initMatrix() {
+  const canvas = document.getElementById('matrix-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+  resize(); window.addEventListener('resize', resize);
+  const chars = '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
+  const fontSize = 14;
+  const columns = Math.floor(canvas.width / fontSize);
+  const drops = Array(columns).fill(1);
+  function draw() {
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#f97316';
+    ctx.font = fontSize + 'px monospace';
+    for (let i = 0; i < drops.length; i++) {
+      const text = chars[Math.floor(Math.random() * chars.length)];
+      ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+      if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+      drops[i]++;
+    }
+  }
+  setInterval(draw, 50);
+})();
+
+// Active nav
+const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+document.querySelectorAll('nav a').forEach(a => {
+  if (a.getAttribute('href') === currentPage) a.classList.add('active');
+});
+</script>
+</body>
+</html>

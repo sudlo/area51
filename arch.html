@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Matrix | Architecture</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Share+Tech+Mono&display=swap');
+
+  :root {
+    --bg: #000000;
+    --card: #0a0a0a;
+    --card-hover: #111111;
+    --border: #1a1a1a;
+    --border-hover: #f97316;
+    --orange: #f97316;
+    --orange-dark: #ea580c;
+    --gold: #fbbf24;
+    --gold-dim: #b45309;
+    --text: #e5e5e5;
+    --text-dim: #737373;
+    --text-muted: #404040;
+    --glow-orange: 0 0 20px rgba(249,115,22,0.15);
+    --glow-gold: 0 0 30px rgba(251,191,36,0.1);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Share Tech Mono', monospace;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  #matrix-canvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.25;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 20px 40px;
+  }
+
+  /* Header */
+  header {
+    text-align: center;
+    padding: 40px 20px 30px;
+    position: relative;
+  }
+
+  header::before {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 600px; height: 200px;
+    background: radial-gradient(ellipse, rgba(249,115,22,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  h1 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 3.5rem;
+    font-weight: 900;
+    color: var(--orange);
+    text-transform: uppercase;
+    letter-spacing: 12px;
+    text-shadow: 0 0 40px rgba(249,115,22,0.4), 0 0 80px rgba(249,115,22,0.1);
+    position: relative;
+    animation: flicker 4s infinite alternate;
+  }
+
+  @keyframes flicker {
+    0%, 100% { opacity: 1; text-shadow: 0 0 40px rgba(249,115,22,0.4), 0 0 80px rgba(249,115,22,0.1); }
+    50% { opacity: 0.92; text-shadow: 0 0 30px rgba(249,115,22,0.3), 0 0 60px rgba(249,115,22,0.05); }
+  }
+
+  .subtitle {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 1rem;
+    color: var(--gold);
+    margin-top: 10px;
+    letter-spacing: 3px;
+    opacity: 0.8;
+  }
+
+  .glitch-line {
+    width: 200px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--orange), var(--gold), transparent);
+    margin: 20px auto;
+    opacity: 0.5;
+  }
+
+  /* Navigation */
+  nav {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 30px;
+    padding: 0 20px;
+  }
+
+  nav a {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-dim);
+    text-decoration: none;
+    padding: 10px 18px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    transition: all 0.3s;
+    background: var(--card);
+  }
+
+  nav a:hover, nav a.active {
+    border-color: var(--orange);
+    color: var(--orange);
+    box-shadow: var(--glow-orange);
+    background: rgba(249,115,22,0.05);
+  }
+
+  /* Page title */
+  .page-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.6rem;
+    color: var(--orange);
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    margin-bottom: 8px;
+  }
+
+  .page-desc {
+    color: var(--text-dim);
+    font-size: 0.9rem;
+    margin-bottom: 30px;
+    letter-spacing: 0.5px;
+  }
+
+  /* Cards */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 24px;
+    margin-bottom: 16px;
+    transition: all 0.3s;
+  }
+
+  .card:hover {
+    border-color: var(--gold-dim);
+    box-shadow: 0 0 15px rgba(249,115,22,0.05);
+  }
+
+  .card h3 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.95rem;
+    color: var(--gold);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 12px;
+  }
+
+  .card p {
+    color: var(--text-dim);
+    font-size: 0.85rem;
+    line-height: 1.6;
+  }
+
+  /* Buttons */
+  .btn {
+    display: inline-block;
+    padding: 10px 22px;
+    background: linear-gradient(135deg, var(--orange), var(--orange-dark));
+    border: none;
+    border-radius: 4px;
+    color: #000;
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 700;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-decoration: none;
+  }
+
+  .btn:hover {
+    background: linear-gradient(135deg, var(--gold), var(--orange));
+    box-shadow: 0 0 20px rgba(249,115,22,0.3);
+    transform: translateY(-1px);
+  }
+
+  .btn-outline {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+  }
+
+  .btn-outline:hover {
+    border-color: var(--gold);
+    color: var(--gold);
+    background: rgba(251,191,36,0.05);
+    box-shadow: var(--glow-gold);
+  }
+
+  /* Code blocks */
+  .code-block {
+    background: #050505;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 14px 18px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.82rem;
+    color: var(--gold);
+    overflow-x: auto;
+    white-space: pre-wrap;
+    line-height: 1.6;
+    margin: 8px 0;
+  }
+
+  /* Link tags */
+  .link-tag {
+    display: inline-block;
+    padding: 6px 14px;
+    background: rgba(249,115,22,0.08);
+    border: 1px solid rgba(249,115,22,0.2);
+    border-radius: 20px;
+    color: var(--orange);
+    font-size: 0.78rem;
+    text-decoration: none;
+    transition: all 0.3s;
+    letter-spacing: 0.5px;
+    margin: 4px 4px 4px 0;
+  }
+
+  .link-tag:hover {
+    background: rgba(249,115,22,0.2);
+    border-color: var(--orange);
+    box-shadow: var(--glow-orange);
+  }
+
+  /* Grid */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+
+  @media (max-width: 900px) {
+    .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+    h1 { font-size: 2.2rem; letter-spacing: 6px; }
+    nav a { padding: 8px 12px; font-size: 0.7rem; }
+  }
+
+  /* Footer */
+  footer {
+    text-align: center;
+    padding: 50px 20px 30px;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    letter-spacing: 2px;
+  }
+
+  .footer-line {
+    width: 100px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
+    margin: 0 auto 16px;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--orange); }
+
+  .hidden { display: none !important; }
+
+  .arch-section { margin-bottom: 30px; }
+  .pattern-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; margin-bottom: 30px; }
+  .pattern-card { background: linear-gradient(145deg, #0d0d0d, #080808); border: 1px solid var(--border); border-radius: 6px; padding: 20px; cursor: pointer; transition: all 0.35s; position: relative; overflow: hidden; }
+  .pattern-card::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--orange), var(--gold)); transform: scaleX(0); transform-origin: left; transition: transform 0.4s; }
+  .pattern-card:hover { border-color: var(--orange); transform: translateY(-3px); box-shadow: var(--glow-orange); }
+  .pattern-card:hover::after { transform: scaleX(1); }
+  .pattern-card h4 { font-family: 'Orbitron', sans-serif; font-size: 0.9rem; color: var(--gold); margin-bottom: 8px; letter-spacing: 1px; }
+  .pattern-card p { font-size: 0.78rem; color: var(--text-dim); line-height: 1.5; }
+  .palette { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+  .palette-btn { padding: 8px 16px; background: transparent; border: 1px solid var(--border); border-radius: 4px; color: var(--text-dim); font-family: 'Share Tech Mono', monospace; font-size: 0.78rem; cursor: pointer; transition: all 0.3s; }
+  .palette-btn:hover, .palette-btn.active { border-color: var(--orange); color: var(--orange); background: rgba(249,115,22,0.08); box-shadow: var(--glow-orange); }
+  .output-area { background: #050505; border: 1px solid var(--border); border-radius: 6px; padding: 20px; font-family: 'Share Tech Mono', monospace; font-size: 0.82rem; color: var(--gold); min-height: 200px; white-space: pre-wrap; overflow-x: auto; line-height: 1.6; }
+  .action-row { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+  .template-section { background: var(--card); border: 1px solid var(--border); border-radius: 6px; padding: 20px; margin-bottom: 16px; }
+  .template-section h4 { font-family: 'Orbitron', sans-serif; font-size: 0.85rem; color: var(--orange); margin-bottom: 12px; letter-spacing: 1px; }
+  .copy-btn { float: right; padding: 4px 12px; background: rgba(249,115,22,0.1); border: 1px solid rgba(249,115,22,0.3); border-radius: 3px; color: var(--orange); font-size: 0.7rem; cursor: pointer; transition: all 0.3s; }
+  .copy-btn:hover { background: rgba(249,115,22,0.2); box-shadow: var(--glow-orange); }
+</style>
+</head>
+<body>
+<canvas id="matrix-canvas"></canvas>
+<div class="container">
+
+  <header>
+    <h1>MATRIX</h1>
+    <div class="subtitle">There is no spoon. Only infrastructure.</div>
+    <div class="glitch-line"></div>
+  </header>
+
+  <nav>
+    <a href="index.html">Mind Map</a>
+    <a href="arch.html">Architecture</a>
+    <a href="search.html">Search</a>
+    <a href="blog.html">Blog & Tech</a>
+    <a href="about.html">About</a>
+  </nav>
+
+
+<div style="margin-bottom:30px;">
+  <div class="page-title">Architecture Builder</div>
+  <div class="page-desc">Design, document, and generate infrastructure code for cloud architectures.</div>
+</div>
+
+<div class="arch-section">
+  <h3 style="font-family:'Orbitron',sans-serif;color:var(--orange);font-size:1rem;text-transform:uppercase;letter-spacing:2px;margin-bottom:16px;">Pattern Library</h3>
+  <div class="pattern-grid" id="patternGrid"></div>
+</div>
+
+<div class="arch-section">
+  <h3 style="font-family:'Orbitron',sans-serif;color:var(--orange);font-size:1rem;text-transform:uppercase;letter-spacing:2px;margin-bottom:16px;">Component Palette</h3>
+  <p style="color:var(--text-dim);font-size:0.85rem;margin-bottom:14px;">Select components to generate diagrams and Terraform code.</p>
+  <div class="palette" id="palette"></div>
+  <div class="action-row">
+    <button class="btn" onclick="generateMermaid()">Generate Mermaid</button>
+    <button class="btn btn-outline" onclick="generateTerraform()">Generate Terraform</button>
+    <button class="btn btn-outline" onclick="generateADR()">Generate ADR</button>
+    <button class="btn btn-outline" onclick="clearSelection()">Clear</button>
+  </div>
+  <div class="output-area" id="archOutput">Select components or a pattern to begin...</div>
+</div>
+
+<div class="arch-section">
+  <h3 style="font-family:'Orbitron',sans-serif;color:var(--orange);font-size:1rem;text-transform:uppercase;letter-spacing:2px;margin-bottom:16px;">C4 Model Templates</h3>
+  <div class="grid-2">
+    <div class="template-section">
+      <h4>System Context <button class="copy-btn" onclick="copyText('c4-context')">Copy</button></h4>
+      <pre class="code-block" id="c4-context" style="font-size:0.75rem;">C4Context
+  title System Context for MyApp
+  Enterprise_Boundary(b0, "Enterprise") {
+    Person(user, "User", "End user")
+    System(app, "MyApp", "The application")
+    System_Ext(payment, "Payment Gateway", "External")
+    Rel(user, app, "Uses")
+    Rel(app, payment, "Processes payments")
+  }</pre>
+    </div>
+    <div class="template-section">
+      <h4>Container Diagram <button class="copy-btn" onclick="copyText('c4-container')">Copy</button></h4>
+      <pre class="code-block" id="c4-container" style="font-size:0.75rem;">C4Container
+  title Container Diagram for MyApp
+  Person(user, "User")
+  Container_Boundary(app, "MyApp") {
+    Container(web, "Web App", "React", "Frontend")
+    Container(api, "API", "Node.js", "Backend")
+    Container(db, "Database", "PostgreSQL", "Data")
+    Rel(user, web, "Uses", "HTTPS")
+    Rel(web, api, "Calls", "JSON")
+    Rel(api, db, "Reads/Writes", "SQL")
+  }</pre>
+    </div>
+  </div>
+</div>
+
+
+  <footer>
+    <div class="footer-line"></div>
+    <div>Matrix &mdash; Built for GitHub Pages</div>
+    <div style="margin-top:6px; font-size:0.7rem; color:#333;">Wake up, Neo...</div>
+  </footer>
+
+</div>
+
+<script>
+
+// Matrix rain
+(function initMatrix() {
+  const canvas = document.getElementById('matrix-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+  resize(); window.addEventListener('resize', resize);
+  const chars = '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
+  const fontSize = 14;
+  const columns = Math.floor(canvas.width / fontSize);
+  const drops = Array(columns).fill(1);
+  function draw() {
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#f97316';
+    ctx.font = fontSize + 'px monospace';
+    for (let i = 0; i < drops.length; i++) {
+      const text = chars[Math.floor(Math.random() * chars.length)];
+      ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+      if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+      drops[i]++;
+    }
+  }
+  setInterval(draw, 50);
+})();
+
+// Active nav
+const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+document.querySelectorAll('nav a').forEach(a => {
+  if (a.getAttribute('href') === currentPage) a.classList.add('active');
+});
+
+
+const patterns = [
+  { name: "3-Tier Web App", desc: "Classic web app with presentation, application, and data tiers.",
+    mermaid: `graph TB
+  User-->LB[Load Balancer]
+  LB-->Web1[Web Server]
+  LB-->Web2[Web Server]
+  Web1-->App1[App Server]
+  Web2-->App2[App Server]
+  App1-->DB[(Primary DB)]
+  App2-->DB
+  DB-->Replica[(Read Replica)]`,
+    terraform: `resource "aws_lb" "main" { name = "app-lb" }
+resource "aws_instance" "web" { count = 2 }
+resource "aws_db_instance" "db" { engine = "postgres" }` },
+  { name: "Microservices", desc: "Decoupled services with API gateway, service mesh, and polyglot persistence.",
+    mermaid: `graph TB
+  Client-->GW[API Gateway]
+  GW-->Auth[Auth Service]
+  GW-->Order[Order Service]
+  GW-->User[User Service]
+  Order-->DB1[(Order DB)]
+  User-->DB2[(User DB)]
+  Order-->MQ[Message Queue]
+  MQ-->Notify[Notification Service]`,
+    terraform: `resource "aws_api_gateway_rest_api" "gw" {}
+resource "aws_ecs_service" "svc" {}
+resource "aws_mq_broker" "mq" {}` },
+  { name: "Serverless Event-Driven", desc: "Event-driven architecture using functions, queues, and event buses.",
+    mermaid: `graph TB
+  Client-->APIG[API Gateway]
+  APIG-->Lambda1[Upload Function]
+  Lambda1-->S3[(S3 Bucket)]
+  S3-->Event[S3 Event]
+  Event-->Lambda2[Process Function]
+  Lambda2-->Dynamo[(DynamoDB)]
+  Lambda2-->SNS[Notification Topic]`,
+    terraform: `resource "aws_api_gateway_rest_api" "api" {}
+resource "aws_lambda_function" "fn" {}
+resource "aws_dynamodb_table" "tbl" {}` },
+  { name: "Data Lake", desc: "Ingestion, storage, processing, and analytics pipeline for big data.",
+    mermaid: `graph TB
+  Sources-->Kinesis[Data Stream]
+  Kinesis-->S3[(Raw Data Lake)]
+  S3-->Glue[ETL Job]
+  Glue-->Parquet[(Processed Data)]
+  Parquet-->Athena[Query Engine]
+  Parquet-->Redshift[(Data Warehouse)]
+  Athena-->BI[BI Dashboard]`,
+    terraform: `resource "aws_kinesis_stream" "stream" {}
+resource "aws_s3_bucket" "lake" {}
+resource "aws_glue_job" "etl" {}` },
+  { name: "Kubernetes Platform", desc: "Container platform with ingress, service mesh, monitoring, and GitOps.",
+    mermaid: `graph TB
+  DNS-->CDN[CloudFront]
+  CDN-->Ingress[Ingress Controller]
+  Ingress-->Svc1[Web Service]
+  Ingress-->Svc2[API Service]
+  Svc1-->Mesh[Service Mesh]
+  Svc2-->Mesh
+  Mesh-->DB[(PostgreSQL)]
+  Mesh-->Cache[(Redis)]
+  Monitor[Prometheus/Grafana]-->Mesh`,
+    terraform: `resource "aws_eks_cluster" "k8s" {}
+resource "helm_release" "ingress" {}
+resource "helm_release" "monitoring" {}` },
+  { name: "Multi-Region Active-Active", desc: "Globally distributed application with traffic management and data replication.",
+    mermaid: `graph TB
+  User-->Route53[Route 53]
+  Route53-->Region1[US-East]
+  Route53-->Region2[EU-West]
+  Region1-->DB1[(Primary)]
+  Region2-->DB2[(Replica)]
+  DB1<-->Repl[Cross-Region Replication]
+  Repl<-->DB2`,
+    terraform: `resource "aws_route53_record" "dns" {}
+resource "aws_db_instance" "primary" {}
+resource "aws_db_instance" "replica" { replicate_source_db = ... }` }
+];
+
+const archComponents = [
+  'VM','Kubernetes','PostgreSQL','Redis','MongoDB','Elasticsearch',
+  'Load Balancer','VPC','S3 Bucket','Lambda','API Gateway',
+  'CloudFront','Route53','EKS','AKS','GKE',
+  'Docker','Helm','Prometheus','Grafana','CloudWatch',
+  'SQS','SNS','EventBridge','DynamoDB','RDS',
+  'ECR','IAM Role','Security Group','NAT Gateway','Bastion Host'
+];
+
+let selectedComponents = new Set();
+
+function renderPatterns() {
+  document.getElementById('patternGrid').innerHTML = patterns.map((p, i) => `
+    <div class="pattern-card" onclick="loadPattern(${i})">
+      <h4>${p.name}</h4>
+      <p>${p.desc}</p>
+    </div>
+  `).join('');
+}
+
+function renderPalette() {
+  document.getElementById('palette').innerHTML = archComponents.map(c => `
+    <button class="palette-btn" id="comp-${c.replace(/\s/g,'')}" onclick="toggleComponent('${c}')">${c}</button>
+  `).join('');
+}
+
+function loadPattern(idx) {
+  const p = patterns[idx];
+  document.getElementById('archOutput').innerHTML = `
+    <div style="color:var(--orange);margin-bottom:12px;font-family:'Orbitron',sans-serif;font-size:0.85rem;">PATTERN: ${p.name.toUpperCase()}</div>
+    <div style="color:var(--gold);margin-bottom:8px;font-size:0.8rem;">Mermaid Diagram:</div>
+    <pre style="margin:0 0 20px 0;white-space:pre-wrap;word-break:break-all;">${p.mermaid}</pre>
+    <div style="color:var(--gold);margin-bottom:8px;font-size:0.8rem;">Terraform Skeleton:</div>
+    <pre style="margin:0;white-space:pre-wrap;word-break:break-all;">${p.terraform}</pre>
+  `;
+}
+
+function toggleComponent(name) {
+  const id = 'comp-' + name.replace(/\s/g,'');
+  const btn = document.getElementById(id);
+  if (selectedComponents.has(name)) {
+    selectedComponents.delete(name);
+    btn.classList.remove('active');
+  } else {
+    selectedComponents.add(name);
+    btn.classList.add('active');
+  }
+}
+
+function generateMermaid() {
+  const comps = Array.from(selectedComponents);
+  if (comps.length === 0) { document.getElementById('archOutput').textContent = 'Select at least one component.'; return; }
+  let mermaid = 'graph TB\n';
+  const ids = {};
+  comps.forEach((c, i) => { ids[c] = 'N' + i; });
+  comps.forEach(c => { mermaid += `  ${ids[c]}[${c}]\n`; });
+  if (ids['Load Balancer'] && ids['VM']) mermaid += `  ${ids['Load Balancer']} --> ${ids['VM']}\n`;
+  if (ids['Load Balancer'] && ids['Kubernetes']) mermaid += `  ${ids['Load Balancer']} --> ${ids['Kubernetes']}\n`;
+  if (ids['API Gateway'] && ids['Lambda']) mermaid += `  ${ids['API Gateway']} --> ${ids['Lambda']}\n`;
+  if (ids['Kubernetes'] && ids['PostgreSQL']) mermaid += `  ${ids['Kubernetes']} --> ${ids['PostgreSQL']}\n`;
+  if (ids['Kubernetes'] && ids['Redis']) mermaid += `  ${ids['Kubernetes']} --> ${ids['Redis']}\n`;
+  if (ids['VPC'] && ids['VM']) mermaid += `  ${ids['VPC']} -.-> ${ids['VM']}\n`;
+  if (ids['VPC'] && ids['Kubernetes']) mermaid += `  ${ids['VPC']} -.-> ${ids['Kubernetes']}\n`;
+  if (ids['CloudFront'] && ids['S3 Bucket']) mermaid += `  ${ids['CloudFront']} --> ${ids['S3 Bucket']}\n`;
+  if (ids['Route53'] && ids['Load Balancer']) mermaid += `  ${ids['Route53']} --> ${ids['Load Balancer']}\n`;
+  if (ids['Route53'] && ids['API Gateway']) mermaid += `  ${ids['Route53']} --> ${ids['API Gateway']}\n`;
+  if (ids['Prometheus'] && ids['Grafana']) mermaid += `  ${ids['Prometheus']} --> ${ids['Grafana']}\n`;
+  if (ids['VM'] && ids['Docker']) mermaid += `  ${ids['VM']} --> ${ids['Docker']}\n`;
+  if (ids['EKS'] && ids['Helm']) mermaid += `  ${ids['EKS']} --> ${ids['Helm']}\n`;
+  if (ids['AKS'] && ids['Helm']) mermaid += `  ${ids['AKS']} --> ${ids['Helm']}\n`;
+  if (ids['GKE'] && ids['Helm']) mermaid += `  ${ids['GKE']} --> ${ids['Helm']}\n`;
+  if (ids['Lambda'] && ids['DynamoDB']) mermaid += `  ${ids['Lambda']} --> ${ids['DynamoDB']}\n`;
+  if (ids['Lambda'] && ids['SQS']) mermaid += `  ${ids['Lambda']} --> ${ids['SQS']}\n`;
+  if (ids['API Gateway'] && ids['Lambda']) mermaid += `  ${ids['API Gateway']} --> ${ids['Lambda']}\n`;
+  if (ids['Kubernetes'] && ids['MongoDB']) mermaid += `  ${ids['Kubernetes']} --> ${ids['MongoDB']}\n`;
+  if (ids['Kubernetes'] && ids['Elasticsearch']) mermaid += `  ${ids['Kubernetes']} --> ${ids['Elasticsearch']}\n`;
+  document.getElementById('archOutput').innerHTML = `<div style="color:var(--orange);margin-bottom:12px;font-family:'Orbitron',sans-serif;font-size:0.85rem;">MERMAID DIAGRAM</div><pre style="margin:0;white-space:pre-wrap;word-break:break-all;">${mermaid}</pre>`;
+}
+
+function generateTerraform() {
+  const comps = Array.from(selectedComponents);
+  if (comps.length === 0) { document.getElementById('archOutput').textContent = 'Select at least one component.'; return; }
+  let tf = `terraform {\n  required_providers {\n    aws = {\n      source  = \"hashicorp/aws\"\n      version = \"~> 5.0\"\n    }\n  }\n}\n\nprovider \"aws\" {\n  region = \"us-east-1\"\n}\n\n`;
+  comps.forEach(c => {
+    const safe = c.toLowerCase().replace(/\s/g, '_');
+    if (c === 'VM') tf += `resource \"aws_instance\" \"${safe}\" {\n  ami           = \"ami-0c55b159cbfafe1f0\"\n  instance_type = \"t3.micro\"\n  tags = { Name = \"${c}\" }\n}\n\n`;
+    else if (c === 'VPC') tf += `resource \"aws_vpc\" \"${safe}\" {\n  cidr_block = \"10.0.0.0/16\"\n  tags = { Name = \"${c}\" }\n}\n\n`;
+    else if (c === 'Load Balancer') tf += `resource \"aws_lb\" \"${safe}\" {\n  name               = \"${safe}\"\n  internal           = false\n  load_balancer_type = \"application\"\n  subnets            = [aws_subnet.public.id]\n}\n\n`;
+    else if (c === 'S3 Bucket') tf += `resource \"aws_s3_bucket\" \"${safe}\" {\n  bucket = \"my-app-bucket-unique\"\n}\n\n`;
+    else if (c === 'PostgreSQL' || c === 'RDS') tf += `resource \"aws_db_instance\" \"${safe}\" {\n  identifier        = \"${safe}\"\n  engine            = \"postgres\"\n  instance_class    = \"db.t3.micro\"\n  allocated_storage = 20\n  username          = \"admin\"\n  password          = var.db_password\n}\n\n`;
+    else if (c === 'Redis') tf += `resource \"aws_elasticache_cluster\" \"${safe}\" {\n  cluster_id      = \"${safe}\"\n  engine          = \"redis\"\n  node_type       = \"cache.t3.micro\"\n  num_cache_nodes = 1\n}\n\n`;
+    else if (c === 'Lambda') tf += `resource \"aws_lambda_function\" \"${safe}\" {\n  function_name = \"${safe}\"\n  handler       = \"index.handler\"\n  runtime       = \"nodejs20.x\"\n  role          = aws_iam_role.lambda.arn\n  filename      = \"function.zip\"\n}\n\n`;
+    else if (c === 'API Gateway') tf += `resource \"aws_api_gateway_rest_api\" \"${safe}\" {\n  name = \"${safe}\"\n}\n\n`;
+    else if (c.includes('Kubernetes') || c === 'EKS' || c === 'AKS' || c === 'GKE') tf += `resource \"aws_eks_cluster\" \"${safe}\" {\n  name     = \"${safe}\"\n  role_arn = aws_iam_role.eks.arn\n  vpc_config {\n    subnet_ids = [aws_subnet.private.id]\n  }\n}\n\n`;
+    else if (c === 'DynamoDB') tf += `resource \"aws_dynamodb_table\" \"${safe}\" {\n  name         = \"${safe}\"\n  billing_mode = \"PAY_PER_REQUEST\"\n  hash_key     = \"id\"\n  attribute {\n    name = \"id\"\n    type = \"S\"\n  }\n}\n\n`;
+    else if (c === 'SQS') tf += `resource \"aws_sqs_queue\" \"${safe}\" {\n  name = \"${safe}\"\n}\n\n`;
+    else if (c === 'SNS') tf += `resource \"aws_sns_topic\" \"${safe}\" {\n  name = \"${safe}\"\n}\n\n`;
+    else if (c === 'Security Group') tf += `resource \"aws_security_group\" \"${safe}\" {\n  name_prefix = \"${safe}\"\n  vpc_id      = aws_vpc.main.id\n  ingress {\n    from_port   = 443\n    to_port     = 443\n    protocol    = \"tcp\"\n    cidr_blocks = [\"0.0.0.0/0\"]\n  }\n}\n\n`;
+    else if (c === 'IAM Role') tf += `resource \"aws_iam_role\" \"${safe}\" {\n  name = \"${safe}\"\n  assume_role_policy = jsonencode({\n    Version = \"2012-10-17\"\n    Statement = [{\n      Action = \"sts:AssumeRole\"\n      Effect = \"Allow\"\n      Principal = { Service = \"lambda.amazonaws.com\" }\n    }]\n  })\n}\n\n`;
+    else if (c === 'NAT Gateway') tf += `resource \"aws_nat_gateway\" \"${safe}\" {\n  allocation_id = aws_eip.nat.id\n  subnet_id     = aws_subnet.public.id\n}\n\n`;
+    else if (c === 'Bastion Host') tf += `resource \"aws_instance\" \"${safe}\" {\n  ami           = \"ami-0c55b159cbfafe1f0\"\n  instance_type = \"t3.micro\"\n  subnet_id     = aws_subnet.public.id\n  key_name      = aws_key_pair.bastion.key_name\n  tags = { Name = \"bastion\" }\n}\n\n`;
+    else tf += `resource \"aws_resource\" \"${safe}\" {\n  # TODO: Configure ${c} resource\n  tags = { Name = \"${c}\" }\n}\n\n`;
+  });
+  document.getElementById('archOutput').innerHTML = `<div style="color:var(--orange);margin-bottom:12px;font-family:'Orbitron',sans-serif;font-size:0.85rem;">TERRAFORM SKELETON</div><pre style="margin:0;white-space:pre-wrap;word-break:break-all;">${tf}</pre>`;
+}
+
+function generateADR() {
+  const comps = Array.from(selectedComponents);
+  const tech = comps.length > 0 ? comps.join(', ') : 'selected technologies';
+  const adr = `# ADR-001: Architecture with ${tech}\n\n## Status\nAccepted\n\n## Context\nWe need to design a cloud architecture that meets scalability, reliability, and cost-efficiency requirements.\n\n## Decision\nWe will use the following components:\n${comps.map(c => '- ' + c).join('\n') || '- TBD'}\n\n## Consequences\n**Positive:**\n- Scalable and maintainable infrastructure\n- Industry-standard tooling\n- Strong community support\n\n**Negative:**\n- Operational complexity\n- Learning curve for the team\n- Potential vendor lock-in\n\n## Alternatives Considered\n- Monolithic architecture\n- Different cloud provider\n- Managed PaaS solutions\n\n## Date\n${new Date().toISOString().split('T')[0]}`;
+  document.getElementById('archOutput').innerHTML = `<div style="color:var(--orange);margin-bottom:12px;font-family:'Orbitron',sans-serif;font-size:0.85rem;">ARCHITECTURE DECISION RECORD</div><pre style="margin:0;white-space:pre-wrap;word-break:break-all;">${adr}</pre>`;
+}
+
+function clearSelection() {
+  selectedComponents.clear();
+  document.querySelectorAll('.palette-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('archOutput').textContent = 'Select components or a pattern to begin...';
+}
+
+function copyText(id) {
+  const text = document.getElementById(id).textContent;
+  navigator.clipboard.writeText(text).then(() => alert('Copied to clipboard!'));
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  renderPatterns();
+  renderPalette();
+});
+</script>
+</body>
+</html>

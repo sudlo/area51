@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Matrix | Mind Map</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Share+Tech+Mono&display=swap');
+
+  :root {
+    --bg: #000000;
+    --card: #0a0a0a;
+    --card-hover: #111111;
+    --border: #1a1a1a;
+    --border-hover: #f97316;
+    --orange: #f97316;
+    --orange-dark: #ea580c;
+    --gold: #fbbf24;
+    --gold-dim: #b45309;
+    --text: #e5e5e5;
+    --text-dim: #737373;
+    --text-muted: #404040;
+    --glow-orange: 0 0 20px rgba(249,115,22,0.15);
+    --glow-gold: 0 0 30px rgba(251,191,36,0.1);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Share Tech Mono', monospace;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  #matrix-canvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.25;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 20px 40px;
+  }
+
+  /* Header */
+  header {
+    text-align: center;
+    padding: 40px 20px 30px;
+    position: relative;
+  }
+
+  header::before {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 600px; height: 200px;
+    background: radial-gradient(ellipse, rgba(249,115,22,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  h1 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 3.5rem;
+    font-weight: 900;
+    color: var(--orange);
+    text-transform: uppercase;
+    letter-spacing: 12px;
+    text-shadow: 0 0 40px rgba(249,115,22,0.4), 0 0 80px rgba(249,115,22,0.1);
+    position: relative;
+    animation: flicker 4s infinite alternate;
+  }
+
+  @keyframes flicker {
+    0%, 100% { opacity: 1; text-shadow: 0 0 40px rgba(249,115,22,0.4), 0 0 80px rgba(249,115,22,0.1); }
+    50% { opacity: 0.92; text-shadow: 0 0 30px rgba(249,115,22,0.3), 0 0 60px rgba(249,115,22,0.05); }
+  }
+
+  .subtitle {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 1rem;
+    color: var(--gold);
+    margin-top: 10px;
+    letter-spacing: 3px;
+    opacity: 0.8;
+  }
+
+  .glitch-line {
+    width: 200px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--orange), var(--gold), transparent);
+    margin: 20px auto;
+    opacity: 0.5;
+  }
+
+  /* Navigation */
+  nav {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 30px;
+    padding: 0 20px;
+  }
+
+  nav a {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-dim);
+    text-decoration: none;
+    padding: 10px 18px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    transition: all 0.3s;
+    background: var(--card);
+  }
+
+  nav a:hover, nav a.active {
+    border-color: var(--orange);
+    color: var(--orange);
+    box-shadow: var(--glow-orange);
+    background: rgba(249,115,22,0.05);
+  }
+
+  /* Page title */
+  .page-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.6rem;
+    color: var(--orange);
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    margin-bottom: 8px;
+  }
+
+  .page-desc {
+    color: var(--text-dim);
+    font-size: 0.9rem;
+    margin-bottom: 30px;
+    letter-spacing: 0.5px;
+  }
+
+  /* Cards */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 24px;
+    margin-bottom: 16px;
+    transition: all 0.3s;
+  }
+
+  .card:hover {
+    border-color: var(--gold-dim);
+    box-shadow: 0 0 15px rgba(249,115,22,0.05);
+  }
+
+  .card h3 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.95rem;
+    color: var(--gold);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 12px;
+  }
+
+  .card p {
+    color: var(--text-dim);
+    font-size: 0.85rem;
+    line-height: 1.6;
+  }
+
+  /* Buttons */
+  .btn {
+    display: inline-block;
+    padding: 10px 22px;
+    background: linear-gradient(135deg, var(--orange), var(--orange-dark));
+    border: none;
+    border-radius: 4px;
+    color: #000;
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 700;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-decoration: none;
+  }
+
+  .btn:hover {
+    background: linear-gradient(135deg, var(--gold), var(--orange));
+    box-shadow: 0 0 20px rgba(249,115,22,0.3);
+    transform: translateY(-1px);
+  }
+
+  .btn-outline {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+  }
+
+  .btn-outline:hover {
+    border-color: var(--gold);
+    color: var(--gold);
+    background: rgba(251,191,36,0.05);
+    box-shadow: var(--glow-gold);
+  }
+
+  /* Code blocks */
+  .code-block {
+    background: #050505;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 14px 18px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.82rem;
+    color: var(--gold);
+    overflow-x: auto;
+    white-space: pre-wrap;
+    line-height: 1.6;
+    margin: 8px 0;
+  }
+
+  /* Link tags */
+  .link-tag {
+    display: inline-block;
+    padding: 6px 14px;
+    background: rgba(249,115,22,0.08);
+    border: 1px solid rgba(249,115,22,0.2);
+    border-radius: 20px;
+    color: var(--orange);
+    font-size: 0.78rem;
+    text-decoration: none;
+    transition: all 0.3s;
+    letter-spacing: 0.5px;
+    margin: 4px 4px 4px 0;
+  }
+
+  .link-tag:hover {
+    background: rgba(249,115,22,0.2);
+    border-color: var(--orange);
+    box-shadow: var(--glow-orange);
+  }
+
+  /* Grid */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+
+  @media (max-width: 900px) {
+    .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+    h1 { font-size: 2.2rem; letter-spacing: 6px; }
+    nav a { padding: 8px 12px; font-size: 0.7rem; }
+  }
+
+  /* Footer */
+  footer {
+    text-align: center;
+    padding: 50px 20px 30px;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    letter-spacing: 2px;
+  }
+
+  .footer-line {
+    width: 100px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
+    margin: 0 auto 16px;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--orange); }
+
+  .hidden { display: none !important; }
+
+  /* Mind Map Categories */
+  .category {
+    margin-bottom: 14px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+    background: var(--card);
+    transition: border-color 0.4s, box-shadow 0.4s;
+  }
+
+  .category:hover { border-color: var(--gold-dim); }
+
+  .category-header {
+    padding: 20px 26px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .category-header::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: linear-gradient(180deg, var(--orange), var(--gold));
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .category-header:hover::before { opacity: 1; }
+  .category-header:hover { background: var(--card-hover); }
+
+  .category-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .category-count {
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    background: rgba(249,115,22,0.1);
+    padding: 4px 12px;
+    border-radius: 20px;
+    border: 1px solid rgba(249,115,22,0.2);
+  }
+
+  .category-toggle {
+    font-size: 1.2rem;
+    color: var(--orange);
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    margin-left: 16px;
+  }
+
+  .category.expanded .category-toggle { transform: rotate(90deg); }
+
+  .category-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.6s cubic-bezier(0.4, 0, 0.2, 1), padding 0.4s;
+    padding: 0 24px;
+  }
+
+  .category.expanded .category-body {
+    max-height: 3000px;
+    padding: 0 24px 24px;
+  }
+
+  .nodes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 14px;
+    padding-top: 4px;
+  }
+
+  .node-card {
+    background: linear-gradient(145deg, #0d0d0d, #080808);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 18px 16px;
+    cursor: pointer;
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .node-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--orange), var(--gold));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s;
+  }
+
+  .node-card:hover {
+    border-color: var(--orange);
+    transform: translateY(-3px);
+    box-shadow: var(--glow-orange), 0 10px 40px rgba(0,0,0,0.5);
+  }
+
+  .node-card:hover::after { transform: scaleX(1); }
+
+  .node-name {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: 1px;
+    margin-bottom: 5px;
+  }
+
+  .node-desc {
+    font-size: 0.74rem;
+    color: var(--text-dim);
+    line-height: 1.4;
+  }
+
+  /* Modal */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.92);
+    backdrop-filter: blur(8px);
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .modal-overlay.active {
+    display: flex;
+    opacity: 1;
+  }
+
+  .modal {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    width: 100%;
+    max-width: 850px;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 0 60px rgba(249,115,22,0.1), 0 25px 50px rgba(0,0,0,0.8);
+    transform: scale(0.95) translateY(20px);
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .modal-overlay.active .modal {
+    transform: scale(1) translateY(0);
+  }
+
+  .modal-header {
+    padding: 26px 30px 20px;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+  }
+
+  .modal-header::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--orange), var(--gold), var(--orange));
+  }
+
+  .modal-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--orange);
+    letter-spacing: 2px;
+  }
+
+  .modal-subtitle {
+    color: var(--text-dim);
+    font-size: 0.82rem;
+    margin-top: 5px;
+    letter-spacing: 1px;
+  }
+
+  .modal-close {
+    position: absolute;
+    top: 22px; right: 22px;
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    width: 36px; height: 36px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal-close:hover {
+    border-color: var(--orange);
+    color: var(--orange);
+    box-shadow: var(--glow-orange);
+  }
+
+  .modal-body { padding: 26px 30px; }
+
+  .section-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--gold);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin: 22px 0 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .section-title:first-child { margin-top: 0; }
+  .section-title::before {
+    content: '';
+    width: 20px;
+    height: 1px;
+    background: var(--gold);
+  }
+
+  .section-content {
+    color: var(--text-dim);
+    font-size: 0.86rem;
+    line-height: 1.7;
+    padding-left: 30px;
+  }
+
+  .section-content p { margin-bottom: 10px; color: var(--text); }
+
+  .issue-item {
+    padding: 10px 14px;
+    background: rgba(249,115,22,0.04);
+    border-left: 2px solid var(--orange);
+    margin-bottom: 8px;
+    border-radius: 0 4px 4px 0;
+    font-size: 0.84rem;
+    color: var(--text);
+  }
+
+  .cmd-block {
+    background: #050505;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 12px 16px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--gold);
+    overflow-x: auto;
+    margin-bottom: 8px;
+    position: relative;
+  }
+
+  .usecase-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 10px;
+    padding-left: 30px;
+  }
+
+  .usecase-item {
+    background: rgba(251,191,36,0.05);
+    border: 1px solid rgba(251,191,36,0.15);
+    border-radius: 4px;
+    padding: 12px 14px;
+    font-size: 0.8rem;
+    color: var(--text);
+    transition: all 0.3s;
+  }
+
+  .usecase-item:hover {
+    border-color: var(--gold);
+    background: rgba(251,191,36,0.08);
+  }
+
+  .link-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding-left: 30px;
+  }
+
+  .search-box {
+    display: flex;
+    gap: 0;
+    max-width: 600px;
+    margin: 0 auto 40px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+    background: var(--card);
+  }
+
+  .search-box input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    padding: 14px 18px;
+    color: var(--text);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.9rem;
+    outline: none;
+  }
+
+  .search-box input::placeholder { color: var(--text-muted); }
+  .search-box input:focus { border-color: var(--orange); }
+
+  .search-box button {
+    padding: 0 24px;
+    background: linear-gradient(135deg, var(--orange), var(--orange-dark));
+    border: none;
+    color: #000;
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 700;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .search-box button:hover {
+    background: linear-gradient(135deg, var(--gold), var(--orange));
+    box-shadow: 0 0 20px rgba(249,115,22,0.3);
+  }
+</style>
+</head>
+<body>
+<canvas id="matrix-canvas"></canvas>
+<div class="container">
+
+  <header>
+    <h1>MATRIX</h1>
+    <div class="subtitle">There is no spoon. Only infrastructure.</div>
+    <div class="glitch-line"></div>
+  </header>
+
+
+  <nav>
+    <a href="index.html">Mind Map</a>
+    <a href="arch.html">Architecture</a>
+    <a href="search.html">Search</a>
+    <a href="blog.html">Blog & Tech</a>
+    <a href="about.html">About</a>
+  </nav>
+
+
+<div class="search-box">
+  <input type="text" id="globalSearch" placeholder="Search the construct..." autocomplete="off" onkeydown="if(event.key==='Enter')performSearch()">
+  <button onclick="performSearch()">Search</button>
+</div>
+
+<div id="categories"></div>
+
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitle">Title</div>
+      <div class="modal-subtitle" id="modalSubtitle">Category</div>
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+
+  <footer>
+    <div class="footer-line"></div>
+    <div>Matrix &mdash; Built for GitHub Pages</div>
+    <div style="margin-top:6px; font-size:0.7rem; color:#333;">Wake up, Neo...</div>
+  </footer>
+
+
+<script>
+
+// Matrix rain
+(function initMatrix() {
+  const canvas = document.getElementById('matrix-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+  resize(); window.addEventListener('resize', resize);
+  const chars = '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
+  const fontSize = 14;
+  const columns = Math.floor(canvas.width / fontSize);
+  const drops = Array(columns).fill(1);
+  function draw() {
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#f97316';
+    ctx.font = fontSize + 'px monospace';
+    for (let i = 0; i < drops.length; i++) {
+      const text = chars[Math.floor(Math.random() * chars.length)];
+      ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+      if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+      drops[i]++;
+    }
+  }
+  setInterval(draw, 50);
+})();
+
+// Active nav
+const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+document.querySelectorAll('nav a').forEach(a => {
+  if (a.getAttribute('href') === currentPage) a.classList.add('active');
+});
+
+
+// ===================== DATA =====================
+const categories = [
+
+  {
+    name: "Cloud Fundamentals",
+    nodes: [
+      { name: "IaaS", desc: "Infrastructure as a Service", overview: "IaaS provides virtualized computing resources over the internet. Users manage OS, middleware, runtime, data, and applications while the provider manages virtualization, servers, storage, and networking.", issues: ["Vendor lock-in with proprietary APIs", "Unexpected egress costs", "Complex capacity planning", "Shared responsibility model confusion", "Compliance in multi-tenant environments"], commands: ["aws ec2 describe-instances", "az vm list", "gcloud compute instances list", "terraform plan", "pulumi preview"], usecases: ["Lift-and-shift migrations", "Disaster recovery sites", "High-performance computing", "Dev/test environments", "Seasonal workload scaling"], links: ["AWS EC2","Azure VMs","GCP Compute","Terraform Docs","Pulumi Docs"] },
+      { name: "PaaS", desc: "Platform as a Service", overview: "PaaS abstracts infrastructure management, allowing developers to focus on code. The platform handles runtime, middleware, OS, and infrastructure scaling automatically.", issues: ["Limited control over underlying infrastructure", "Framework version constraints", "Cold start latency", "Vendor-specific deployment formats", "Debugging distributed apps"], commands: ["az webapp deploy", "gcloud app deploy", "heroku create", "flyctl launch", "railway up"], usecases: ["Rapid prototyping", "Microservices deployment", "API backends", "Event-driven processing", "Mobile backends"], links: ["Azure App Service","Google App Engine","Heroku","Fly.io","Railway"] },
+      { name: "SaaS", desc: "Software as a Service", overview: "SaaS delivers fully managed applications over the internet. Users access software via browsers or APIs without managing any underlying infrastructure.", issues: ["Data sovereignty concerns", "Limited customization", "Integration complexity", "Subscription cost creep", "Downtime dependency on vendor"], commands: ["curl -H 'Authorization: Bearer TOKEN'", "salesforce CLI", "hubspot API", "stripe CLI", "twilio CLI"], usecases: ["CRM and ERP systems", "Email and collaboration", "Analytics dashboards", "Payment processing", "Communication APIs"], links: ["Salesforce","HubSpot","Stripe","Twilio","Zendesk"] },
+      { name: "CAF", desc: "Cloud Adoption Framework", overview: "CAF provides structured guidance for organizations migrating to cloud. It covers strategy, plan, ready, adopt, govern, and manage phases.", issues: ["Organizational resistance to change", "Skills gap in cloud technologies", "Legacy system dependencies", "Budget overrun during migration", "Security posture gaps"], commands: ["az deployment sub create", "aws cloudformation deploy", "terraform apply", "pulumi up", "cdk deploy"], usecases: ["Enterprise cloud migration", "Datacenter exit strategy", "Hybrid cloud planning", "Cost optimization programs", "Governance framework setup"], links: ["Microsoft CAF","AWS CAF","Google Adoption","Terraform Modules","CloudFormation"] },
+      { name: "WAF", desc: "Well-Architected Framework", overview: "WAF provides best practices across operational excellence, security, reliability, performance efficiency, cost optimization, and sustainability pillars.", issues: ["Balancing cost vs reliability", "Implementing all pillars simultaneously", "Measuring sustainability metrics", "Keeping documentation current", "Cross-team alignment on standards"], commands: ["aws wellarchitected", "az advisor", "gcloud recommender", "terraform validate", "checkov -d ."], usecases: ["Architecture reviews", "Production readiness checks", "Security audits", "Cost optimization reviews", "Disaster recovery planning"], links: ["AWS WAF","Azure WAF","Google WAF","Checkov","Bridgecrew"] }
+    ]
+  },
+  {
+    name: "Cloud Providers",
+    nodes: [
+      { name: "AWS", desc: "Amazon Web Services", overview: "AWS is the largest cloud provider offering 200+ services across compute, storage, databases, ML, IoT, and more across 30+ regions globally.", issues: ["Complex pricing models", "Service sprawl and choice paralysis", "IAM policy complexity", "Region-specific service availability", "Egress cost surprises"], commands: ["aws configure", "aws s3 ls", "aws ec2 describe-instances", "aws cloudformation deploy", "aws eks update-kubeconfig"], usecases: ["Enterprise workloads", "Serverless applications", "Machine learning pipelines", "Big data analytics", "IoT platforms"], links: ["AWS Docs","AWS CLI","CloudFormation","EKS","Lambda"] },
+      { name: "Azure", desc: "Microsoft Azure", overview: "Azure provides 200+ cloud services with deep integration into Microsoft ecosystems. Strong in hybrid cloud, enterprise identity, and compliance.", issues: ["ARM template verbosity", "Service naming inconsistencies", "Hybrid connectivity complexity", "Licensing confusion", "Portal performance"], commands: ["az login", "az group create", "az vm create", "az aks get-credentials", "az deployment group create"], usecases: ["Microsoft 365 integration", "Hybrid Active Directory", ".NET application hosting", "Enterprise SAP workloads", "Windows Virtual Desktop"], links: ["Azure Docs","Azure CLI","ARM Templates","AKS","Azure DevOps"] },
+      { name: "GCP", desc: "Google Cloud Platform", overview: "GCP excels in data analytics, ML/AI, Kubernetes, and open-source technologies. Offers competitive pricing and strong networking capabilities.", issues: ["Smaller market share than AWS/Azure", "Fewer enterprise features", "Limited region coverage", "Documentation gaps", "Support tier confusion"], commands: ["gcloud auth login", "gcloud config set project", "gcloud compute instances list", "gcloud container clusters get-credentials", "gsutil ls"], usecases: ["BigQuery analytics", "TensorFlow ML workloads", "Kubernetes-native apps", "Data pipelines", "AI/ML model training"], links: ["GCP Docs","Cloud SDK","Cloud Build","GKE","BigQuery"] },
+      { name: "Multi-Cloud", desc: "Multi-Cloud Strategy", overview: "Multi-cloud uses services from multiple providers to avoid vendor lock-in, optimize costs, and leverage best-of-breed services.", issues: ["Cross-cloud networking complexity", "Inconsistent IAM models", "Data transfer costs between clouds", "Operational overhead", "Tooling fragmentation"], commands: ["terraform plan", "pulumi preview", "crossplane", "rancher", "anthos"], usecases: ["Vendor risk mitigation", "Best-service selection", "Regulatory compliance", "Disaster recovery across clouds", "Cost arbitrage"], links: ["Terraform","Pulumi","Crossplane","Rancher","Anthos"] },
+      { name: "Hybrid Cloud", desc: "Hybrid Cloud Architecture", overview: "Hybrid cloud combines on-premises infrastructure with public cloud, enabling data sovereignty, legacy support, and burst capacity.", issues: ["Network latency between on-prem and cloud", "Consistent security policies", "Data synchronization", "Management tooling sprawl", "Skill requirements"], commands: ["az network vpn-gateway", "aws directconnect", "gcloud interconnect", "terraform apply", "ansible-playbook"], usecases: ["Regulated data on-prem", "Cloud bursting", "Legacy system integration", "Edge computing", "Gradual cloud migration"], links: ["Azure Arc","AWS Outposts","Google Anthos","VMware Cloud","OpenShift"] }
+    ]
+  },
+  {
+    name: "Databases & Storage",
+    nodes: [
+      { name: "MySQL", desc: "Open-source RDBMS", overview: "MySQL is the world's most popular open-source relational database. Powers WordPress, Drupal, and countless web applications.", issues: ["Replication lag in read replicas", "InnoDB lock contention", "Query optimization complexity", "Backup consistency", "Connection pool exhaustion"], commands: ["mysql -u root -p", "mysqldump -u root -p db > backup.sql", "SHOW PROCESSLIST;", "EXPLAIN SELECT *;", "mysqlslap --auto-generate-sql"], usecases: ["Web application backends", "CMS databases", "E-commerce catalogs", "Logging systems", "Session storage"], links: ["MySQL Docs","MySQL Workbench","Percona","ProxySQL","MySQL Shell"] },
+      { name: "PostgreSQL", desc: "Advanced open-source RDBMS", overview: "PostgreSQL is an advanced object-relational database with strong ACID compliance, extensibility, and JSON support.", issues: ["VACUUM bloat management", "Connection limit scaling", "Write amplification in WAL", "Complex query planning", "Extension compatibility"], commands: ["psql -U postgres", "pg_dump db > backup.sql", "EXPLAIN ANALYZE;", "VACUUM FULL;", "pgbench -i -s 10"], usecases: ["Geospatial applications (PostGIS)", "Financial systems", "JSON document storage", "Time-series data (TimescaleDB)", "Full-text search"], links: ["PostgreSQL Docs","pgAdmin","TimescaleDB","Citus","Patroni"] },
+      { name: "Redis", desc: "In-memory data store", overview: "Redis is an in-memory key-value store used for caching, session management, real-time analytics, and message brokering.", issues: ["Memory fragmentation", "Persistence trade-offs (RDB vs AOF)", "Cluster resharding complexity", "Hot key contention", "Eviction policy tuning"], commands: ["redis-cli", "INFO memory", "MONITOR", "redis-benchmark", "redis-cli --cluster create"], usecases: ["Session caching", "Real-time leaderboards", "Rate limiting", "Pub/sub messaging", "Geospatial indexing"], links: ["Redis Docs","Redis Insight","KeyDB","Dragonfly","Valkey"] },
+      { name: "MongoDB", desc: "Document NoSQL database", overview: "MongoDB stores data in flexible JSON-like documents. Scales horizontally via sharding and supports complex aggregations.", issues: ["Shard key selection impact", "Index bloat", "Replication lag", "Schema design for scale", "Aggregation pipeline performance"], commands: ["mongosh", "mongodump", "db.collection.find().explain()", "mongostat", "mongotop"], usecases: ["Content management", "Catalogs and inventories", "Mobile backends", "IoT data storage", "Real-time analytics"], links: ["MongoDB Docs","MongoDB Compass","Atlas","Studio 3T","Percona Server"] },
+      { name: "Elasticsearch", desc: "Search and analytics engine", overview: "Elasticsearch is a distributed search and analytics engine built on Apache Lucene. Powers logging, monitoring, and full-text search.", issues: ["Shard allocation balancing", "Heap memory pressure", "Mapping explosion", "Query performance at scale", "Snapshot repository management"], commands: ["curl localhost:9200/_cluster/health", "curl -X POST 'localhost:9200/_search'", "elasticsearch-certutil", "bin/elasticsearch-setup-passwords", "curator"], usecases: ["Log aggregation (ELK stack)", "Application search", "Security analytics (SIEM)", "Metrics monitoring", "E-commerce search"], links: ["Elasticsearch Docs","Kibana","Logstash","OpenSearch","Beats"] },
+      { name: "Object Storage", desc: "S3, Blob, GCS", overview: "Object storage provides scalable, durable storage for unstructured data like images, videos, backups, and logs via HTTP APIs.", issues: ["Consistency models (eventual vs strong)", "Large object multipart uploads", "Access control complexity", "Lifecycle policy management", "Cross-region replication costs"], commands: ["aws s3 cp file s3://bucket/", "az storage blob upload", "gsutil cp file gs://bucket/", "rclone sync", "s3cmd ls"], usecases: ["Static website hosting", "Backup and archive", "Media storage", "Data lake foundations", "Log retention"], links: ["AWS S3","Azure Blob","Google Cloud Storage","MinIO","Wasabi"] }
+    ]
+  },
+  {
+    name: "Containers & Orchestration",
+    nodes: [
+      { name: "Docker", desc: "Container platform", overview: "Docker packages applications into portable containers with their dependencies, ensuring consistency across dev, staging, and production.", issues: ["Image bloat and layer caching", "Multi-architecture builds", "Secret management in images", "Container security scanning", "Registry performance"], commands: ["docker build -t app .", "docker run -p 8080:80 app", "docker-compose up -d", "docker scan app", "docker system prune"], usecases: ["Microservices packaging", "CI/CD pipelines", "Local development environments", "Legacy app modernization", "Batch processing"], links: ["Docker Docs","Docker Hub","Docker Compose","BuildKit","Podman"] },
+      { name: "Kubernetes", desc: "Container orchestration", overview: "Kubernetes automates deployment, scaling, and management of containerized applications across clusters of nodes.", issues: ["Complex networking (CNI)", "Storage provisioning (CSI)", "RBAC policy sprawl", "Resource quota management", "Upgrade coordination"], commands: ["kubectl get nodes", "kubectl apply -f deployment.yaml", "kubectl logs pod-name", "kubectl top nodes", "helm install chart"], usecases: ["Microservices orchestration", "Auto-scaling workloads", "Blue-green deployments", "Multi-cloud portability", "Stateful application management"], links: ["K8s Docs","kubectl","Helm","k9s","k3s"] },
+      { name: "Helm", desc: "K8s package manager", overview: "Helm is the package manager for Kubernetes, using charts to define, install, and upgrade complex K8s applications.", issues: ["Chart version management", "Values file complexity", "Hook execution ordering", "Subchart dependencies", "Tiller security (v2 legacy)"], commands: ["helm repo add stable", "helm install myapp chart/", "helm upgrade myapp chart/", "helm rollback myapp 1", "helm template chart/"], usecases: ["Application templating", "Environment-specific configs", "Chart repositories", "Release management", "CI/CD integration"], links: ["Helm Docs","Artifact Hub","Helmfile","ChartMuseum","Helm Diff"] },
+      { name: "Service Mesh", desc: "Istio, Linkerd, Consul", overview: "Service mesh adds observability, security, and traffic management to microservices without modifying application code.", issues: ["Control plane complexity", "Sidecar resource overhead", "mTLS certificate rotation", "Latency injection", "Debugging mesh traffic"], commands: ["istioctl install", "linkerd check", "consul connect", "kubectl get vs -A", "istioctl proxy-config"], usecases: ["Zero-trust microservices", "Canary deployments", "Circuit breaking", "Traffic mirroring", "Observability without code changes"], links: ["Istio","Linkerd","Consul Connect","Cilium Service Mesh","Traefik Mesh"] },
+      { name: "Serverless Containers", desc: "Fargate, Cloud Run", overview: "Serverless containers run containerized workloads without managing servers, scaling to zero and charging per request.", issues: ["Cold start latency", "Vendor lock-in", "Limited execution time", "Local debugging difficulty", "State management"], commands: ["aws ecs run-task", "gcloud run deploy", "az containerapp up", "knative service create", "fargatecli"], usecases: ["Event-driven processing", "API backends", "Batch jobs", "Webhooks", "Microservices without cluster management"], links: ["AWS Fargate","Cloud Run","Azure Container Apps","Knative","OpenFaaS"] }
+    ]
+  },
+  {
+    name: "DevOps & Automation",
+    nodes: [
+      { name: "Ansible", desc: "Configuration management", overview: "Ansible automates configuration management, application deployment, and orchestration using YAML playbooks and agentless SSH.", issues: ["Idempotency enforcement", "Variable precedence complexity", "Performance at large scale", "Secret management in playbooks", "Module maintenance"], commands: ["ansible-playbook site.yml", "ansible all -m ping", "ansible-vault encrypt file.yml", "ansible-galaxy install role", "ansible-lint"], usecases: ["Server provisioning", "Application deployment", "Security hardening", "Patch management", "Network automation"], links: ["Ansible Docs","Ansible Galaxy","AWX","Ansible Vault","Molecule"] },
+      { name: "Terraform", desc: "Infrastructure as Code", overview: "Terraform provisions and manages infrastructure across 100+ providers using declarative HCL configuration files.", issues: ["State file management and locking", "Drift detection", "Module versioning", "Secret exposure in state", "Plan approval workflows"], commands: ["terraform init", "terraform plan", "terraform apply", "terraform state list", "terraform import aws_instance.myid i-123"], usecases: ["Multi-cloud provisioning", "Immutable infrastructure", "Disaster recovery", "Environment replication", "Compliance as code"], links: ["Terraform Docs","Terraform Registry","OpenTofu","Terragrunt","Atlantis"] },
+      { name: "Azure DevOps", desc: "Microsoft DevOps platform", overview: "Azure DevOps provides repos, pipelines, boards, artifacts, and test plans for end-to-end software delivery.", issues: ["YAML pipeline debugging", "Self-hosted agent maintenance", "Service connection security", "Artifact retention policies", "Cross-org project visibility"], commands: ["az pipelines create", "az repos list", "az boards work-item create", "az artifacts universal publish", "az devops configure"], usecases: ["Enterprise CI/CD", "Agile project management", "Artifact management", "Test automation", "Release orchestration"], links: ["Azure Pipelines","Azure Repos","Azure Boards","Azure Artifacts","Azure Test Plans"] },
+      { name: "GitHub Actions", desc: "GitHub CI/CD", overview: "GitHub Actions automates software workflows directly in GitHub repositories using YAML workflows triggered by Git events.", issues: ["Workflow YAML complexity", "Secret rotation", "Runner cost management", "Reusable workflow design", "Action supply chain security"], commands: ["gh workflow run ci.yml", "gh secret set KEY", "act -j build", "gh run watch", "gh release create v1.0.0"], usecases: ["Open-source CI/CD", "Automated releases", "Issue/PR automation", "Security scanning", "Multi-platform builds"], links: ["GitHub Actions","GitHub CLI","act","nektos/act","GitHub Marketplace"] },
+      { name: "Jenkins", desc: "Open-source automation server", overview: "Jenkins is an extensible open-source automation server with 1800+ plugins for building, testing, and deploying software.", issues: ["Plugin dependency hell", "Groovy pipeline syntax", "Master node single point of failure", "Security patching", "Job configuration drift"], commands: ["jenkins-cli", "java -jar jenkins.war", "curl -X POST 'http://jenkins/job/build'", "jenkins-plugin-cli --plugins", "docker exec jenkins cat /var/jenkins_home/secrets"], usecases: ["Legacy CI/CD pipelines", "On-premise builds", "Complex pipeline orchestration", "Multi-branch pipelines", "Plugin-heavy workflows"], links: ["Jenkins Docs","Jenkins Plugins","Blue Ocean","Jenkinsfile","JCasC"] }
+    ]
+  },
+  {
+    name: "Monitoring & Observability",
+    nodes: [
+      { name: "Prometheus/Grafana", desc: "Metrics stack", overview: "Prometheus collects time-series metrics; Grafana visualizes them. The de-facto standard for cloud-native monitoring.", issues: ["Cardinality explosion", "Long-term storage (TSDB)", "Alertmanager routing complexity", "High availability setup", "Scrape target discovery"], commands: ["prometheus --config.file=prom.yml", "kubectl port-forward svc/prometheus 9090", "grafana-cli plugins install", "curl 'localhost:9090/api/v1/query'", "amtool alert"], usecases: ["Kubernetes monitoring", "Application metrics", "Infrastructure health", "Custom business metrics", "SLI/SLO tracking"], links: ["Prometheus","Grafana","Alertmanager","Thanos","VictoriaMetrics"] },
+      { name: "Cloud Monitoring", desc: "CloudWatch, Monitor, Ops", overview: "Native cloud monitoring solutions provide integrated metrics, logs, traces, and alerts without external tooling.", issues: ["Vendor lock-in", "Cost at scale", "Limited customization", "Cross-cloud visibility gaps", "Log retention pricing"], commands: ["aws cloudwatch put-metric-data", "az monitor metrics list", "gcloud monitoring dashboards create", "aws logs tail", "az monitor log-analytics"], usecases: ["Quick-start monitoring", "Cloud-native apps", "Budget-conscious teams", "Integrated alerting", "Auto-remediation"], links: ["CloudWatch","Azure Monitor","Google Ops","Datadog","New Relic"] },
+      { name: "ELK Stack", desc: "Elasticsearch, Logstash, Kibana", overview: "ELK (or Elastic Stack) provides centralized logging, log parsing, and visualization for application and infrastructure logs.", issues: ["Index management and rollover", "Log parsing grok complexity", "JVM heap tuning", "License changes (Elastic vs OpenSearch)", "Ingest pipeline bottlenecks"], commands: ["curl -X POST 'localhost:9200/_bulk'", "logstash -f pipeline.conf", "filebeat setup", "kibana-encryption-keys", "curator delete indices"], usecases: ["Centralized logging", "Security event analysis", "Application debugging", "Compliance auditing", "Business intelligence"], links: ["Elastic Stack","Logstash","Filebeat","OpenSearch","Fluentd"] },
+      { name: "Distributed Tracing", desc: "Jaeger, Zipkin, Tempo", overview: "Distributed tracing tracks requests across microservices, identifying latency bottlenecks and failure points.", issues: ["Instrumentation overhead", "Sampling strategy selection", "Trace context propagation", "Storage costs at scale", "Correlating traces with logs/metrics"], commands: ["jaeger-all-in-one", "kubectl apply -f jaeger.yaml", "curl 'localhost:16686/api/traces'", "tempo-cli", "otelcol --config=config.yaml"], usecases: ["Microservices debugging", "Latency analysis", "Dependency mapping", "Performance regression detection", "Error root cause analysis"], links: ["Jaeger","Zipkin","Grafana Tempo","OpenTelemetry","Honeycomb"] },
+      { name: "SRE", desc: "Site Reliability Engineering", overview: "SRE applies software engineering principles to operations, focusing on reliability, SLIs, SLOs, error budgets, and automation.", issues: ["Defining meaningful SLOs", "Error budget enforcement", "Toil reduction prioritization", "Incident management culture", "Blameless postmortems"], commands: ["sre-cli", "kubectl get events --sort-by='.lastTimestamp'", "terraform plan", "ansible-playbook", "curl -H 'Authorization: Bearer'"], usecases: ["Service level management", "Incident response", "Capacity planning", "Chaos engineering", "Production readiness reviews"], links: ["Google SRE Book","SRE Works","PagerDuty","Chaos Monkey","Gremlin"] }
+    ]
+  },
+  {
+    name: "Security & Compliance",
+    nodes: [
+      { name: "IAM / RBAC", desc: "Identity and access control", overview: "IAM and RBAC manage who can access what resources, enforcing least-privilege principles across cloud and on-premise systems.", issues: ["Permission sprawl", "Overly permissive roles", "Cross-account trust boundaries", "Service account key rotation", "Audit trail completeness"], commands: ["aws iam list-users", "az role assignment list", "gcloud iam roles list", "kubectl auth can-i", "vault read auth/userpass"], usecases: ["Least-privilege enforcement", "Multi-tenant isolation", "Compliance auditing", "Temporary credential issuance", "Just-in-time access"], links: ["AWS IAM","Azure RBAC","GCP IAM","Kubernetes RBAC","HashiCorp Vault"] },
+      { name: "Secrets Management", desc: "Vault, AWS SM, Azure KV", overview: "Secrets management securely stores and distributes API keys, passwords, certificates, and tokens with rotation and audit capabilities.", issues: ["Secret sprawl in code", "Rotation automation", "High availability of secret stores", "Integration with CI/CD", "Secret leakage detection"], commands: ["vault kv put secret/apikey", "aws secretsmanager get-secret-value", "az keyvault secret show", "kubectl create secret generic", "sops -d secret.yaml"], usecases: ["Database credential rotation", "API key management", "Certificate lifecycle", "CI/CD secret injection", "Dynamic secrets"], links: ["HashiCorp Vault","AWS Secrets Manager","Azure Key Vault","Sealed Secrets","Mozilla SOPS"] },
+      { name: "Network Security", desc: "Firewalls, WAF, Zero Trust", overview: "Network security protects infrastructure through segmentation, encryption, intrusion detection, and zero-trust architectures.", issues: ["East-west traffic visibility", "Micro-segmentation complexity", "Certificate management at scale", "DDoS mitigation", "Legacy protocol support"], commands: ["aws ec2 describe-security-groups", "az network nsg list", "gcloud compute firewall-rules list", "nmap -sS target", "openssl s_client -connect"], usecases: ["VPC segmentation", "API gateway security", "DDoS protection", "VPN replacement with mTLS", "Container network policies"], links: ["AWS WAF","Cloudflare","Palo Alto Prisma","Cilium","Calico"] },
+      { name: "Compliance", desc: "SOC2, ISO, GDPR, HIPAA", overview: "Compliance frameworks ensure organizations meet regulatory and industry standards for security, privacy, and operational practices.", issues: ["Continuous compliance monitoring", "Evidence collection automation", "Cross-framework mapping", "Audit preparation overhead", "Third-party risk assessment"], commands: ["aws configservice", "az policy state summarize", "gcloud asset search-all-resources", "inspec exec profile", "terraform-compliance"], usecases: ["SOC 2 audits", "GDPR data mapping", "HIPAA technical safeguards", "PCI-DSS compliance", "FedRAMP authorization"], links: ["AWS Config","Azure Policy","GCP Asset Inventory","Chef InSpec","Terraform Compliance"] },
+      { name: "Zero Trust", desc: "Never trust, always verify", overview: "Zero Trust assumes breach and verifies every access request regardless of network location, using identity, device health, and least privilege.", issues: ["Legacy app integration", "User experience friction", "Device trust verification", "Continuous authentication overhead", "Architecture complexity"], commands: ["kubectl apply -f network-policy.yaml", "vault login -method=oidc", "aws verify", "az network bastion ssh", "cloudflare access"], usecases: ["Remote workforce security", "Cloud migration security", "Insider threat mitigation", "Supply chain security", "BYOD policies"], links: ["BeyondCorp","Microsoft Zero Trust","Cloudflare Zero Trust","Zscaler","Okta"] }
+    ]
+  },
+  {
+    name: "Networking",
+    nodes: [
+      { name: "VPC / VNet", desc: "Virtual private clouds", overview: "VPCs and VNets provide isolated network environments in the cloud with subnets, route tables, and network ACLs.", issues: ["IP address exhaustion", "Subnet design for growth", "Peering complexity", "NAT gateway costs", "DNS resolution across VPCs"], commands: ["aws ec2 describe-vpcs", "az network vnet list", "gcloud compute networks list", "terraform plan", "pulumi preview"], usecases: ["Multi-tier application isolation", "Development environment separation", "Hybrid connectivity", "Micro-segmentation", "Global network architecture"], links: ["AWS VPC","Azure VNet","GCP VPC","Terraform VPC Module","CIDR Calculator"] },
+      { name: "Load Balancing", desc: "ALB, NLB, GLB", overview: "Load balancers distribute traffic across backend instances for high availability, scalability, and fault tolerance.", issues: ["Session affinity requirements", "SSL/TLS termination overhead", "Health check configuration", "Cross-zone load balancing costs", "Sticky session scaling"], commands: ["aws elbv2 describe-load-balancers", "az network lb list", "gcloud compute forwarding-rules list", "kubectl get svc", "nginx -t"], usecases: ["Web application scaling", "API gateway load distribution", "Blue-green deployments", "SSL termination", "Global traffic management"], links: ["AWS ALB","Azure Load Balancer","GCP Load Balancing","NGINX","HAProxy"] },
+      { name: "CDN & Edge", desc: "CloudFront, CDN, Fastly", overview: "CDNs cache content at edge locations closer to users, reducing latency and origin load for static and dynamic content.", issues: ["Cache invalidation timing", "Edge configuration propagation", "Dynamic content caching strategies", "Origin shield costs", "Geo-blocking complexity"], commands: ["aws cloudfront create-invalidation", "az cdn endpoint purge", "gcloud compute url-maps invalidate", "curl -I https://cdn.example.com", "fastly purge"], usecases: ["Static asset delivery", "Video streaming", "API response caching", "DDoS mitigation", "Global application acceleration"], links: ["CloudFront","Azure CDN","Cloudflare","Fastly","Akamai"] },
+      { name: "DNS", desc: "Route53, Cloud DNS, Azure DNS", overview: "Managed DNS services provide scalable, reliable domain name resolution with health checks, traffic policies, and geo-routing.", issues: ["DNS propagation delays", "Record type selection", "DDoS on DNS infrastructure", "Split-horizon DNS", "Certificate validation timing"], commands: ["aws route53 change-resource-record-sets", "az network dns record-set a add-record", "gcloud dns record-sets transaction start", "dig @8.8.8.8 example.com", "nslookup -type=MX"], usecases: ["Global load balancing", "Failover routing", "Geolocation routing", "Private DNS zones", "Domain migration"], links: ["Route 53","Azure DNS","Google Cloud DNS","Cloudflare DNS","DNSimple"] },
+      { name: "Hybrid Connectivity", desc: "VPN, Direct Connect, ExpressRoute", overview: "Hybrid connectivity links on-premises networks to cloud via VPN tunnels or dedicated private connections.", issues: ["Bandwidth bottleneck", "Single point of failure", "BGP configuration complexity", "Latency over internet VPN", "Cost of dedicated circuits"], commands: ["aws directconnect describe-connections", "az network vpn-gateway list", "gcloud compute vpn-gateways list", "ping -M do -s 1472 10.0.0.1", "traceroute"], usecases: ["Datacenter extension", "Hybrid Active Directory", "Backup over private line", "Low-latency workloads", "Regulatory compliance networking"], links: ["AWS Direct Connect","Azure ExpressRoute","Google Cloud Interconnect","Site-to-Site VPN","SD-WAN"] }
+    ]
+  },
+  {
+    name: "AI / Agents",
+    nodes: [
+      { name: "MCP Servers", desc: "Model Context Protocol", overview: "MCP (Model Context Protocol) standardizes how AI models connect to external data sources, tools, and APIs for enhanced capabilities.", issues: ["Protocol standardization", "Context window limitations", "Latency in tool calling", "Authentication for external tools", "Error handling in tool chains"], commands: ["mcp-server init", "npx @anthropic/mcp-server", "pip install mcp", "mcp-client connect", "curl -X POST localhost:3000/mcp"], usecases: ["AI-powered IDEs", "Automated documentation", "Database query agents", "Code review automation", "Knowledge base assistants"], links: ["Anthropic MCP","MCP Spec","OpenAI Functions","LangChain Tools","CrewAI"] },
+      { name: "LLM Ops", desc: "Large Language Model Operations", overview: "LLM Ops covers deployment, monitoring, versioning, and optimization of large language models in production environments.", issues: ["Model versioning and rollback", "Prompt injection attacks", "Token cost optimization", "Latency at scale", "Hallucination mitigation"], commands: ["openai api completions.create", "ollama run llama3", "vllm serve", "langfuse trace", "weights & biases login"], usecases: ["Chatbot deployment", "Content generation pipelines", "Code assistant APIs", "Document analysis", "Multi-model routing"], links: ["OpenAI API","Ollama","vLLM","Langfuse","Weights & Biases"] },
+      { name: "RAG & Chatbots", desc: "Retrieval-Augmented Generation", overview: "RAG enhances LLMs by retrieving relevant documents from knowledge bases before generating responses, reducing hallucinations.", issues: ["Chunking strategy selection", "Embedding model selection", "Vector database scaling", "Relevance scoring tuning", "Context window overflow"], commands: ["python -m rag.load", "chromadb run", "pinecone index create", "qdrant --snapshot restore", "curl -X POST localhost:8000/rag"], usecases: ["Enterprise knowledge bases", "Customer support bots", "Legal document analysis", "Medical diagnosis support", "Technical documentation Q&A"], links: ["LangChain","LlamaIndex","ChromaDB","Pinecone","Qdrant"] },
+      { name: "AI Architecture", desc: "Designing AI systems", overview: "AI architecture patterns for scalable, reliable, and cost-effective machine learning and generative AI systems.", issues: ["Model serving patterns", "GPU resource management", "Data pipeline design", "A/B testing for models", "Observability for AI systems"], commands: ["kubectl apply -f inference-deployment.yaml", "docker run --gpus all", "tritonserver --model-repository", "mlflow run", "bentoml serve"], usecases: ["Real-time inference APIs", "Batch prediction pipelines", "Multi-model ensembles", "Edge AI deployment", "Federated learning"], links: ["NVIDIA Triton","MLflow","BentoML","Kubeflow","Seldon Core"] },
+      { name: "MLOps", desc: "Machine Learning Operations", overview: "MLOps streamlines the ML lifecycle from experimentation to production deployment, monitoring, and retraining.", issues: ["Experiment tracking", "Model drift detection", "Feature store consistency", "Pipeline reproducibility", "Cross-team collaboration"], commands: ["mlflow experiments create", "kubeflow pipeline run", "dvc push", "great_expectations suite edit", "evidently ai report"], usecases: ["Fraud detection systems", "Recommendation engines", "Predictive maintenance", "Demand forecasting", "Image classification pipelines"], links: ["MLflow","Kubeflow","DVC","Great Expectations","Evidently AI"] }
+    ]
+  },
+  {
+    name: "Architecture & Design",
+    nodes: [
+      { name: "Reference Architectures", desc: "Proven design patterns", overview: "Reference architectures provide battle-tested blueprints for common scenarios, accelerating design decisions and reducing risk.", issues: ["Over-engineering for simple cases", "Technology selection bias", "Scaling assumptions", "Security integration gaps", "Cost estimation accuracy"], commands: ["terraform plan", "pulumi preview", "cdk diff", "architectural-decision-record", "c4model"], usecases: ["E-commerce platforms", "SaaS multi-tenancy", "Data lake architectures", "Event-driven systems", "Microservices platforms"], links: ["AWS Reference","Azure Architecture","GCP Solutions","Azure Patterns","Cloud Patterns"] },
+      { name: "ADRs", desc: "Architecture Decision Records", overview: "ADRs document significant architectural decisions, their context, consequences, and status for future maintainers.", issues: ["ADR format consistency", "Decision staleness", "Team adoption", "Linking to code artifacts", "Searchability across ADRs"], commands: ["adr new 'Choose database'", "adr list", "adr generate toc", "git log --grep='ADR'", "markdown-toc -i"], usecases: ["Technology selection rationale", "Migration justification", "Vendor evaluation records", "Design pattern adoption", "Team knowledge transfer"], links: ["ADR GitHub","MADR Template","Nat Pryce ADR","Architecture Notes","Tech Radar"] },
+      { name: "Diagram-as-Code", desc: "Mermaid, PlantUML, D2", overview: "Diagram-as-code tools generate architecture diagrams from text, enabling version control, collaboration, and automation.", issues: ["Layout control limitations", "Complex diagram readability", "Styling consistency", "Export quality", "Learning curve for syntax"], commands: ["mmdc -i diagram.mmd -o out.svg", "plantuml diagram.puml", "d2 input.d2 out.svg", "structurizr-cli export", "c4builder"], usecases: ["Architecture documentation", "CI/CD pipeline diagrams", "Onboarding docs", "Design reviews", "Automated documentation"], links: ["Mermaid","PlantUML","D2 Lang","Structurizr","C4 Model"] },
+      { name: "Cost Optimization", desc: "FinOps practices", overview: "Cloud cost optimization applies FinOps practices to monitor, allocate, and reduce cloud spending without sacrificing performance.", issues: ["Shared cost allocation", "Reserved instance planning", "Spot instance interruption handling", "Tagging compliance", "Unit economics calculation"], commands: ["aws ce get-cost-and-usage", "az costmanagement query", "gcloud billing budgets create", "infracost breakdown", "terraform plan"], usecases: ["Budget alerting", "Right-sizing VMs", "Storage tier optimization", "Reserved capacity planning", "Waste elimination"], links: ["AWS Cost Explorer","Azure Cost Management","GCP Billing","Infracost","Kubecost"] },
+      { name: "Performance Tuning", desc: "Latency and throughput", overview: "Performance tuning optimizes application and infrastructure for latency, throughput, and resource utilization.", issues: ["Bottleneck identification", "Load testing realism", "Caching invalidation", "Database query optimization", "Network latency optimization"], commands: ["ab -n 10000 -c 100", "k6 run script.js", "locust -f locustfile.py", "redis-cli slowlog get", "pg_stat_statements"], usecases: ["API response optimization", "Database query tuning", "CDN configuration", "Connection pooling", "Async processing"], links: ["k6","Locust","Apache Bench","Redis Slowlog","PostgreSQL Stats"] }
+    ]
+  },
+  {
+    name: "Technology & Blog",
+    nodes: [
+      { name: "Dev.to Blog", desc: "Developer community", overview: "Dev.to is a community of software developers sharing articles, tutorials, and discussions on technology topics.", issues: ["Content discoverability", "SEO optimization", "Engagement metrics", "Cross-posting canonical URLs", "Editor limitations"], commands: ["curl https://dev.to/api/articles", "devto-cli publish", "frontmatter check", "markdownlint", "git push origin main"], usecases: ["Technical blogging", "Tutorial publishing", "Community engagement", "Personal branding", "Knowledge sharing"], links: ["Dev.to","Hashnode","Medium","Substack","Ghost"] },
+      { name: "Technical Writing", desc: "Docs, READMEs, Wikis", overview: "Technical writing creates clear documentation for APIs, systems, and processes that developers can actually use.", issues: ["Documentation drift from code", "Audience level mismatch", "Maintenance burden", "Search functionality", "Multi-format publishing"], commands: ["mkdocs serve", "docusaurus start", "gitbook sync", "vale lint", "markdown-toc -i"], usecases: ["API documentation", "Internal wikis", "Runbooks", "Architecture docs", "Onboarding guides"], links: ["Docusaurus","MkDocs","Read the Docs","Vale","GitBook"] },
+      { name: "Open Source", desc: "Contributing and maintaining", overview: "Open source involves contributing to, maintaining, or consuming publicly available software with community governance.", issues: ["License compliance", "Security vulnerability disclosure", "Maintainer burnout", "Community governance", "Sustainability funding"], commands: ["git clone", "git fork", "gh pr create", "npm publish", "trivy fs ."], usecases: ["Library development", "Tooling contributions", "Community building", "Corporate open source", "Inner source programs"], links: ["GitHub","GitLab","OpenSSF","OSI","CHAOSS"] },
+      { name: "Developer Tools", desc: "IDEs, CLI, Productivity", overview: "Developer tools enhance productivity through better IDEs, command-line utilities, automation, and workflow optimization.", issues: ["Tool sprawl and context switching", "Configuration drift across machines", "Plugin security", "Learning curve", "Integration gaps"], commands: ["code .", "vim +PlugInstall", "brew install", "chezmoi apply", "stow dotfiles"], usecases: ["Dotfile management", "CLI automation", "IDE customization", "Terminal workflows", "Remote development"], links: ["VS Code","Neovim","Homebrew","Chezmoi","Stow"] }
+    ]
+  }
+];
+
+// ===================== RENDER =====================
+function renderCategories() {
+  const container = document.getElementById('categories');
+  container.innerHTML = categories.map((cat, ci) => `
+    <div class="category" id="cat-${ci}">
+      <div class="category-header" onclick="toggleCategory(${ci})">
+        <div style="display:flex;align-items:center;gap:16px;">
+          <span class="category-title">${cat.name}</span>
+          <span class="category-count">${cat.nodes.length} nodes</span>
+        </div>
+        <span class="category-toggle">&#8250;</span>
+      </div>
+      <div class="category-body">
+        <div class="nodes-grid">
+          ${cat.nodes.map((node, ni) => `
+            <div class="node-card" onclick="openModal(${ci}, ${ni})" data-name="${node.name.toLowerCase()}" data-cat="${cat.name.toLowerCase()}">
+              <div class="node-name">${node.name}</div>
+              <div class="node-desc">${node.desc}</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function toggleCategory(idx) {
+  const cat = document.getElementById('cat-' + idx);
+  cat.classList.toggle('expanded');
+}
+
+function openModal(ci, ni) {
+  const node = categories[ci].nodes[ni];
+  document.getElementById('modalTitle').textContent = node.name;
+  document.getElementById('modalSubtitle').textContent = categories[ci].name + ' // ' + node.desc;
+
+  document.getElementById('modalBody').innerHTML = `
+    <div class="section-title">Overview</div>
+    <div class="section-content"><p>${node.overview}</p></div>
+
+    <div class="section-title">Common Issues</div>
+    <div class="section-content">
+      ${node.issues.map(i => `<div class="issue-item">${i}</div>`).join('')}
+    </div>
+
+    <div class="section-title">Commands</div>
+    <div class="section-content">
+      ${node.commands.map(c => `<div class="cmd-block">${c}</div>`).join('')}
+    </div>
+
+    <div class="section-title">Use Cases</div>
+    <div class="usecase-grid">
+      ${node.usecases.map(u => `<div class="usecase-item">${u}</div>`).join('')}
+    </div>
+
+    <div class="section-title">References</div>
+    <div class="link-list">
+      ${node.links.map(l => `<a class="link-tag" href="https://www.google.com/search?q=${encodeURIComponent(l + ' ' + node.name)}" target="_blank" rel="noopener">${l}</a>`).join('')}
+    </div>
+
+    <div class="section-title">Web Search</div>
+    <div class="section-content" style="padding-left:30px;">
+      <div style="display:flex;gap:10px;margin-bottom:12px;">
+        <input type="text" id="nodeSearchInput" placeholder="Search ${node.name}..." 
+          style="flex:1;background:#050505;border:1px solid var(--border);padding:10px 14px;color:var(--text);font-family:'Share Tech Mono',monospace;border-radius:4px;outline:none;"
+          onkeydown="if(event.key==='Enter')searchNodeWeb(${ci},${ni})">
+        <button onclick="searchNodeWeb(${ci},${ni})" 
+          style="background:linear-gradient(135deg,var(--orange),var(--orange-dark));border:none;border-radius:4px;padding:0 18px;color:#000;font-family:'Orbitron',sans-serif;font-weight:700;font-size:0.7rem;text-transform:uppercase;letter-spacing:1px;cursor:pointer;">Search</button>
+      </div>
+      <div id="nodeSearchResults" style="max-height:300px;overflow-y:auto;"></div>
+    </div>
+  `;
+
+  document.getElementById('modalOverlay').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal(e) {
+  if (e && e.target !== document.getElementById('modalOverlay')) return;
+  document.getElementById('modalOverlay').classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+async function searchNodeWeb(ci, ni) {
+  const node = categories[ci].nodes[ni];
+  const input = document.getElementById('nodeSearchInput');
+  const query = input.value.trim();
+  if (!query) return;
+
+  const container = document.getElementById('nodeSearchResults');
+  container.innerHTML = '<div style="color:var(--text-muted);font-size:0.8rem;">Searching...</div>';
+
+  try {
+    const res = await fetch(`https://api.stackexchange.com/2.3/search/advanced?order=desc&sort=relevance&q=${encodeURIComponent(query + ' ' + node.name)}&site=stackoverflow&pagesize=5`);
+    const data = await res.json();
+    container.innerHTML = data.items?.map(item => `
+      <div style="padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.03);">
+        <a href="${item.link}" target="_blank" rel="noopener" style="color:var(--text);font-size:0.82rem;text-decoration:none;">${item.title}</a>
+        <div style="color:var(--text-muted);font-size:0.72rem;margin-top:3px;">Score: ${item.score} | Answers: ${item.answer_count}</div>
+      </div>
+    `).join('') || '<div style="color:var(--text-muted);font-size:0.8rem;">No results</div>';
+  } catch {
+    container.innerHTML = '<div style="color:var(--text-muted);font-size:0.8rem;">Search unavailable</div>';
+  }
+}
+
+function performSearch() {
+  const query = document.getElementById('globalSearch').value.trim().toLowerCase();
+  if (!query) {
+    document.querySelectorAll('.node-card').forEach(c => c.style.display = 'block');
+    return;
+  }
+  document.querySelectorAll('.node-card').forEach(card => {
+    const match = card.dataset.name.includes(query) || card.dataset.cat.includes(query);
+    card.style.display = match ? 'block' : 'none';
+    if (match) {
+      const parent = card.closest('.category');
+      if (!parent.classList.contains('expanded')) parent.classList.add('expanded');
+    }
+  });
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+document.addEventListener('DOMContentLoaded', renderCategories);
+</script>
+</body>
+</html>
