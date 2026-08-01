@@ -3,322 +3,116 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Matrix | Architecture</title>
+<title>Matrix | Architecture Builder</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Share+Tech+Mono&display=swap');
-
   :root {
-    --bg: #000000;
-    --card: #0a0a0a;
-    --card-hover: #111111;
-    --border: #1a1a1a;
-    --border-hover: #f97316;
-    --orange: #f97316;
-    --orange-dark: #ea580c;
-    --gold: #fbbf24;
-    --gold-dim: #b45309;
-    --text: #e5e5e5;
-    --text-dim: #737373;
-    --text-muted: #404040;
-    --glow-orange: 0 0 20px rgba(249,115,22,0.15);
+    --bg: #000000; --card: #0a0a0a; --card-hover: #111111; --border: #1a1a1a;
+    --border-hover: #f97316; --orange: #f97316; --orange-dark: #ea580c;
+    --gold: #fbbf24; --gold-dim: #b45309; --text: #e5e5e5; --text-dim: #737373;
+    --text-muted: #404040; --glow-orange: 0 0 20px rgba(249,115,22,0.15);
     --glow-gold: 0 0 30px rgba(251,191,36,0.1);
+    --aws: #ff9900; --azure: #0078d4; --gcp: #4285f4;
   }
-
   * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Share Tech Mono', monospace;
-    min-height: 100vh;
-    overflow-x: hidden;
-    position: relative;
-  }
-
-  #matrix-canvas {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    z-index: 0;
-    pointer-events: none;
-    opacity: 0.25;
-  }
-
-  .container {
-    position: relative;
-    z-index: 1;
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 0 20px 40px;
-  }
-
-  /* Header */
-  header {
-    text-align: center;
-    padding: 40px 20px 30px;
-    position: relative;
-  }
-
-  header::before {
-    content: '';
-    position: absolute;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    width: 600px; height: 200px;
-    background: radial-gradient(ellipse, rgba(249,115,22,0.08) 0%, transparent 70%);
-    pointer-events: none;
-  }
-
-  h1 {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 3.5rem;
-    font-weight: 900;
-    color: var(--orange);
-    text-transform: uppercase;
-    letter-spacing: 12px;
-    text-shadow: 0 0 40px rgba(249,115,22,0.4), 0 0 80px rgba(249,115,22,0.1);
-    position: relative;
-    animation: flicker 4s infinite alternate;
-  }
-
-  @keyframes flicker {
-    0%, 100% { opacity: 1; text-shadow: 0 0 40px rgba(249,115,22,0.4), 0 0 80px rgba(249,115,22,0.1); }
-    50% { opacity: 0.92; text-shadow: 0 0 30px rgba(249,115,22,0.3), 0 0 60px rgba(249,115,22,0.05); }
-  }
-
-  .subtitle {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 1rem;
-    color: var(--gold);
-    margin-top: 10px;
-    letter-spacing: 3px;
-    opacity: 0.8;
-  }
-
-  .glitch-line {
-    width: 200px;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--orange), var(--gold), transparent);
-    margin: 20px auto;
-    opacity: 0.5;
-  }
-
-  /* Navigation */
-  nav {
-    display: flex;
-    justify-content: center;
-    gap: 8px;
-    flex-wrap: wrap;
-    margin-bottom: 30px;
-    padding: 0 20px;
-  }
-
-  nav a {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    color: var(--text-dim);
-    text-decoration: none;
-    padding: 10px 18px;
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    transition: all 0.3s;
-    background: var(--card);
-  }
-
-  nav a:hover, nav a.active {
-    border-color: var(--orange);
-    color: var(--orange);
-    box-shadow: var(--glow-orange);
-    background: rgba(249,115,22,0.05);
-  }
-
-  /* Page title */
-  .page-title {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 1.6rem;
-    color: var(--orange);
-    text-transform: uppercase;
-    letter-spacing: 3px;
-    margin-bottom: 8px;
-  }
-
-  .page-desc {
-    color: var(--text-dim);
-    font-size: 0.9rem;
-    margin-bottom: 30px;
-    letter-spacing: 0.5px;
-  }
-
-  /* Cards */
-  .card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 24px;
-    margin-bottom: 16px;
-    transition: all 0.3s;
-  }
-
-  .card:hover {
-    border-color: var(--gold-dim);
-    box-shadow: 0 0 15px rgba(249,115,22,0.05);
-  }
-
-  .card h3 {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 0.95rem;
-    color: var(--gold);
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    margin-bottom: 12px;
-  }
-
-  .card p {
-    color: var(--text-dim);
-    font-size: 0.85rem;
-    line-height: 1.6;
-  }
-
-  /* Buttons */
-  .btn {
-    display: inline-block;
-    padding: 10px 22px;
-    background: linear-gradient(135deg, var(--orange), var(--orange-dark));
-    border: none;
-    border-radius: 4px;
-    color: #000;
-    font-family: 'Orbitron', sans-serif;
-    font-weight: 700;
-    font-size: 0.78rem;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    cursor: pointer;
-    transition: all 0.3s;
-    text-decoration: none;
-  }
-
-  .btn:hover {
-    background: linear-gradient(135deg, var(--gold), var(--orange));
-    box-shadow: 0 0 20px rgba(249,115,22,0.3);
-    transform: translateY(-1px);
-  }
-
-  .btn-outline {
-    background: transparent;
-    border: 1px solid var(--border);
-    color: var(--text-dim);
-  }
-
-  .btn-outline:hover {
-    border-color: var(--gold);
-    color: var(--gold);
-    background: rgba(251,191,36,0.05);
-    box-shadow: var(--glow-gold);
-  }
-
-  /* Code blocks */
-  .code-block {
-    background: #050505;
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 14px 18px;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.82rem;
-    color: var(--gold);
-    overflow-x: auto;
-    white-space: pre-wrap;
-    line-height: 1.6;
-    margin: 8px 0;
-  }
-
-  /* Link tags */
-  .link-tag {
-    display: inline-block;
-    padding: 6px 14px;
-    background: rgba(249,115,22,0.08);
-    border: 1px solid rgba(249,115,22,0.2);
-    border-radius: 20px;
-    color: var(--orange);
-    font-size: 0.78rem;
-    text-decoration: none;
-    transition: all 0.3s;
-    letter-spacing: 0.5px;
-    margin: 4px 4px 4px 0;
-  }
-
-  .link-tag:hover {
-    background: rgba(249,115,22,0.2);
-    border-color: var(--orange);
-    box-shadow: var(--glow-orange);
-  }
-
-  /* Grid */
+  body { background: var(--bg); color: var(--text); font-family: 'Share Tech Mono', monospace; min-height: 100vh; overflow-x: hidden; position: relative; }
+  #matrix-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; opacity: 0.25; }
+  .container { position: relative; z-index: 1; max-width: 1400px; margin: 0 auto; padding: 0 20px 40px; }
+  header { text-align: center; padding: 40px 20px 30px; position: relative; }
+  header::before { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 600px; height: 200px; background: radial-gradient(ellipse, rgba(249,115,22,0.08) 0%, transparent 70%); pointer-events: none; }
+  h1 { font-family: 'Orbitron', sans-serif; font-size: 3.5rem; font-weight: 900; color: var(--orange); text-transform: uppercase; letter-spacing: 12px; text-shadow: 0 0 40px rgba(249,115,22,0.4), 0 0 80px rgba(249,115,22,0.1); position: relative; animation: flicker 4s infinite alternate; }
+  @keyframes flicker { 0%, 100% { opacity: 1; text-shadow: 0 0 40px rgba(249,115,22,0.4), 0 0 80px rgba(249,115,22,0.1); } 50% { opacity: 0.92; text-shadow: 0 0 30px rgba(249,115,22,0.3), 0 0 60px rgba(249,115,22,0.05); } }
+  .subtitle { font-family: 'Share Tech Mono', monospace; font-size: 1rem; color: var(--gold); margin-top: 10px; letter-spacing: 3px; opacity: 0.8; }
+  .glitch-line { width: 200px; height: 1px; background: linear-gradient(90deg, transparent, var(--orange), var(--gold), transparent); margin: 20px auto; opacity: 0.5; }
+  nav { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-bottom: 30px; padding: 0 20px; }
+  nav a { font-family: 'Orbitron', sans-serif; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-dim); text-decoration: none; padding: 10px 18px; border: 1px solid var(--border); border-radius: 4px; transition: all 0.3s; background: var(--card); }
+  nav a:hover, nav a.active { border-color: var(--orange); color: var(--orange); box-shadow: var(--glow-orange); background: rgba(249,115,22,0.05); }
+  .page-title { font-family: 'Orbitron', sans-serif; font-size: 1.6rem; color: var(--orange); text-transform: uppercase; letter-spacing: 3px; margin-bottom: 8px; }
+  .page-desc { color: var(--text-dim); font-size: 0.9rem; margin-bottom: 30px; letter-spacing: 0.5px; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 6px; padding: 24px; margin-bottom: 16px; transition: all 0.3s; }
+  .card:hover { border-color: var(--gold-dim); box-shadow: 0 0 15px rgba(249,115,22,0.05); }
+  .card h3 { font-family: 'Orbitron', sans-serif; font-size: 0.95rem; color: var(--gold); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 12px; }
+  .btn { display: inline-block; padding: 10px 22px; background: linear-gradient(135deg, var(--orange), var(--orange-dark)); border: none; border-radius: 4px; color: #000; font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 1.5px; cursor: pointer; transition: all 0.3s; text-decoration: none; }
+  .btn:hover { background: linear-gradient(135deg, var(--gold), var(--orange)); box-shadow: 0 0 20px rgba(249,115,22,0.3); transform: translateY(-1px); }
+  .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-dim); }
+  .btn-outline:hover { border-color: var(--gold); color: var(--gold); background: rgba(251,191,36,0.05); box-shadow: var(--glow-gold); }
+  .code-block { background: #050505; border: 1px solid var(--border); border-radius: 4px; padding: 14px 18px; font-family: 'Share Tech Mono', monospace; font-size: 0.82rem; color: var(--gold); overflow-x: auto; white-space: pre-wrap; line-height: 1.6; margin: 8px 0; }
+  .link-tag { display: inline-block; padding: 6px 14px; background: rgba(249,115,22,0.08); border: 1px solid rgba(249,115,22,0.2); border-radius: 20px; color: var(--orange); font-size: 0.78rem; text-decoration: none; transition: all 0.3s; letter-spacing: 0.5px; margin: 4px 4px 4px 0; }
+  .link-tag:hover { background: rgba(249,115,22,0.2); border-color: var(--orange); box-shadow: var(--glow-orange); }
   .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-
-  @media (max-width: 900px) {
-    .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
-    h1 { font-size: 2.2rem; letter-spacing: 6px; }
-    nav a { padding: 8px 12px; font-size: 0.7rem; }
-  }
-
-  /* Footer */
-  footer {
-    text-align: center;
-    padding: 50px 20px 30px;
-    color: var(--text-muted);
-    font-size: 0.75rem;
-    letter-spacing: 2px;
-  }
-
-  .footer-line {
-    width: 100px;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
-    margin: 0 auto 16px;
-  }
-
-  /* Scrollbar */
+  @media (max-width: 900px) { .grid-2 { grid-template-columns: 1fr; } h1 { font-size: 2.2rem; letter-spacing: 6px; } nav a { padding: 8px 12px; font-size: 0.7rem; } }
+  footer { text-align: center; padding: 50px 20px 30px; color: var(--text-muted); font-size: 0.75rem; letter-spacing: 2px; }
+  .footer-line { width: 100px; height: 1px; background: linear-gradient(90deg, transparent, var(--gold-dim), transparent); margin: 0 auto 16px; }
   ::-webkit-scrollbar { width: 6px; }
   ::-webkit-scrollbar-track { background: var(--bg); }
   ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
   ::-webkit-scrollbar-thumb:hover { background: var(--orange); }
-
-  .hidden { display: none !important; }
-
-  .arch-section { margin-bottom: 30px; }
-  .pattern-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; margin-bottom: 30px; }
+  .wizard-step { display: none; animation: fadeIn 0.4s ease; }
+  .wizard-step.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  .provider-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin: 20px 0; }
+  .provider-card { background: linear-gradient(145deg, #0d0d0d, #080808); border: 1px solid var(--border); border-radius: 8px; padding: 30px 20px; text-align: center; cursor: pointer; transition: all 0.35s; position: relative; overflow: hidden; }
+  .provider-card::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; transform: scaleX(0); transform-origin: left; transition: transform 0.4s; }
+  .provider-card:hover { transform: translateY(-4px); box-shadow: 0 10px 40px rgba(0,0,0,0.6); }
+  .provider-card:hover::after { transform: scaleX(1); }
+  .provider-card.aws::after { background: var(--aws); }
+  .provider-card.azure::after { background: var(--azure); }
+  .provider-card.gcp::after { background: var(--gcp); }
+  .provider-card.aws:hover { border-color: var(--aws); box-shadow: 0 0 25px rgba(255,153,0,0.15); }
+  .provider-card.azure:hover { border-color: var(--azure); box-shadow: 0 0 25px rgba(0,120,212,0.15); }
+  .provider-card.gcp:hover { border-color: var(--gcp); box-shadow: 0 0 25px rgba(66,133,244,0.15); }
+  .provider-card h4 { font-family: 'Orbitron', sans-serif; font-size: 1.1rem; margin-bottom: 8px; letter-spacing: 2px; }
+  .provider-card.aws h4 { color: var(--aws); }
+  .provider-card.azure h4 { color: var(--azure); }
+  .provider-card.gcp h4 { color: var(--gcp); }
+  .provider-card p { font-size: 0.78rem; color: var(--text-dim); line-height: 1.5; }
+  .pattern-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; margin: 20px 0; }
   .pattern-card { background: linear-gradient(145deg, #0d0d0d, #080808); border: 1px solid var(--border); border-radius: 6px; padding: 20px; cursor: pointer; transition: all 0.35s; position: relative; overflow: hidden; }
   .pattern-card::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--orange), var(--gold)); transform: scaleX(0); transform-origin: left; transition: transform 0.4s; }
   .pattern-card:hover { border-color: var(--orange); transform: translateY(-3px); box-shadow: var(--glow-orange); }
   .pattern-card:hover::after { transform: scaleX(1); }
   .pattern-card h4 { font-family: 'Orbitron', sans-serif; font-size: 0.9rem; color: var(--gold); margin-bottom: 8px; letter-spacing: 1px; }
   .pattern-card p { font-size: 0.78rem; color: var(--text-dim); line-height: 1.5; }
-  .palette { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
-  .palette-btn { padding: 8px 16px; background: transparent; border: 1px solid var(--border); border-radius: 4px; color: var(--text-dim); font-family: 'Share Tech Mono', monospace; font-size: 0.78rem; cursor: pointer; transition: all 0.3s; }
-  .palette-btn:hover, .palette-btn.active { border-color: var(--orange); color: var(--orange); background: rgba(249,115,22,0.08); box-shadow: var(--glow-orange); }
+  .pattern-card .provider-tags { margin-top: 10px; display: flex; gap: 6px; flex-wrap: wrap; }
+  .pattern-card .provider-tags span { font-size: 0.65rem; padding: 2px 8px; border-radius: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .tag-aws { background: rgba(255,153,0,0.1); color: var(--aws); border: 1px solid rgba(255,153,0,0.2); }
+  .tag-azure { background: rgba(0,120,212,0.1); color: var(--azure); border: 1px solid rgba(0,120,212,0.2); }
+  .tag-gcp { background: rgba(66,133,244,0.1); color: var(--gcp); border: 1px solid rgba(66,133,244,0.2); }
+  .option-group { margin-bottom: 20px; }
+  .option-group h4 { font-family: 'Orbitron', sans-serif; font-size: 0.85rem; color: var(--orange); margin-bottom: 12px; letter-spacing: 1px; }
+  .option-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; }
+  .option-btn { padding: 10px 14px; background: transparent; border: 1px solid var(--border); border-radius: 4px; color: var(--text-dim); font-family: 'Share Tech Mono', monospace; font-size: 0.78rem; cursor: pointer; transition: all 0.3s; text-align: left; }
+  .option-btn:hover, .option-btn.active { border-color: var(--orange); color: var(--orange); background: rgba(249,115,22,0.08); box-shadow: var(--glow-orange); }
   .output-area { background: #050505; border: 1px solid var(--border); border-radius: 6px; padding: 20px; font-family: 'Share Tech Mono', monospace; font-size: 0.82rem; color: var(--gold); min-height: 200px; white-space: pre-wrap; overflow-x: auto; line-height: 1.6; }
   .action-row { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
-  .template-section { background: var(--card); border: 1px solid var(--border); border-radius: 6px; padding: 20px; margin-bottom: 16px; }
-  .template-section h4 { font-family: 'Orbitron', sans-serif; font-size: 0.85rem; color: var(--orange); margin-bottom: 12px; letter-spacing: 1px; }
   .copy-btn { float: right; padding: 4px 12px; background: rgba(249,115,22,0.1); border: 1px solid rgba(249,115,22,0.3); border-radius: 3px; color: var(--orange); font-size: 0.7rem; cursor: pointer; transition: all 0.3s; }
   .copy-btn:hover { background: rgba(249,115,22,0.2); box-shadow: var(--glow-orange); }
+  .step-indicator { display: flex; justify-content: center; gap: 12px; margin-bottom: 30px; }
+  .step-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--border); transition: all 0.3s; }
+  .step-dot.active { background: var(--orange); box-shadow: 0 0 10px rgba(249,115,22,0.5); }
+  .step-dot.done { background: var(--gold); }
+  .template-section { background: var(--card); border: 1px solid var(--border); border-radius: 6px; padding: 20px; margin-bottom: 16px; }
+  .template-section h4 { font-family: 'Orbitron', sans-serif; font-size: 0.85rem; color: var(--orange); margin-bottom: 12px; letter-spacing: 1px; }
+  .summary-box { background: rgba(249,115,22,0.04); border: 1px solid rgba(249,115,22,0.15); border-radius: 6px; padding: 16px 20px; margin-bottom: 20px; }
+  .summary-box h4 { font-family: 'Orbitron', sans-serif; color: var(--gold); font-size: 0.85rem; margin-bottom: 10px; }
+  .summary-box p { color: var(--text-dim); font-size: 0.82rem; line-height: 1.6; }
+  .summary-box .tag { display: inline-block; padding: 3px 10px; border-radius: 4px; font-size: 0.72rem; margin: 3px 3px 0 0; }
+  .tab-bar { display: flex; gap: 4px; margin-bottom: 16px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+  .tab-btn { padding: 8px 18px; background: transparent; border: 1px solid transparent; border-radius: 4px; color: var(--text-dim); font-family: 'Orbitron', sans-serif; font-size: 0.72rem; cursor: pointer; transition: all 0.3s; text-transform: uppercase; letter-spacing: 1px; }
+  .tab-btn:hover { color: var(--orange); }
+  .tab-btn.active { border-color: var(--orange); color: var(--orange); background: rgba(249,115,22,0.05); }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; animation: fadeIn 0.3s ease; }
 </style>
 </head>
 <body>
 <canvas id="matrix-canvas"></canvas>
 <div class="container">
-
   <header>
     <h1>MATRIX</h1>
     <div class="subtitle">There is no spoon. Only infrastructure.</div>
     <div class="glitch-line"></div>
   </header>
-
   <nav>
     <a href="index.html">Mind Map</a>
     <a href="arch.html">Architecture</a>
@@ -326,75 +120,148 @@
     <a href="blog.html">Blog & Tech</a>
     <a href="about.html">About</a>
   </nav>
-
-
-<div style="margin-bottom:30px;">
-  <div class="page-title">Architecture Builder</div>
-  <div class="page-desc">Design, document, and generate infrastructure code for cloud architectures.</div>
-</div>
-
-<div class="arch-section">
-  <h3 style="font-family:'Orbitron',sans-serif;color:var(--orange);font-size:1rem;text-transform:uppercase;letter-spacing:2px;margin-bottom:16px;">Pattern Library</h3>
-  <div class="pattern-grid" id="patternGrid"></div>
-</div>
-
-<div class="arch-section">
-  <h3 style="font-family:'Orbitron',sans-serif;color:var(--orange);font-size:1rem;text-transform:uppercase;letter-spacing:2px;margin-bottom:16px;">Component Palette</h3>
-  <p style="color:var(--text-dim);font-size:0.85rem;margin-bottom:14px;">Select components to generate diagrams and Terraform code.</p>
-  <div class="palette" id="palette"></div>
-  <div class="action-row">
-    <button class="btn" onclick="generateMermaid()">Generate Mermaid</button>
-    <button class="btn btn-outline" onclick="generateTerraform()">Generate Terraform</button>
-    <button class="btn btn-outline" onclick="generateADR()">Generate ADR</button>
-    <button class="btn btn-outline" onclick="clearSelection()">Clear</button>
+  <div style="margin-bottom:30px;">
+    <div class="page-title">Architecture Builder</div>
+    <div class="page-desc">Tell me what you want to build. I will generate the diagram, the Terraform, and the ADR.</div>
   </div>
-  <div class="output-area" id="archOutput">Select components or a pattern to begin...</div>
-</div>
-
-<div class="arch-section">
-  <h3 style="font-family:'Orbitron',sans-serif;color:var(--orange);font-size:1rem;text-transform:uppercase;letter-spacing:2px;margin-bottom:16px;">C4 Model Templates</h3>
-  <div class="grid-2">
-    <div class="template-section">
-      <h4>System Context <button class="copy-btn" onclick="copyText('c4-context')">Copy</button></h4>
-      <pre class="code-block" id="c4-context" style="font-size:0.75rem;">C4Context
-  title System Context for MyApp
-  Enterprise_Boundary(b0, "Enterprise") {
-    Person(user, "User", "End user")
-    System(app, "MyApp", "The application")
-    System_Ext(payment, "Payment Gateway", "External")
-    Rel(user, app, "Uses")
-    Rel(app, payment, "Processes payments")
-  }</pre>
+  <div class="card" id="wizard">
+    <div class="step-indicator">
+      <div class="step-dot active" id="dot-0"></div>
+      <div class="step-dot" id="dot-1"></div>
+      <div class="step-dot" id="dot-2"></div>
+      <div class="step-dot" id="dot-3"></div>
     </div>
-    <div class="template-section">
-      <h4>Container Diagram <button class="copy-btn" onclick="copyText('c4-container')">Copy</button></h4>
-      <pre class="code-block" id="c4-container" style="font-size:0.75rem;">C4Container
-  title Container Diagram for MyApp
-  Person(user, "User")
-  Container_Boundary(app, "MyApp") {
-    Container(web, "Web App", "React", "Frontend")
-    Container(api, "API", "Node.js", "Backend")
-    Container(db, "Database", "PostgreSQL", "Data")
-    Rel(user, web, "Uses", "HTTPS")
-    Rel(web, api, "Calls", "JSON")
-    Rel(api, db, "Reads/Writes", "SQL")
-  }</pre>
+    <div class="wizard-step active" id="step-0">
+      <h3 style="font-family:'Orbitron',sans-serif;color:var(--orange);font-size:1rem;text-transform:uppercase;letter-spacing:2px;margin-bottom:8px;text-align:center;">Step 1 &mdash; Choose Your Cloud</h3>
+      <p style="text-align:center;color:var(--text-dim);font-size:0.85rem;margin-bottom:20px;">Which provider will host this architecture?</p>
+      <div class="provider-grid">
+        <div class="provider-card aws" onclick="selectProvider('aws')">
+          <h4>AWS</h4>
+          <p>Amazon Web Services<br>200+ services, global regions, enterprise-grade</p>
+        </div>
+        <div class="provider-card azure" onclick="selectProvider('azure')">
+          <h4>Azure</h4>
+          <p>Microsoft Azure<br>Deep Microsoft integration, hybrid cloud, enterprise</p>
+        </div>
+        <div class="provider-card gcp" onclick="selectProvider('gcp')">
+          <h4>GCP</h4>
+          <p>Google Cloud Platform<br>Data analytics, Kubernetes, AI/ML, networking</p>
+        </div>
+      </div>
+    </div>
+    <div class="wizard-step" id="step-1">
+      <h3 style="font-family:'Orbitron',sans-serif;color:var(--orange);font-size:1rem;text-transform:uppercase;letter-spacing:2px;margin-bottom:8px;text-align:center;">Step 2 &mdash; What Are You Building?</h3>
+      <p style="text-align:center;color:var(--text-dim);font-size:0.85rem;margin-bottom:20px;">Select an architecture pattern. Terraform and diagrams will be provider-native.</p>
+      <div class="pattern-grid" id="patternGrid"></div>
+      <div style="text-align:center;margin-top:20px;">
+        <button class="btn btn-outline" onclick="prevStep()">Back</button>
+      </div>
+    </div>
+    <div class="wizard-step" id="step-2">
+      <h3 style="font-family:'Orbitron',sans-serif;color:var(--orange);font-size:1rem;text-transform:uppercase;letter-spacing:2px;margin-bottom:8px;text-align:center;">Step 3 &mdash; Configure Components</h3>
+      <p style="text-align:center;color:var(--text-dim);font-size:0.85rem;margin-bottom:20px;">Toggle the components you need. Everything else will be inferred.</p>
+      <div id="optionsContainer"></div>
+      <div style="text-align:center;margin-top:20px;">
+        <button class="btn btn-outline" onclick="prevStep()">Back</button>
+        <button class="btn" onclick="nextStep()" style="margin-left:10px;">Generate</button>
+      </div>
+    </div>
+    <div class="wizard-step" id="step-3">
+      <h3 style="font-family:'Orbitron',sans-serif;color:var(--orange);font-size:1rem;text-transform:uppercase;letter-spacing:2px;margin-bottom:8px;text-align:center;">Your Architecture Is Ready</h3>
+      <div class="summary-box" id="summaryBox"></div>
+      <div class="tab-bar">
+        <button class="tab-btn active" onclick="switchTab('mermaid')">Mermaid</button>
+        <button class="tab-btn" onclick="switchTab('terraform')">Terraform</button>
+        <button class="tab-btn" onclick="switchTab('adr')">ADR</button>
+        <button class="tab-btn" onclick="switchTab('c4')">C4 Context</button>
+      </div>
+      <div class="tab-panel active" id="tab-mermaid">
+        <div class="action-row">
+          <button class="btn" onclick="copyOutput('mermaidOut')">Copy Mermaid</button>
+          <button class="btn btn-outline" onclick="downloadFile('diagram.mmd', 'mermaidOut')">Download .mmd</button>
+        </div>
+        <div class="output-area" id="mermaidOut"></div>
+      </div>
+      <div class="tab-panel" id="tab-terraform">
+        <div class="action-row">
+          <button class="btn" onclick="copyOutput('terraformOut')">Copy Terraform</button>
+          <button class="btn btn-outline" onclick="downloadFile('main.tf', 'terraformOut')">Download main.tf</button>
+        </div>
+        <div class="output-area" id="terraformOut"></div>
+      </div>
+      <div class="tab-panel" id="tab-adr">
+        <div class="action-row">
+          <button class="btn" onclick="copyOutput('adrOut')">Copy ADR</button>
+          <button class="btn btn-outline" onclick="downloadFile('adr.md', 'adrOut')">Download .md</button>
+        </div>
+        <div class="output-area" id="adrOut"></div>
+      </div>
+      <div class="tab-panel" id="tab-c4">
+        <div class="action-row">
+          <button class="btn" onclick="copyOutput('c4Out')">Copy C4</button>
+          <button class="btn btn-outline" onclick="downloadFile('c4.puml', 'c4Out')">Download .puml</button>
+        </div>
+        <div class="output-area" id="c4Out"></div>
+      </div>
+      <div style="text-align:center;margin-top:20px;">
+        <button class="btn btn-outline" onclick="resetWizard()">Start Over</button>
+      </div>
     </div>
   </div>
-</div>
-
-
+  <div class="card">
+    <h3>C4 Model Templates</h3>
+    <div class="grid-2">
+      <div class="template-section">
+        <h4>System Context <button class="copy-btn" onclick="copyText('c4-context')">Copy</button></h4>
+        <pre class="code-block" id="c4-context" style="font-size:0.75rem;">@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+LAYOUT_WITH_LEGEND()
+Person(user, "User", "End user of the system")
+System(app, "Application", "The core system being built")
+System_Ext(payment, "Payment Gateway", "External payment processor")
+System_Ext(email, "Email Service", "External email provider")
+Rel(user, app, "Uses", "HTTPS")
+Rel(app, payment, "Processes payments", "HTTPS/JSON")
+Rel(app, email, "Sends notifications", "HTTPS/REST")
+SHOW_LEGEND()
+@enduml</pre>
+      </div>
+      <div class="template-section">
+        <h4>Container Diagram <button class="copy-btn" onclick="copyText('c4-container')">Copy</button></h4>
+        <pre class="code-block" id="c4-container" style="font-size:0.75rem;">@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+LAYOUT_WITH_LEGEND()
+Person(user, "User", "End user")
+System_Boundary(app, "Application Boundary") {
+  Container(web, "Web App", "React/Vue", "Delivers static content")
+  Container(api, "API Gateway", "NGINX/AWS ALB/Azure APIM", "Routes requests")
+  Container(backend, "Backend Service", "Node.js/Go/Python", "Business logic")
+  Container(worker, "Background Worker", "Python/Rust", "Async job processing")
+  ContainerDb(db, "Primary Database", "PostgreSQL/MySQL", "Relational data")
+  ContainerDb(cache, "Cache", "Redis/Memcached", "Session & hot data")
+  ContainerDb(queue, "Message Queue", "RabbitMQ/SQS", "Async messaging")
+}
+System_Ext(s3, "Object Storage", "S3/Blob/GCS")
+Rel(user, web, "Uses", "HTTPS")
+Rel(web, api, "Calls", "HTTPS/JSON")
+Rel(api, backend, "Forwards", "HTTP/JSON")
+Rel(backend, db, "Reads/Writes", "SQL/TCP")
+Rel(backend, cache, "Caches", "Redis protocol")
+Rel(backend, queue, "Publishes", "AMQP/HTTPS")
+Rel(worker, queue, "Consumes", "AMQP/HTTPS")
+Rel(worker, s3, "Stores files", "HTTPS")
+SHOW_LEGEND()
+@enduml</pre>
+      </div>
+    </div>
+  </div>
   <footer>
     <div class="footer-line"></div>
     <div>Matrix &mdash; Built for GitHub Pages</div>
     <div style="margin-top:6px; font-size:0.7rem; color:#333;">Wake up, Neo...</div>
   </footer>
-
 </div>
-
 <script>
-
-// Matrix rain
 (function initMatrix() {
   const canvas = document.getElementById('matrix-canvas');
   if (!canvas) return;
@@ -403,8 +270,9 @@
   resize(); window.addEventListener('resize', resize);
   const chars = '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
   const fontSize = 14;
-  const columns = Math.floor(canvas.width / fontSize);
-  const drops = Array(columns).fill(1);
+  let columns = Math.floor(canvas.width / fontSize);
+  let drops = Array(columns).fill(1);
+  window.addEventListener('resize', () => { columns = Math.floor(canvas.width / fontSize); drops = Array(columns).fill(1); });
   function draw() {
     ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -419,221 +287,1734 @@
   }
   setInterval(draw, 50);
 })();
-
-// Active nav
 const currentPage = window.location.pathname.split('/').pop() || 'index.html';
-document.querySelectorAll('nav a').forEach(a => {
-  if (a.getAttribute('href') === currentPage) a.classList.add('active');
-});
+document.querySelectorAll('nav a').forEach(a => { if (a.getAttribute('href') === currentPage) a.classList.add('active'); });
 
+let wizardState = { provider: null, pattern: null, options: {} };
+let currentStep = 0;
 
-const patterns = [
-  { name: "3-Tier Web App", desc: "Classic web app with presentation, application, and data tiers.",
-    mermaid: `graph TB
-  User-->LB[Load Balancer]
-  LB-->Web1[Web Server]
-  LB-->Web2[Web Server]
-  Web1-->App1[App Server]
-  Web2-->App2[App Server]
-  App1-->DB[(Primary DB)]
-  App2-->DB
-  DB-->Replica[(Read Replica)]`,
-    terraform: `resource "aws_lb" "main" { name = "app-lb" }
-resource "aws_instance" "web" { count = 2 }
-resource "aws_db_instance" "db" { engine = "postgres" }` },
-  { name: "Microservices", desc: "Decoupled services with API gateway, service mesh, and polyglot persistence.",
-    mermaid: `graph TB
-  Client-->GW[API Gateway]
-  GW-->Auth[Auth Service]
-  GW-->Order[Order Service]
-  GW-->User[User Service]
-  Order-->DB1[(Order DB)]
-  User-->DB2[(User DB)]
-  Order-->MQ[Message Queue]
-  MQ-->Notify[Notification Service]`,
-    terraform: `resource "aws_api_gateway_rest_api" "gw" {}
-resource "aws_ecs_service" "svc" {}
-resource "aws_mq_broker" "mq" {}` },
-  { name: "Serverless Event-Driven", desc: "Event-driven architecture using functions, queues, and event buses.",
-    mermaid: `graph TB
-  Client-->APIG[API Gateway]
-  APIG-->Lambda1[Upload Function]
-  Lambda1-->S3[(S3 Bucket)]
-  S3-->Event[S3 Event]
-  Event-->Lambda2[Process Function]
-  Lambda2-->Dynamo[(DynamoDB)]
-  Lambda2-->SNS[Notification Topic]`,
-    terraform: `resource "aws_api_gateway_rest_api" "api" {}
-resource "aws_lambda_function" "fn" {}
-resource "aws_dynamodb_table" "tbl" {}` },
-  { name: "Data Lake", desc: "Ingestion, storage, processing, and analytics pipeline for big data.",
-    mermaid: `graph TB
-  Sources-->Kinesis[Data Stream]
-  Kinesis-->S3[(Raw Data Lake)]
-  S3-->Glue[ETL Job]
-  Glue-->Parquet[(Processed Data)]
-  Parquet-->Athena[Query Engine]
-  Parquet-->Redshift[(Data Warehouse)]
-  Athena-->BI[BI Dashboard]`,
-    terraform: `resource "aws_kinesis_stream" "stream" {}
-resource "aws_s3_bucket" "lake" {}
-resource "aws_glue_job" "etl" {}` },
-  { name: "Kubernetes Platform", desc: "Container platform with ingress, service mesh, monitoring, and GitOps.",
-    mermaid: `graph TB
-  DNS-->CDN[CloudFront]
-  CDN-->Ingress[Ingress Controller]
-  Ingress-->Svc1[Web Service]
-  Ingress-->Svc2[API Service]
-  Svc1-->Mesh[Service Mesh]
-  Svc2-->Mesh
-  Mesh-->DB[(PostgreSQL)]
-  Mesh-->Cache[(Redis)]
-  Monitor[Prometheus/Grafana]-->Mesh`,
-    terraform: `resource "aws_eks_cluster" "k8s" {}
-resource "helm_release" "ingress" {}
-resource "helm_release" "monitoring" {}` },
-  { name: "Multi-Region Active-Active", desc: "Globally distributed application with traffic management and data replication.",
-    mermaid: `graph TB
-  User-->Route53[Route 53]
-  Route53-->Region1[US-East]
-  Route53-->Region2[EU-West]
-  Region1-->DB1[(Primary)]
-  Region2-->DB2[(Replica)]
-  DB1<-->Repl[Cross-Region Replication]
-  Repl<-->DB2`,
-    terraform: `resource "aws_route53_record" "dns" {}
-resource "aws_db_instance" "primary" {}
-resource "aws_db_instance" "replica" { replicate_source_db = ... }` }
-];
+const patterns = {
+  aws: [
+    { key: '3tier', name: '3-Tier Web Application', desc: 'Classic presentation, application, and data tiers with auto-scaling.', tags: ['aws'] },
+    { key: 'microservices', name: 'Microservices on ECS/EKS', desc: 'Containerized services with API Gateway, service mesh, and polyglot persistence.', tags: ['aws'] },
+    { key: 'serverless', name: 'Serverless Event-Driven', desc: 'Lambda functions, API Gateway, S3 events, DynamoDB, and SNS/SQS.', tags: ['aws'] },
+    { key: 'datalake', name: 'Data Lake & Analytics', desc: 'Kinesis ingestion, S3 data lake, Glue ETL, Athena, and Redshift.', tags: ['aws'] },
+    { key: 'k8s', name: 'Kubernetes Platform (EKS)', desc: 'EKS cluster with ingress, service mesh, monitoring, and GitOps.', tags: ['aws'] },
+    { key: 'multiregion', name: 'Multi-Region Active-Active', desc: 'Route 53, multi-region ALB, Aurora Global DB, and DynamoDB Global Tables.', tags: ['aws'] },
+    { key: 'ai', name: 'AI/ML Inference Pipeline', desc: 'SageMaker endpoints, API Gateway, Lambda preprocessing, and S3 model store.', tags: ['aws'] }
+  ],
+  azure: [
+    { key: '3tier', name: '3-Tier Web Application', desc: 'App Service frontend, API Management, Azure SQL, and Traffic Manager.', tags: ['azure'] },
+    { key: 'microservices', name: 'Microservices on AKS', desc: 'AKS with Azure Container Registry, API Management, and Service Bus.', tags: ['azure'] },
+    { key: 'serverless', name: 'Serverless Event-Driven', desc: 'Azure Functions, Logic Apps, Event Grid, Cosmos DB, and Storage Queues.', tags: ['azure'] },
+    { key: 'datalake', name: 'Data Lake & Analytics', desc: 'Event Hubs, ADLS Gen2, Azure Synapse, Databricks, and Power BI.', tags: ['azure'] },
+    { key: 'k8s', name: 'Kubernetes Platform (AKS)', desc: 'AKS with AGIC ingress, Azure Monitor, Key Vault, and Flux/ArgoCD.', tags: ['azure'] },
+    { key: 'multiregion', name: 'Multi-Region Active-Active', desc: 'Front Door, paired regions, Cosmos DB multi-region, and SQL auto-failover.', tags: ['azure'] },
+    { key: 'ai', name: 'AI/ML Inference Pipeline', desc: 'Azure ML endpoints, API Management, Function preprocessing, and Blob model store.', tags: ['azure'] }
+  ],
+  gcp: [
+    { key: '3tier', name: '3-Tier Web Application', desc: 'Cloud Load Balancing, Cloud Run/Compute Engine, Cloud SQL, and Cloud CDN.', tags: ['gcp'] },
+    { key: 'microservices', name: 'Microservices on GKE', desc: 'GKE with Cloud Load Balancing, Cloud Pub/Sub, and Cloud Memorystore.', tags: ['gcp'] },
+    { key: 'serverless', name: 'Serverless Event-Driven', desc: 'Cloud Functions, Cloud Run, Eventarc, Firestore, and Cloud Tasks.', tags: ['gcp'] },
+    { key: 'datalake', name: 'Data Lake & Analytics', desc: 'Pub/Sub, Cloud Storage, Dataflow, BigQuery, and Looker.', tags: ['gcp'] },
+    { key: 'k8s', name: 'Kubernetes Platform (GKE)', desc: 'GKE Autopilot/Standard with Cloud Load Balancing, Anthos, and Cloud Monitoring.', tags: ['gcp'] },
+    { key: 'multiregion', name: 'Multi-Region Active-Active', desc: 'Cloud DNS, multi-region load balancing, Cloud Spanner, and Cloud SQL replicas.', tags: ['gcp'] },
+    { key: 'ai', name: 'AI/ML Inference Pipeline', desc: 'Vertex AI endpoints, Cloud Endpoints, Function preprocessing, and GCS model store.', tags: ['gcp'] }
+  ]
+};
 
-const archComponents = [
-  'VM','Kubernetes','PostgreSQL','Redis','MongoDB','Elasticsearch',
-  'Load Balancer','VPC','S3 Bucket','Lambda','API Gateway',
-  'CloudFront','Route53','EKS','AKS','GKE',
-  'Docker','Helm','Prometheus','Grafana','CloudWatch',
-  'SQS','SNS','EventBridge','DynamoDB','RDS',
-  'ECR','IAM Role','Security Group','NAT Gateway','Bastion Host'
-];
+const optionCatalog = {
+  '3tier': {
+    'Compute': ['Auto Scaling', 'Spot/Preemptible VMs', 'Containerized (Docker)'],
+    'Database': ['PostgreSQL', 'MySQL', 'SQL Server', 'NoSQL (DynamoDB/Cosmos/Firestore)'],
+    'Caching': ['Redis', 'Memcached'],
+    'CDN': ['CloudFront', 'Azure CDN', 'Cloud CDN'],
+    'Security': ['WAF', 'DDoS Protection', 'Private Endpoints']
+  },
+  'microservices': {
+    'Orchestration': ['Managed Kubernetes', 'Container Service (ECS/ACI/Cloud Run)'],
+    'Service Mesh': ['Istio', 'Linkerd', 'Consul', 'Cilium'],
+    'Messaging': ['RabbitMQ', 'Kafka', 'Managed Queue (SQS/Service Bus/PubSub)'],
+    'Observability': ['Prometheus + Grafana', 'Cloud Native (CloudWatch/Monitor/Operations)', 'Datadog'],
+    'Security': ['mTLS', 'API Gateway Auth', 'Private Cluster']
+  },
+  'serverless': {
+    'Trigger': ['HTTP/API', 'Event/Queue', 'Schedule/Timer', 'File Upload'],
+    'Compute': ['Functions', 'Containerized Functions'],
+    'Persistence': ['Document DB', 'Relational DB', 'Key-Value Store', 'Object Storage'],
+    'Integration': ['Event Bus', 'Workflow Orchestration', 'Message Queue'],
+    'Security': ['API Key Auth', 'OAuth/JWT', 'VPC Integration']
+  },
+  'datalake': {
+    'Ingestion': ['Streaming', 'Batch', 'Change Data Capture'],
+    'Storage': ['Object Storage', 'Delta Lake', 'Iceberg'],
+    'Processing': ['Spark', 'Flink', 'Managed ETL'],
+    'Analytics': ['SQL Query Engine', 'BI Integration', 'ML Feature Store'],
+    'Governance': ['Data Catalog', 'Lineage Tracking', 'Access Control']
+  },
+  'k8s': {
+    'Ingress': ['NGINX', 'Traefik', 'Application Gateway', 'Cloud Load Balancer'],
+    'Storage': ['Managed Disks', 'Network File System', 'Object Storage CSI'],
+    'Observability': ['Prometheus Stack', 'Cloud Native Monitoring', 'Jaeger/Tempo Tracing'],
+    'GitOps': ['ArgoCD', 'Flux', 'Rancher Fleet'],
+    'Security': ['OPA/Gatekeeper', 'Falco', 'Pod Security Standards', 'Secrets Encryption']
+  },
+  'multiregion': {
+    'Traffic': ['Geo-DNS', 'Latency-Based Routing', 'Weighted Routing'],
+    'Data': ['Global Database', 'Async Replication', 'Conflict Resolution'],
+    'Compute': ['Regional Clusters', 'VM Scale Sets', 'Container Replicas'],
+    'DR': ['Backup Vault', 'Site Recovery', 'Pilot Light', 'Warm Standby']
+  },
+  'ai': {
+    'Model Serving': ['Real-time Endpoint', 'Batch Inference', 'Edge Deployment'],
+    'Preprocessing': ['Data Validation', 'Feature Engineering', 'Vectorization'],
+    'Storage': ['Model Registry', 'Feature Store', 'Vector DB'],
+    'Monitoring': ['Model Drift', 'Data Quality', 'Latency/Throughput'],
+    'Security': ['Model Encryption', 'Input Sanitization', 'Access Control']
+  }
+};
 
-let selectedComponents = new Set();
-
+function selectProvider(p) { wizardState.provider = p; renderPatterns(); nextStep(); }
 function renderPatterns() {
-  document.getElementById('patternGrid').innerHTML = patterns.map((p, i) => `
-    <div class="pattern-card" onclick="loadPattern(${i})">
+  const list = patterns[wizardState.provider] || [];
+  document.getElementById('patternGrid').innerHTML = list.map(p => `
+    <div class="pattern-card" onclick="selectPattern('${p.key}')">
       <h4>${p.name}</h4>
       <p>${p.desc}</p>
+      <div class="provider-tags">${p.tags.map(t => `<span class="tag-${t}">${t}</span>`).join('')}</div>
     </div>
   `).join('');
 }
-
-function renderPalette() {
-  document.getElementById('palette').innerHTML = archComponents.map(c => `
-    <button class="palette-btn" id="comp-${c.replace(/\s/g,'')}" onclick="toggleComponent('${c}')">${c}</button>
+function selectPattern(key) { wizardState.pattern = key; renderOptions(); nextStep(); }
+function renderOptions() {
+  const opts = optionCatalog[wizardState.pattern] || {};
+  const container = document.getElementById('optionsContainer');
+  container.innerHTML = Object.entries(opts).map(([group, items]) => `
+    <div class="option-group">
+      <h4>${group}</h4>
+      <div class="option-grid">
+        ${items.map(item => `<button class="option-btn" id="opt-${group}-${item.replace(/\s+/g,'-')}" onclick="toggleOption('${group}', '${item.replace(/'/g, "\'")}')">${item}</button>`).join('')}
+      </div>
+    </div>
   `).join('');
+  wizardState.options = {};
 }
-
-function loadPattern(idx) {
-  const p = patterns[idx];
-  document.getElementById('archOutput').innerHTML = `
-    <div style="color:var(--orange);margin-bottom:12px;font-family:'Orbitron',sans-serif;font-size:0.85rem;">PATTERN: ${p.name.toUpperCase()}</div>
-    <div style="color:var(--gold);margin-bottom:8px;font-size:0.8rem;">Mermaid Diagram:</div>
-    <pre style="margin:0 0 20px 0;white-space:pre-wrap;word-break:break-all;">${p.mermaid}</pre>
-    <div style="color:var(--gold);margin-bottom:8px;font-size:0.8rem;">Terraform Skeleton:</div>
-    <pre style="margin:0;white-space:pre-wrap;word-break:break-all;">${p.terraform}</pre>
-  `;
-}
-
-function toggleComponent(name) {
-  const id = 'comp-' + name.replace(/\s/g,'');
+function toggleOption(group, item) {
+  const id = 'opt-' + group + '-' + item.replace(/\s+/g, '-');
   const btn = document.getElementById(id);
-  if (selectedComponents.has(name)) {
-    selectedComponents.delete(name);
-    btn.classList.remove('active');
-  } else {
-    selectedComponents.add(name);
-    btn.classList.add('active');
+  if (!wizardState.options[group]) wizardState.options[group] = new Set();
+  if (wizardState.options[group].has(item)) { wizardState.options[group].delete(item); btn.classList.remove('active'); }
+  else { wizardState.options[group].add(item); btn.classList.add('active'); }
+}
+function nextStep() {
+  if (currentStep < 3) {
+    document.getElementById('step-' + currentStep).classList.remove('active');
+    document.getElementById('dot-' + currentStep).classList.remove('active');
+    document.getElementById('dot-' + currentStep).classList.add('done');
+    currentStep++;
+    document.getElementById('step-' + currentStep).classList.add('active');
+    document.getElementById('dot-' + currentStep).classList.add('active');
+    if (currentStep === 3) generateOutputs();
   }
 }
-
-function generateMermaid() {
-  const comps = Array.from(selectedComponents);
-  if (comps.length === 0) { document.getElementById('archOutput').textContent = 'Select at least one component.'; return; }
-  let mermaid = 'graph TB\n';
-  const ids = {};
-  comps.forEach((c, i) => { ids[c] = 'N' + i; });
-  comps.forEach(c => { mermaid += `  ${ids[c]}[${c}]\n`; });
-  if (ids['Load Balancer'] && ids['VM']) mermaid += `  ${ids['Load Balancer']} --> ${ids['VM']}\n`;
-  if (ids['Load Balancer'] && ids['Kubernetes']) mermaid += `  ${ids['Load Balancer']} --> ${ids['Kubernetes']}\n`;
-  if (ids['API Gateway'] && ids['Lambda']) mermaid += `  ${ids['API Gateway']} --> ${ids['Lambda']}\n`;
-  if (ids['Kubernetes'] && ids['PostgreSQL']) mermaid += `  ${ids['Kubernetes']} --> ${ids['PostgreSQL']}\n`;
-  if (ids['Kubernetes'] && ids['Redis']) mermaid += `  ${ids['Kubernetes']} --> ${ids['Redis']}\n`;
-  if (ids['VPC'] && ids['VM']) mermaid += `  ${ids['VPC']} -.-> ${ids['VM']}\n`;
-  if (ids['VPC'] && ids['Kubernetes']) mermaid += `  ${ids['VPC']} -.-> ${ids['Kubernetes']}\n`;
-  if (ids['CloudFront'] && ids['S3 Bucket']) mermaid += `  ${ids['CloudFront']} --> ${ids['S3 Bucket']}\n`;
-  if (ids['Route53'] && ids['Load Balancer']) mermaid += `  ${ids['Route53']} --> ${ids['Load Balancer']}\n`;
-  if (ids['Route53'] && ids['API Gateway']) mermaid += `  ${ids['Route53']} --> ${ids['API Gateway']}\n`;
-  if (ids['Prometheus'] && ids['Grafana']) mermaid += `  ${ids['Prometheus']} --> ${ids['Grafana']}\n`;
-  if (ids['VM'] && ids['Docker']) mermaid += `  ${ids['VM']} --> ${ids['Docker']}\n`;
-  if (ids['EKS'] && ids['Helm']) mermaid += `  ${ids['EKS']} --> ${ids['Helm']}\n`;
-  if (ids['AKS'] && ids['Helm']) mermaid += `  ${ids['AKS']} --> ${ids['Helm']}\n`;
-  if (ids['GKE'] && ids['Helm']) mermaid += `  ${ids['GKE']} --> ${ids['Helm']}\n`;
-  if (ids['Lambda'] && ids['DynamoDB']) mermaid += `  ${ids['Lambda']} --> ${ids['DynamoDB']}\n`;
-  if (ids['Lambda'] && ids['SQS']) mermaid += `  ${ids['Lambda']} --> ${ids['SQS']}\n`;
-  if (ids['API Gateway'] && ids['Lambda']) mermaid += `  ${ids['API Gateway']} --> ${ids['Lambda']}\n`;
-  if (ids['Kubernetes'] && ids['MongoDB']) mermaid += `  ${ids['Kubernetes']} --> ${ids['MongoDB']}\n`;
-  if (ids['Kubernetes'] && ids['Elasticsearch']) mermaid += `  ${ids['Kubernetes']} --> ${ids['Elasticsearch']}\n`;
-  document.getElementById('archOutput').innerHTML = `<div style="color:var(--orange);margin-bottom:12px;font-family:'Orbitron',sans-serif;font-size:0.85rem;">MERMAID DIAGRAM</div><pre style="margin:0;white-space:pre-wrap;word-break:break-all;">${mermaid}</pre>`;
+function prevStep() {
+  if (currentStep > 0) {
+    document.getElementById('step-' + currentStep).classList.remove('active');
+    document.getElementById('dot-' + currentStep).classList.remove('active');
+    currentStep--;
+    document.getElementById('step-' + currentStep).classList.add('active');
+    document.getElementById('dot-' + currentStep).classList.remove('done');
+    document.getElementById('dot-' + currentStep).classList.add('active');
+  }
+}
+function resetWizard() {
+  currentStep = 0;
+  wizardState = { provider: null, pattern: null, options: {} };
+  for (let i = 0; i <= 3; i++) {
+    document.getElementById('step-' + i).classList.remove('active');
+    document.getElementById('dot-' + i).classList.remove('active', 'done');
+  }
+  document.getElementById('step-0').classList.add('active');
+  document.getElementById('dot-0').classList.add('active');
+}
+function switchTab(name) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('tab-' + name).classList.add('active');
 }
 
-function generateTerraform() {
-  const comps = Array.from(selectedComponents);
-  if (comps.length === 0) { document.getElementById('archOutput').textContent = 'Select at least one component.'; return; }
-  let tf = `terraform {\n  required_providers {\n    aws = {\n      source  = \"hashicorp/aws\"\n      version = \"~> 5.0\"\n    }\n  }\n}\n\nprovider \"aws\" {\n  region = \"us-east-1\"\n}\n\n`;
-  comps.forEach(c => {
-    const safe = c.toLowerCase().replace(/\s/g, '_');
-    if (c === 'VM') tf += `resource \"aws_instance\" \"${safe}\" {\n  ami           = \"ami-0c55b159cbfafe1f0\"\n  instance_type = \"t3.micro\"\n  tags = { Name = \"${c}\" }\n}\n\n`;
-    else if (c === 'VPC') tf += `resource \"aws_vpc\" \"${safe}\" {\n  cidr_block = \"10.0.0.0/16\"\n  tags = { Name = \"${c}\" }\n}\n\n`;
-    else if (c === 'Load Balancer') tf += `resource \"aws_lb\" \"${safe}\" {\n  name               = \"${safe}\"\n  internal           = false\n  load_balancer_type = \"application\"\n  subnets            = [aws_subnet.public.id]\n}\n\n`;
-    else if (c === 'S3 Bucket') tf += `resource \"aws_s3_bucket\" \"${safe}\" {\n  bucket = \"my-app-bucket-unique\"\n}\n\n`;
-    else if (c === 'PostgreSQL' || c === 'RDS') tf += `resource \"aws_db_instance\" \"${safe}\" {\n  identifier        = \"${safe}\"\n  engine            = \"postgres\"\n  instance_class    = \"db.t3.micro\"\n  allocated_storage = 20\n  username          = \"admin\"\n  password          = var.db_password\n}\n\n`;
-    else if (c === 'Redis') tf += `resource \"aws_elasticache_cluster\" \"${safe}\" {\n  cluster_id      = \"${safe}\"\n  engine          = \"redis\"\n  node_type       = \"cache.t3.micro\"\n  num_cache_nodes = 1\n}\n\n`;
-    else if (c === 'Lambda') tf += `resource \"aws_lambda_function\" \"${safe}\" {\n  function_name = \"${safe}\"\n  handler       = \"index.handler\"\n  runtime       = \"nodejs20.x\"\n  role          = aws_iam_role.lambda.arn\n  filename      = \"function.zip\"\n}\n\n`;
-    else if (c === 'API Gateway') tf += `resource \"aws_api_gateway_rest_api\" \"${safe}\" {\n  name = \"${safe}\"\n}\n\n`;
-    else if (c.includes('Kubernetes') || c === 'EKS' || c === 'AKS' || c === 'GKE') tf += `resource \"aws_eks_cluster\" \"${safe}\" {\n  name     = \"${safe}\"\n  role_arn = aws_iam_role.eks.arn\n  vpc_config {\n    subnet_ids = [aws_subnet.private.id]\n  }\n}\n\n`;
-    else if (c === 'DynamoDB') tf += `resource \"aws_dynamodb_table\" \"${safe}\" {\n  name         = \"${safe}\"\n  billing_mode = \"PAY_PER_REQUEST\"\n  hash_key     = \"id\"\n  attribute {\n    name = \"id\"\n    type = \"S\"\n  }\n}\n\n`;
-    else if (c === 'SQS') tf += `resource \"aws_sqs_queue\" \"${safe}\" {\n  name = \"${safe}\"\n}\n\n`;
-    else if (c === 'SNS') tf += `resource \"aws_sns_topic\" \"${safe}\" {\n  name = \"${safe}\"\n}\n\n`;
-    else if (c === 'Security Group') tf += `resource \"aws_security_group\" \"${safe}\" {\n  name_prefix = \"${safe}\"\n  vpc_id      = aws_vpc.main.id\n  ingress {\n    from_port   = 443\n    to_port     = 443\n    protocol    = \"tcp\"\n    cidr_blocks = [\"0.0.0.0/0\"]\n  }\n}\n\n`;
-    else if (c === 'IAM Role') tf += `resource \"aws_iam_role\" \"${safe}\" {\n  name = \"${safe}\"\n  assume_role_policy = jsonencode({\n    Version = \"2012-10-17\"\n    Statement = [{\n      Action = \"sts:AssumeRole\"\n      Effect = \"Allow\"\n      Principal = { Service = \"lambda.amazonaws.com\" }\n    }]\n  })\n}\n\n`;
-    else if (c === 'NAT Gateway') tf += `resource \"aws_nat_gateway\" \"${safe}\" {\n  allocation_id = aws_eip.nat.id\n  subnet_id     = aws_subnet.public.id\n}\n\n`;
-    else if (c === 'Bastion Host') tf += `resource \"aws_instance\" \"${safe}\" {\n  ami           = \"ami-0c55b159cbfafe1f0\"\n  instance_type = \"t3.micro\"\n  subnet_id     = aws_subnet.public.id\n  key_name      = aws_key_pair.bastion.key_name\n  tags = { Name = \"bastion\" }\n}\n\n`;
-    else tf += `resource \"aws_resource\" \"${safe}\" {\n  # TODO: Configure ${c} resource\n  tags = { Name = \"${c}\" }\n}\n\n`;
-  });
-  document.getElementById('archOutput').innerHTML = `<div style="color:var(--orange);margin-bottom:12px;font-family:'Orbitron',sans-serif;font-size:0.85rem;">TERRAFORM SKELETON</div><pre style="margin:0;white-space:pre-wrap;word-break:break-all;">${tf}</pre>`;
+function generateOutputs() {
+  const { provider, pattern, options } = wizardState;
+  const pName = provider.toUpperCase();
+  const patName = patterns[provider].find(p => p.key === pattern)?.name || pattern;
+  const optSummary = Object.entries(options).map(([g, items]) => {
+    const arr = Array.from(items);
+    return arr.length ? `<span class="tag" style="background:rgba(249,115,22,0.1);border:1px solid rgba(249,115,22,0.2);color:var(--orange);">${g}: ${arr.join(', ')}</span>` : '';
+  }).filter(Boolean).join(' ');
+  document.getElementById('summaryBox').innerHTML = `<h4>Configuration Summary</h4><p><strong>Provider:</strong> ${pName}<br><strong>Pattern:</strong> ${patName}<br><strong>Options:</strong> ${optSummary || '<span style="color:var(--text-muted)">Defaults applied</span>'}</p>`;
+  document.getElementById('mermaidOut').textContent = generateMermaid(provider, pattern, options);
+  document.getElementById('terraformOut').textContent = generateTerraform(provider, pattern, options);
+  document.getElementById('adrOut').textContent = generateADR(provider, pattern, options);
+  document.getElementById('c4Out').textContent = generateC4(provider, pattern, options);
 }
 
-function generateADR() {
-  const comps = Array.from(selectedComponents);
-  const tech = comps.length > 0 ? comps.join(', ') : 'selected technologies';
-  const adr = `# ADR-001: Architecture with ${tech}\n\n## Status\nAccepted\n\n## Context\nWe need to design a cloud architecture that meets scalability, reliability, and cost-efficiency requirements.\n\n## Decision\nWe will use the following components:\n${comps.map(c => '- ' + c).join('\n') || '- TBD'}\n\n## Consequences\n**Positive:**\n- Scalable and maintainable infrastructure\n- Industry-standard tooling\n- Strong community support\n\n**Negative:**\n- Operational complexity\n- Learning curve for the team\n- Potential vendor lock-in\n\n## Alternatives Considered\n- Monolithic architecture\n- Different cloud provider\n- Managed PaaS solutions\n\n## Date\n${new Date().toISOString().split('T')[0]}`;
-  document.getElementById('archOutput').innerHTML = `<div style="color:var(--orange);margin-bottom:12px;font-family:'Orbitron',sans-serif;font-size:0.85rem;">ARCHITECTURE DECISION RECORD</div><pre style="margin:0;white-space:pre-wrap;word-break:break-all;">${adr}</pre>`;
+function generateMermaid(provider, pattern, options) {
+  if (pattern === '3tier') return `graph TB
+    User([User]) --> DNS[Cloud DNS]
+    DNS --> CDN[CDN]
+    CDN --> LB[Load Balancer]
+    LB --> Web1[Web Tier 1]
+    LB --> Web2[Web Tier 2]
+    Web1 --> App1[App Tier 1]
+    Web2 --> App2[App Tier 2]
+    App1 --> DB[(Primary DB)]
+    App2 --> DB
+    DB --> Replica[(Read Replica)]
+    App1 --> Cache[(Redis Cache)]
+    App2 --> Cache
+    LB -.-> WAF[WAF]`;
+  if (pattern === 'microservices') return `graph TB
+    User([User]) --> GW[API Gateway]
+    GW --> Auth[Auth Service]
+    GW --> Svc1[Service A]
+    GW --> Svc2[Service B]
+    GW --> Svc3[Service C]
+    Svc1 --> DB1[(Service DB A)]
+    Svc2 --> DB2[(Service DB B)]
+    Svc3 --> DB3[(Service DB C)]
+    Svc1 --> MQ[Message Queue]
+    Svc2 --> MQ
+    MQ --> Worker[Background Worker]
+    Worker --> ObjectStore[(Object Storage)]`;
+  if (pattern === 'serverless') return `graph TB
+    Client([Client]) --> APIG[API Gateway / HTTP Trigger]
+    APIG --> Fn1[Function 1]
+    APIG --> Fn2[Function 2]
+    Event[Event Source] --> Fn3[Function 3]
+    Fn1 --> DB[(Database)]
+    Fn2 --> Cache[(Cache)]
+    Fn3 --> ObjectStore[(Object Storage)]
+    Fn1 --> Queue[Message Queue]
+    Queue --> Fn4[Function 4]`;
+  if (pattern === 'datalake') return `graph TB
+    Sources[Data Sources] --> Ingest[Ingestion Layer]
+    Ingest --> Raw[(Raw Data Lake)]
+    Raw --> Process[Processing Layer]
+    Process --> Curated[(Curated Data)]
+    Curated --> Query[Query Engine]
+    Curated --> Warehouse[(Data Warehouse)]
+    Query --> BI[BI / Dashboards]
+    Warehouse --> ML[ML / Analytics]`;
+  if (pattern === 'k8s') return `graph TB
+    User([User]) --> DNS[DNS / External-DNS]
+    DNS --> Ingress[Ingress Controller]
+    Ingress --> Svc1[Web Service]
+    Ingress --> Svc2[API Service]
+    Svc1 --> Mesh[Service Mesh]
+    Svc2 --> Mesh
+    Mesh --> DB[(Stateful DB)]
+    Mesh --> Cache[(Cache)]
+    Monitor[Prometheus / Grafana] --> Mesh
+    GitOps[GitOps Controller] --> Svc1
+    GitOps --> Svc2`;
+  if (pattern === 'multiregion') return `graph TB
+    User([User]) --> Traffic[Traffic Manager / DNS]
+    Traffic --> Region1[Region 1]
+    Traffic --> Region2[Region 2]
+    Region1 --> DB1[(Primary DB)]
+    Region2 --> DB2[(Secondary DB)]
+    DB1 <--> Repl[Cross-Region Replication]
+    Repl <--> DB2
+    Region1 --> Cache1[(Regional Cache)]
+    Region2 --> Cache2[(Regional Cache)]`;
+  if (pattern === 'ai') return `graph TB
+    Client([Client]) --> APIG[API Gateway]
+    APIG --> Preprocess[Preprocessing Function]
+    Preprocess --> Model[Model Endpoint]
+    Preprocess --> Feature[(Feature Store)]
+    Model --> Vector[(Vector DB)]
+    Model --> ObjectStore[(Model Registry)]
+    Monitor[Model Monitor] --> Model
+    Monitor --> Drift[Drift Detector]`;
+  return 'graph TB
+    A[Start] --> B[End]';
 }
 
-function clearSelection() {
-  selectedComponents.clear();
-  document.querySelectorAll('.palette-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('archOutput').textContent = 'Select components or a pattern to begin...';
+function generateTerraform(provider, pattern, options) {
+  const o = options;
+  let tf = '';
+  if (provider === 'aws') {
+    tf += `terraform {
+  required_version = ">= 1.5.0"
+  required_providers {
+    aws = { source = "hashicorp/aws" version = "~> 5.0" }
+    random = { source = "hashicorp/random" version = "~> 3.0" }
+  }
+  backend "s3" {
+    bucket = "my-terraform-state"
+    key = "${pattern}/terraform.tfstate"
+    region = "us-east-1"
+    encrypt = true
+    dynamodb_table = "terraform-locks"
+  }
+}
+provider "aws" {
+  region = var.aws_region
+  default_tags { tags = { Environment = var.environment Project = var.project_name ManagedBy = "terraform" } }
+}
+variable "aws_region" { description = "AWS region" type = string default = "us-east-1" }
+variable "environment" { description = "Environment" type = string default = "prod" }
+variable "project_name" { description = "Project name" type = string default = "matrix-app" }
+variable "vpc_cidr" { description = "VPC CIDR" type = string default = "10.0.0.0/16" }
+data "aws_availability_zones" "available" { state = "available" }
+resource "aws_vpc" "main" {
+  cidr_block = var.vpc_cidr
+  enable_dns_hostnames = true
+  enable_dns_support = true
+  tags = { Name = "${var.project_name}-vpc" }
+}
+resource "aws_internet_gateway" "main" { vpc_id = aws_vpc.main.id tags = { Name = "${var.project_name}-igw" } }
+resource "aws_subnet" "public" {
+  count = 2
+  vpc_id = aws_vpc.main.id
+  cidr_block = cidrsubnet(var.vpc_cidr, 8, count.index)
+  availability_zone = data.aws_availability_zones.available.names[count.index]
+  map_public_ip_on_launch = true
+  tags = { Name = "${var.project_name}-public-${count.index + 1}" }
+}
+resource "aws_subnet" "private" {
+  count = 2
+  vpc_id = aws_vpc.main.id
+  cidr_block = cidrsubnet(var.vpc_cidr, 8, count.index + 10)
+  availability_zone = data.aws_availability_zones.available.names[count.index]
+  tags = { Name = "${var.project_name}-private-${count.index + 1}" }
+}
+resource "aws_route_table" "public" {
+  vpc_id = aws_vpc.main.id
+  route { cidr_block = "0.0.0.0/0" gateway_id = aws_internet_gateway.main.id }
+  tags = { Name = "${var.project_name}-public-rt" }
+}
+resource "aws_route_table_association" "public" {
+  count = length(aws_subnet.public)
+  subnet_id = aws_subnet.public[count.index].id
+  route_table_id = aws_route_table.public.id
+}
+resource "aws_security_group" "alb" {
+  name_prefix = "${var.project_name}-alb-"
+  vpc_id = aws_vpc.main.id
+  ingress { from_port = 80 to_port = 80 protocol = "tcp" cidr_blocks = ["0.0.0.0/0"] }
+  ingress { from_port = 443 to_port = 443 protocol = "tcp" cidr_blocks = ["0.0.0.0/0"] }
+  egress { from_port = 0 to_port = 0 protocol = "-1" cidr_blocks = ["0.0.0.0/0"] }
+  tags = { Name = "${var.project_name}-alb-sg" }
+  lifecycle { create_before_destroy = true }
+}
+`;
+    if (pattern === '3tier') {
+      tf += `resource "aws_lb" "main" {
+  name = "${var.project_name}-alb"
+  internal = false
+  load_balancer_type = "application"
+  security_groups = [aws_security_group.alb.id]
+  subnets = aws_subnet.public[*].id
+  enable_deletion_protection = false
+  tags = { Name = "${var.project_name}-alb" }
+}
+resource "aws_lb_target_group" "web" {
+  name = "${var.project_name}-web-tg"
+  port = 80
+  protocol = "HTTP"
+  vpc_id = aws_vpc.main.id
+  health_check { path = "/" port = "traffic-port" healthy_threshold = 2 unhealthy_threshold = 3 timeout = 5 interval = 30 matcher = "200" }
+}
+resource "aws_lb_listener" "http" {
+  load_balancer_arn = aws_lb.main.arn
+  port = 80
+  protocol = "HTTP"
+  default_action { type = "forward" target_group_arn = aws_lb_target_group.web.arn }
+}
+resource "aws_launch_template" "web" {
+  name_prefix = "${var.project_name}-web-"
+  image_id = "ami-0c55b159cbfafe1f0"
+  instance_type = "t3.micro"
+  vpc_security_group_ids = [aws_security_group.alb.id]
+  user_data = base64encode(<<-EOF
+              #!/bin/bash
+              yum install -y httpd
+              systemctl start httpd
+              systemctl enable httpd
+              EOF
+  )
+  tag_specifications {
+    resource_type = "instance"
+    tags = { Name = "${var.project_name}-web" }
+  }
+}
+resource "aws_autoscaling_group" "web" {
+  name = "${var.project_name}-web-asg"
+  desired_capacity = 2
+  min_size = 1
+  max_size = 4
+  vpc_zone_identifier = aws_subnet.public[*].id
+  target_group_arns = [aws_lb_target_group.web.arn]
+  launch_template { id = aws_launch_template.web.id version = "$Latest" }
+  tag { key = "Name" value = "${var.project_name}-web" propagate_at_launch = true }
+}
+resource "aws_db_subnet_group" "main" {
+  name = "${var.project_name}-db-subnet"
+  subnet_ids = aws_subnet.private[*].id
+  tags = { Name = "${var.project_name}-db-subnet" }
+}
+resource "aws_db_instance" "primary" {
+  identifier = "${var.project_name}-db"
+  engine = "postgres"
+  engine_version = "15.4"
+  instance_class = "db.t3.micro"
+  allocated_storage = 20
+  storage_type = "gp3"
+  db_subnet_group_name = aws_db_subnet_group.main.name
+  vpc_security_group_ids = [aws_security_group.alb.id]
+  username = "dbadmin"
+  password = random_password.db.result
+  publicly_accessible = false
+  multi_az = true
+  backup_retention_period = 7
+  skip_final_snapshot = true
+  tags = { Name = "${var.project_name}-db" }
+}
+resource "random_password" "db" {
+  length = 24
+  special = true
+  override_special = "!#$%&*()-_=+[]{}<>:?"
+}
+resource "aws_db_instance" "replica" {
+  identifier = "${var.project_name}-db-replica"
+  replicate_source_db = aws_db_instance.primary.arn
+  instance_class = "db.t3.micro"
+  publicly_accessible = false
+  skip_final_snapshot = true
+  tags = { Name = "${var.project_name}-db-replica" }
+}
+`;
+      if (o['Caching'] && Array.from(o['Caching']).some(x => x.includes('Redis'))) {
+        tf += `resource "aws_elasticache_subnet_group" "main" {
+  name = "${var.project_name}-cache-subnet"
+  subnet_ids = aws_subnet.private[*].id
+}
+resource "aws_elasticache_cluster" "redis" {
+  cluster_id = "${var.project_name}-redis"
+  engine = "redis"
+  node_type = "cache.t3.micro"
+  num_cache_nodes = 1
+  subnet_group_name = aws_elasticache_subnet_group.main.name
+  security_group_ids = [aws_security_group.alb.id]
+  tags = { Name = "${var.project_name}-redis" }
+}
+`;
+      }
+      if (o['CDN'] && Array.from(o['CDN']).some(x => x.includes('CloudFront'))) {
+        tf += `resource "aws_cloudfront_distribution" "main" {
+  enabled = true
+  is_ipv6_enabled = true
+  comment = "${var.project_name} CDN"
+  default_cache_behavior {
+    allowed_methods = ["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"]
+    cached_methods = ["GET", "HEAD"]
+    target_origin_id = "alb"
+    viewer_protocol_policy = "redirect-to-https"
+    forwarded_values { query_string = false cookies { forward = "none" } }
+    min_ttl = 0 default_ttl = 3600 max_ttl = 86400
+  }
+  origin {
+    domain_name = aws_lb.main.dns_name
+    origin_id = "alb"
+    custom_origin_config {
+      http_port = 80
+      https_port = 443
+      origin_protocol_policy = "http-only"
+      origin_ssl_protocols = ["TLSv1.2"]
+    }
+  }
+  restrictions { geo_restriction { restriction_type = "none" } }
+  viewer_certificate { cloudfront_default_certificate = true }
+  tags = { Name = "${var.project_name}-cdn" }
+}
+`;
+      }
+    } else if (pattern === 'microservices') {
+      tf += `resource "aws_ecs_cluster" "main" {
+  name = "${var.project_name}-cluster"
+  setting { name = "containerInsights" value = "enabled" }
+  tags = { Name = "${var.project_name}-cluster" }
+}
+resource "aws_ecs_task_definition" "service" {
+  family = "${var.project_name}-service"
+  network_mode = "awsvpc"
+  requires_compatibilities = ["FARGATE"]
+  cpu = "256"
+  memory = "512"
+  execution_role_arn = aws_iam_role.ecs_execution.arn
+  container_definitions = jsonencode([{
+    name = "app"
+    image = "nginx:latest"
+    essential = true
+    portMappings = [{ containerPort = 80 hostPort = 80 protocol = "tcp" }]
+    logConfiguration = {
+      logDriver = "awslogs"
+      options = {
+        "awslogs-group" = aws_cloudwatch_log_group.ecs.name
+        "awslogs-region" = var.aws_region
+        "awslogs-stream-prefix" = "ecs"
+      }
+    }
+  }])
+  tags = { Name = "${var.project_name}-task" }
+}
+resource "aws_cloudwatch_log_group" "ecs" {
+  name = "/ecs/${var.project_name}"
+  retention_in_days = 7
+}
+resource "aws_ecs_service" "main" {
+  name = "${var.project_name}-service"
+  cluster = aws_ecs_cluster.main.id
+  task_definition = aws_ecs_task_definition.service.arn
+  desired_count = 2
+  launch_type = "FARGATE"
+  network_configuration {
+    subnets = aws_subnet.private[*].id
+    security_groups = [aws_security_group.alb.id]
+    assign_public_ip = false
+  }
+  load_balancer {
+    target_group_arn = aws_lb_target_group.web.arn
+    container_name = "app"
+    container_port = 80
+  }
+  depends_on = [aws_lb_listener.http]
+  tags = { Name = "${var.project_name}-service" }
+}
+resource "aws_lb" "main" {
+  name = "${var.project_name}-alb"
+  internal = false
+  load_balancer_type = "application"
+  security_groups = [aws_security_group.alb.id]
+  subnets = aws_subnet.public[*].id
+  tags = { Name = "${var.project_name}-alb" }
+}
+resource "aws_lb_target_group" "web" {
+  name = "${var.project_name}-tg"
+  port = 80
+  protocol = "HTTP"
+  vpc_id = aws_vpc.main.id
+  target_type = "ip"
+  health_check { path = "/" port = "traffic-port" healthy_threshold = 2 unhealthy_threshold = 3 timeout = 5 interval = 30 matcher = "200" }
+}
+resource "aws_lb_listener" "http" {
+  load_balancer_arn = aws_lb.main.arn
+  port = 80
+  protocol = "HTTP"
+  default_action { type = "forward" target_group_arn = aws_lb_target_group.web.arn }
+}
+resource "aws_iam_role" "ecs_execution" {
+  name = "${var.project_name}-ecs-execution"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{ Action = "sts:AssumeRole" Effect = "Allow" Principal = { Service = "ecs-tasks.amazonaws.com" } }]
+  })
+}
+resource "aws_iam_role_policy_attachment" "ecs_execution" {
+  role = aws_iam_role.ecs_execution.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+}
+`;
+    } else if (pattern === 'serverless') {
+      tf += `resource "aws_api_gateway_rest_api" "main" {
+  name = "${var.project_name}-api"
+  description = "API Gateway for ${var.project_name}"
+  endpoint_configuration { types = ["REGIONAL"] }
+  tags = { Name = "${var.project_name}-api" }
+}
+resource "aws_api_gateway_resource" "proxy" {
+  rest_api_id = aws_api_gateway_rest_api.main.id
+  parent_id = aws_api_gateway_rest_api.main.root_resource_id
+  path_part = "{proxy+}"
+}
+resource "aws_api_gateway_method" "proxy" {
+  rest_api_id = aws_api_gateway_rest_api.main.id
+  resource_id = aws_api_gateway_resource.proxy.id
+  http_method = "ANY"
+  authorization = "NONE"
+}
+resource "aws_api_gateway_integration" "lambda" {
+  rest_api_id = aws_api_gateway_rest_api.main.id
+  resource_id = aws_api_gateway_resource.proxy.id
+  http_method = aws_api_gateway_method.proxy.http_method
+  integration_http_method = "POST"
+  type = "AWS_PROXY"
+  uri = aws_lambda_function.main.invoke_arn
+}
+resource "aws_api_gateway_deployment" "main" {
+  depends_on = [aws_api_gateway_integration.lambda]
+  rest_api_id = aws_api_gateway_rest_api.main.id
+  stage_name = var.environment
+  lifecycle { create_before_destroy = true }
+}
+resource "aws_lambda_function" "main" {
+  function_name = "${var.project_name}-handler"
+  role = aws_iam_role.lambda.arn
+  handler = "index.handler"
+  runtime = "nodejs20.x"
+  filename = data.archive_file.lambda.output_path
+  source_code_hash = data.archive_file.lambda.output_base64sha256
+  timeout = 30
+  memory_size = 256
+  vpc_config {
+    subnet_ids = aws_subnet.private[*].id
+    security_group_ids = [aws_security_group.alb.id]
+  }
+  environment {
+    variables = { NODE_ENV = var.environment }
+  }
+  tags = { Name = "${var.project_name}-lambda" }
+}
+data "archive_file" "lambda" {
+  type = "zip"
+  output_path = "${path.module}/lambda.zip"
+  source {
+    content = <<EOF
+exports.handler = async (event) => {
+  return { statusCode: 200, body: JSON.stringify({ message: "Hello from Matrix" }) };
+};
+EOF
+    filename = "index.js"
+  }
+}
+resource "aws_iam_role" "lambda" {
+  name = "${var.project_name}-lambda-role"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{ Action = "sts:AssumeRole" Effect = "Allow" Principal = { Service = "lambda.amazonaws.com" } }]
+  })
+}
+resource "aws_iam_role_policy_attachment" "lambda_basic" {
+  role = aws_iam_role.lambda.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+resource "aws_iam_role_policy_attachment" "lambda_vpc" {
+  role = aws_iam_role.lambda.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+}
+resource "aws_lambda_permission" "api_gw" {
+  statement_id = "AllowExecutionFromAPIGateway"
+  action = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.main.function_name
+  principal = "apigateway.amazonaws.com"
+  source_arn = "${aws_api_gateway_rest_api.main.execution_arn}/*/*"
+}
+`;
+      if (o['Persistence'] && Array.from(o['Persistence']).some(x => x.includes('DynamoDB') || x.includes('Key-Value'))) {
+        tf += `resource "aws_dynamodb_table" "main" {
+  name = "${var.project_name}-table"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key = "id"
+  attribute { name = "id" type = "S" }
+  point_in_time_recovery { enabled = true }
+  server_side_encryption { enabled = true }
+  tags = { Name = "${var.project_name}-table" }
+}
+`;
+      }
+    } else if (pattern === 'k8s') {
+      tf += `resource "aws_eks_cluster" "main" {
+  name = "${var.project_name}-cluster"
+  role_arn = aws_iam_role.eks_cluster.arn
+  version = "1.29"
+  vpc_config {
+    subnet_ids = aws_subnet.private[*].id
+    endpoint_private_access = true
+    endpoint_public_access = true
+    public_access_cidrs = ["0.0.0.0/0"]
+    security_group_ids = [aws_security_group.alb.id]
+  }
+  enabled_cluster_log_types = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
+  tags = { Name = "${var.project_name}-cluster" }
+}
+resource "aws_eks_node_group" "main" {
+  cluster_name = aws_eks_cluster.main.name
+  node_group_name = "${var.project_name}-nodes"
+  node_role_arn = aws_iam_role.eks_node.arn
+  subnet_ids = aws_subnet.private[*].id
+  scaling_config {
+    desired_size = 2
+    min_size = 1
+    max_size = 4
+  }
+  instance_types = ["t3.medium"]
+  capacity_type = "ON_DEMAND"
+  update_config { max_unavailable = 1 }
+  tags = { Name = "${var.project_name}-nodes" }
+}
+resource "aws_iam_role" "eks_cluster" {
+  name = "${var.project_name}-eks-cluster"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{ Action = "sts:AssumeRole" Effect = "Allow" Principal = { Service = "eks.amazonaws.com" } }]
+  })
+}
+resource "aws_iam_role_policy_attachment" "eks_cluster_policy" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
+  role = aws_iam_role.eks_cluster.name
+}
+resource "aws_iam_role" "eks_node" {
+  name = "${var.project_name}-eks-node"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{ Action = "sts:AssumeRole" Effect = "Allow" Principal = { Service = "ec2.amazonaws.com" } }]
+  })
+}
+resource "aws_iam_role_policy_attachment" "eks_worker_node" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
+  role = aws_iam_role.eks_node.name
+}
+resource "aws_iam_role_policy_attachment" "eks_cni" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
+  role = aws_iam_role.eks_node.name
+}
+resource "aws_iam_role_policy_attachment" "eks_container_registry" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+  role = aws_iam_role.eks_node.name
+}
+`;
+    } else if (pattern === 'datalake') {
+      tf += `resource "aws_s3_bucket" "raw" {
+  bucket = "${var.project_name}-raw-data"
+  tags = { Name = "${var.project_name}-raw" }
+}
+resource "aws_s3_bucket_versioning" "raw" {
+  bucket = aws_s3_bucket.raw.id
+  versioning_configuration { status = "Enabled" }
+}
+resource "aws_s3_bucket_server_side_encryption_configuration" "raw" {
+  bucket = aws_s3_bucket.raw.id
+  rule { apply_server_side_encryption_by_default { sse_algorithm = "AES256" } }
+}
+resource "aws_s3_bucket" "processed" {
+  bucket = "${var.project_name}-processed-data"
+  tags = { Name = "${var.project_name}-processed" }
+}
+resource "aws_glue_catalog_database" "main" {
+  name = "${var.project_name}_db"
+}
+resource "aws_athena_database" "main" {
+  name = "${var.project_name}_athena"
+  bucket = aws_s3_bucket.processed.id
+}
+resource "aws_kinesis_stream" "main" {
+  name = "${var.project_name}-stream"
+  shard_count = 2
+  retention_period = 24
+  encryption_type = "KMS"
+  tags = { Name = "${var.project_name}-stream" }
+}
+`;
+    } else if (pattern === 'multiregion') {
+      tf += `resource "aws_route53_zone" "main" {
+  name = "${var.project_name}.example.com"
+}
+resource "aws_route53_record" "primary" {
+  zone_id = aws_route53_zone.main.zone_id
+  name = "app.${var.project_name}.example.com"
+  type = "A"
+  set_identifier = "primary"
+  failover_routing_policy { type = "PRIMARY" }
+  health_check_id = aws_route53_health_check.primary.id
+  alias {
+    name = aws_lb.main.dns_name
+    zone_id = aws_lb.main.zone_id
+    evaluate_target_health = true
+  }
+}
+resource "aws_route53_health_check" "primary" {
+  fqdn = aws_lb.main.dns_name
+  port = 80
+  type = "HTTP"
+  resource_path = "/"
+  failure_threshold = 3
+  request_interval = 30
+  tags = { Name = "${var.project_name}-health" }
+}
+resource "aws_db_instance" "primary" {
+  identifier = "${var.project_name}-primary"
+  engine = "postgres"
+  engine_version = "15.4"
+  instance_class = "db.t3.micro"
+  allocated_storage = 20
+  multi_az = true
+  publicly_accessible = false
+  skip_final_snapshot = true
+  tags = { Name = "${var.project_name}-primary" }
+}
+`;
+    } else if (pattern === 'ai') {
+      tf += `resource "aws_sagemaker_endpoint_configuration" "main" {
+  name = "${var.project_name}-ep-config"
+  production_variants {
+    variant_name = "primary"
+    model_name = aws_sagemaker_model.main.name
+    initial_instance_count = 1
+    instance_type = "ml.t2.medium"
+    initial_variant_weight = 1
+  }
+}
+resource "aws_sagemaker_endpoint" "main" {
+  name = "${var.project_name}-endpoint"
+  endpoint_config_name = aws_sagemaker_endpoint_configuration.main.name
+  tags = { Name = "${var.project_name}-endpoint" }
+}
+resource "aws_sagemaker_model" "main" {
+  name = "${var.project_name}-model"
+  execution_role_arn = aws_iam_role.sagemaker.arn
+  primary_container {
+    image = "763104351884.dkr.ecr.${var.aws_region}.amazonaws.com/pytorch-inference:2.0.0-cpu-py310-ubuntu20.04-ec2"
+    model_data_url = "s3://${aws_s3_bucket.raw.bucket}/model.tar.gz"
+  }
+  tags = { Name = "${var.project_name}-model" }
+}
+resource "aws_iam_role" "sagemaker" {
+  name = "${var.project_name}-sagemaker-role"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{ Action = "sts:AssumeRole" Effect = "Allow" Principal = { Service = "sagemaker.amazonaws.com" } }]
+  })
+}
+resource "aws_iam_role_policy_attachment" "sagemaker_full" {
+  role = aws_iam_role.sagemaker.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSageMakerFullAccess"
+}
+`;
+    }
+    tf += `output "vpc_id" { description = "VPC ID" value = aws_vpc.main.id }
+output "public_subnet_ids" { description = "Public subnet IDs" value = aws_subnet.public[*].id }
+output "private_subnet_ids" { description = "Private subnet IDs" value = aws_subnet.private[*].id }
+`;
+  } else if (provider === 'azure') {
+    tf += `terraform {
+  required_version = ">= 1.5.0"
+  required_providers {
+    azurerm = { source = "hashicorp/azurerm" version = "~> 3.75" }
+    random = { source = "hashicorp/random" version = "~> 3.0" }
+  }
+  backend "azurerm" {
+    resource_group_name = "tfstate-rg"
+    storage_account_name = "tfstatestorage"
+    container_name = "tfstate"
+    key = "${pattern}.terraform.tfstate"
+  }
+}
+provider "azurerm" { features { resource_group { prevent_deletion_if_contains_resources = false } } }
+variable "location" { description = "Azure region" type = string default = "East US" }
+variable "environment" { description = "Environment" type = string default = "prod" }
+variable "project_name" { description = "Project name" type = string default = "matrix-app" }
+variable "address_space" { description = "VNet address space" type = string default = "10.0.0.0/16" }
+resource "azurerm_resource_group" "main" {
+  name = "${var.project_name}-${var.environment}-rg"
+  location = var.location
+  tags = { Environment = var.environment Project = var.project_name ManagedBy = "terraform" }
+}
+resource "azurerm_virtual_network" "main" {
+  name = "${var.project_name}-vnet"
+  address_space = [var.address_space]
+  location = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
+  tags = azurerm_resource_group.main.tags
+}
+resource "azurerm_subnet" "public" {
+  name = "public"
+  resource_group_name = azurerm_resource_group.main.name
+  virtual_network_name = azurerm_virtual_network.main.name
+  address_prefixes = [cidrsubnet(var.address_space, 8, 1)]
+}
+resource "azurerm_subnet" "private" {
+  name = "private"
+  resource_group_name = azurerm_resource_group.main.name
+  virtual_network_name = azurerm_virtual_network.main.name
+  address_prefixes = [cidrsubnet(var.address_space, 8, 2)]
+}
+resource "azurerm_network_security_group" "public" {
+  name = "${var.project_name}-public-nsg"
+  location = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
+  security_rule {
+    name = "AllowHTTP" priority = 100 direction = "Inbound" access = "Allow" protocol = "Tcp"
+    source_port_range = "*" destination_port_range = "80" source_address_prefix = "*" destination_address_prefix = "*"
+  }
+  security_rule {
+    name = "AllowHTTPS" priority = 110 direction = "Inbound" access = "Allow" protocol = "Tcp"
+    source_port_range = "*" destination_port_range = "443" source_address_prefix = "*" destination_address_prefix = "*"
+  }
+  tags = azurerm_resource_group.main.tags
+}
+resource "azurerm_subnet_network_security_group_association" "public" {
+  subnet_id = azurerm_subnet.public.id
+  network_security_group_id = azurerm_network_security_group.public.id
+}
+`;
+    if (pattern === '3tier') {
+      tf += `resource "azurerm_service_plan" "main" {
+  name = "${var.project_name}-plan"
+  resource_group_name = azurerm_resource_group.main.name
+  location = azurerm_resource_group.main.location
+  os_type = "Linux"
+  sku_name = "P1v2"
+  tags = azurerm_resource_group.main.tags
+}
+resource "azurerm_linux_web_app" "main" {
+  name = "${var.project_name}-web"
+  resource_group_name = azurerm_resource_group.main.name
+  location = azurerm_resource_group.main.location
+  service_plan_id = azurerm_service_plan.main.id
+  site_config {
+    application_stack { node_version = "20-lts" }
+    always_on = true
+    ftps_state = "Disabled"
+    http2_enabled = true
+  }
+  https_only = true
+  tags = azurerm_resource_group.main.tags
+}
+resource "azurerm_mssql_server" "main" {
+  name = "${var.project_name}-sql"
+  resource_group_name = azurerm_resource_group.main.name
+  location = azurerm_resource_group.main.location
+  version = "12.0"
+  administrator_login = "sqladmin"
+  administrator_login_password = random_password.db.result
+  minimum_tls_version = "1.2"
+  public_network_access_enabled = false
+  tags = azurerm_resource_group.main.tags
+}
+resource "azurerm_mssql_database" "main" {
+  name = "${var.project_name}-db"
+  server_id = azurerm_mssql_server.main.id
+  sku_name = "S0"
+  tags = azurerm_resource_group.main.tags
+}
+resource "random_password" "db" {
+  length = 24
+  special = true
+  override_special = "!#$%&*()-_=+[]{}<>:?"
+}
+`;
+      if (o['Caching'] && Array.from(o['Caching']).some(x => x.includes('Redis'))) {
+        tf += `resource "azurerm_redis_cache" "main" {
+  name = "${var.project_name}-redis"
+  location = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
+  capacity = 1
+  family = "C"
+  sku_name = "Standard"
+  enable_non_ssl_port = false
+  minimum_tls_version = "1.2"
+  tags = azurerm_resource_group.main.tags
+}
+`;
+      }
+    } else if (pattern === 'microservices') {
+      tf += `resource "azurerm_kubernetes_cluster" "main" {
+  name = "${var.project_name}-aks"
+  location = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
+  dns_prefix = "${var.project_name}-aks"
+  kubernetes_version = "1.29"
+  default_node_pool {
+    name = "default"
+    node_count = 2
+    vm_size = "Standard_D2_v2"
+    vnet_subnet_id = azurerm_subnet.private.id
+  }
+  identity { type = "SystemAssigned" }
+  network_profile {
+    network_plugin = "azure"
+    network_policy = "calico"
+    load_balancer_sku = "standard"
+  }
+  oms_agent {
+    log_analytics_workspace_id = azurerm_log_analytics_workspace.main.id
+  }
+  tags = azurerm_resource_group.main.tags
+}
+resource "azurerm_log_analytics_workspace" "main" {
+  name = "${var.project_name}-logs"
+  location = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
+  sku = "PerGB2018"
+  retention_in_days = 30
+  tags = azurerm_resource_group.main.tags
+}
+resource "azurerm_container_registry" "main" {
+  name = "${replace(var.project_name, "-", "")}acr"
+  resource_group_name = azurerm_resource_group.main.name
+  location = azurerm_resource_group.main.location
+  sku = "Standard"
+  admin_enabled = false
+  tags = azurerm_resource_group.main.tags
+}
+`;
+    } else if (pattern === 'serverless') {
+      tf += `resource "azurerm_storage_account" "functions" {
+  name = "${replace(var.project_name, "-", "")}funcsa"
+  resource_group_name = azurerm_resource_group.main.name
+  location = azurerm_resource_group.main.location
+  account_tier = "Standard"
+  account_replication_type = "LRS"
+  min_tls_version = "TLS1_2"
+  tags = azurerm_resource_group.main.tags
+}
+resource "azurerm_linux_function_app" "main" {
+  name = "${var.project_name}-func"
+  resource_group_name = azurerm_resource_group.main.name
+  location = azurerm_resource_group.main.location
+  service_plan_id = azurerm_service_plan.functions.id
+  storage_account_name = azurerm_storage_account.functions.name
+  storage_account_access_key = azurerm_storage_account.functions.primary_access_key
+  site_config {
+    application_stack { node_version = "20" }
+    always_on = false
+    ftps_state = "Disabled"
+    http2_enabled = true
+  }
+  https_only = true
+  tags = azurerm_resource_group.main.tags
+}
+resource "azurerm_service_plan" "functions" {
+  name = "${var.project_name}-func-plan"
+  resource_group_name = azurerm_resource_group.main.name
+  location = azurerm_resource_group.main.location
+  os_type = "Linux"
+  sku_name = "Y1"
+  tags = azurerm_resource_group.main.tags
+}
+`;
+      if (o['Persistence'] && Array.from(o['Persistence']).some(x => x.includes('Cosmos') || x.includes('Document'))) {
+        tf += `resource "azurerm_cosmosdb_account" "main" {
+  name = "${replace(var.project_name, "-", "")}cosmos"
+  location = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
+  offer_type = "Standard"
+  kind = "GlobalDocumentDB"
+  enable_free_tier = false
+  consistency_policy {
+    consistency_level = "Session"
+  }
+  geo_location {
+    location = azurerm_resource_group.main.location
+    failover_priority = 0
+  }
+  tags = azurerm_resource_group.main.tags
+}
+`;
+      }
+    } else if (pattern === 'k8s') {
+      tf += `resource "azurerm_kubernetes_cluster" "main" {
+  name = "${var.project_name}-aks"
+  location = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
+  dns_prefix = "${var.project_name}-aks"
+  kubernetes_version = "1.29"
+  default_node_pool {
+    name = "system"
+    node_count = 2
+    vm_size = "Standard_D2_v2"
+    vnet_subnet_id = azurerm_subnet.private.id
+    only_critical_addons_enabled = true
+  }
+  identity { type = "SystemAssigned" }
+  network_profile {
+    network_plugin = "azure"
+    network_policy = "calico"
+    load_balancer_sku = "standard"
+  }
+  oms_agent {
+    log_analytics_workspace_id = azurerm_log_analytics_workspace.main.id
+  }
+  azure_policy_enabled = true
+  tags = azurerm_resource_group.main.tags
+}
+resource "azurerm_kubernetes_cluster_node_pool" "workload" {
+  name = "workload"
+  kubernetes_cluster_id = azurerm_kubernetes_cluster.main.id
+  vm_size = "Standard_D4_v3"
+  node_count = 2
+  vnet_subnet_id = azurerm_subnet.private.id
+  tags = azurerm_resource_group.main.tags
+}
+resource "azurerm_log_analytics_workspace" "main" {
+  name = "${var.project_name}-logs"
+  location = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
+  sku = "PerGB2018"
+  retention_in_days = 30
+  tags = azurerm_resource_group.main.tags
+}
+`;
+    } else if (pattern === 'datalake') {
+      tf += `resource "azurerm_storage_account" "datalake" {
+  name = "${replace(var.project_name, "-", "")}dl"
+  resource_group_name = azurerm_resource_group.main.name
+  location = azurerm_resource_group.main.location
+  account_tier = "Standard"
+  account_replication_type = "LRS"
+  account_kind = "StorageV2"
+  is_hns_enabled = true
+  min_tls_version = "TLS1_2"
+  tags = azurerm_resource_group.main.tags
+}
+resource "azurerm_storage_data_lake_gen2_filesystem" "raw" {
+  name = "raw"
+  storage_account_id = azurerm_storage_account.datalake.id
+}
+resource "azurerm_storage_data_lake_gen2_filesystem" "processed" {
+  name = "processed"
+  storage_account_id = azurerm_storage_account.datalake.id
+}
+resource "azurerm_eventhub_namespace" "main" {
+  name = "${var.project_name}-ehns"
+  location = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
+  sku = "Standard"
+  capacity = 1
+  tags = azurerm_resource_group.main.tags
+}
+resource "azurerm_eventhub" "main" {
+  name = "${var.project_name}-eh"
+  namespace_name = azurerm_eventhub_namespace.main.name
+  resource_group_name = azurerm_resource_group.main.name
+  partition_count = 2
+  message_retention = 1
+}
+resource "azurerm_synapse_workspace" "main" {
+  name = "${var.project_name}-synapse"
+  resource_group_name = azurerm_resource_group.main.name
+  location = azurerm_resource_group.main.location
+  storage_data_lake_gen2_filesystem_id = azurerm_storage_data_lake_gen2_filesystem.raw.id
+  sql_administrator_login = "sqladminuser"
+  sql_administrator_login_password = random_password.db.result
+  tags = azurerm_resource_group.main.tags
+}
+`;
+    } else if (pattern === 'multiregion') {
+      tf += `resource "azurerm_traffic_manager_profile" "main" {
+  name = "${var.project_name}-tm"
+  resource_group_name = azurerm_resource_group.main.name
+  traffic_routing_method = "Performance"
+  dns_config {
+    relative_name = "${var.project_name}-app"
+    ttl = 30
+  }
+  monitor_config {
+    protocol = "HTTP"
+    port = 80
+    path = "/"
+    interval_in_seconds = 30
+    timeout_in_seconds = 10
+    tolerated_number_of_failures = 3
+  }
+  tags = azurerm_resource_group.main.tags
+}
+resource "azurerm_cosmosdb_account" "main" {
+  name = "${replace(var.project_name, "-", "")}cosmos"
+  location = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
+  offer_type = "Standard"
+  kind = "GlobalDocumentDB"
+  enable_multiple_write_locations = true
+  consistency_policy { consistency_level = "Session" }
+  geo_location { location = azurerm_resource_group.main.location failover_priority = 0 }
+  geo_location { location = "West US" failover_priority = 1 }
+  tags = azurerm_resource_group.main.tags
+}
+`;
+    } else if (pattern === 'ai') {
+      tf += `resource "azurerm_machine_learning_workspace" "main" {
+  name = "${var.project_name}-mlws"
+  location = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
+  application_insights_id = azurerm_application_insights.main.id
+  key_vault_id = azurerm_key_vault.main.id
+  storage_account_id = azurerm_storage_account.functions.id
+  identity { type = "SystemAssigned" }
+  tags = azurerm_resource_group.main.tags
+}
+resource "azurerm_application_insights" "main" {
+  name = "${var.project_name}-appinsights"
+  location = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
+  application_type = "web"
+  tags = azurerm_resource_group.main.tags
+}
+resource "azurerm_key_vault" "main" {
+  name = "${var.project_name}-kv"
+  location = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
+  tenant_id = data.azurerm_client_config.current.tenant_id
+  sku_name = "standard"
+  soft_delete_retention_days = 7
+  purge_protection_enabled = false
+  tags = azurerm_resource_group.main.tags
+}
+data "azurerm_client_config" "current" {}
+`;
+    }
+    tf += `output "resource_group_name" { description = "Resource group name" value = azurerm_resource_group.main.name }
+output "vnet_id" { description = "Virtual Network ID" value = azurerm_virtual_network.main.id }
+output "public_subnet_id" { description = "Public subnet ID" value = azurerm_subnet.public.id }
+`;
+  } else if (provider === 'gcp') {
+    tf += `terraform {
+  required_version = ">= 1.5.0"
+  required_providers {
+    google = { source = "hashicorp/google" version = "~> 5.0" }
+    random = { source = "hashicorp/random" version = "~> 3.0" }
+  }
+  backend "gcs" {
+    bucket = "my-terraform-state-bucket"
+    prefix = "${pattern}/terraform.tfstate"
+  }
+}
+provider "google" {
+  project = var.gcp_project
+  region = var.gcp_region
+}
+variable "gcp_project" { description = "GCP project ID" type = string }
+variable "gcp_region" { description = "GCP region" type = string default = "us-central1" }
+variable "environment" { description = "Environment" type = string default = "prod" }
+variable "project_name" { description = "Project name" type = string default = "matrix-app" }
+resource "google_compute_network" "main" {
+  name = "${var.project_name}-vpc"
+  auto_create_subnetworks = false
+  routing_mode = "GLOBAL"
+}
+resource "google_compute_subnetwork" "public" {
+  name = "${var.project_name}-public-subnet"
+  ip_cidr_range = "10.0.1.0/24"
+  region = var.gcp_region
+  network = google_compute_network.main.id
+}
+resource "google_compute_subnetwork" "private" {
+  name = "${var.project_name}-private-subnet"
+  ip_cidr_range = "10.0.2.0/24"
+  region = var.gcp_region
+  network = google_compute_network.main.id
+  private_ip_google_access = true
+}
+resource "google_compute_firewall" "allow_http" {
+  name = "${var.project_name}-allow-http"
+  network = google_compute_network.main.name
+  allow { protocol = "tcp" ports = ["80", "443"] }
+  source_ranges = ["0.0.0.0/0"]
+  target_tags = ["web"]
+}
+resource "google_compute_firewall" "allow_internal" {
+  name = "${var.project_name}-allow-internal"
+  network = google_compute_network.main.name
+  allow { protocol = "tcp" ports = ["0-65535"] }
+  source_ranges = ["10.0.0.0/16"]
+}
+`;
+    if (pattern === '3tier') {
+      tf += `resource "google_compute_global_address" "lb_ip" {
+  name = "${var.project_name}-lb-ip"
+}
+resource "google_compute_managed_ssl_certificate" "main" {
+  name = "${var.project_name}-ssl-cert"
+  managed { domains = ["${var.project_name}.example.com"] }
+}
+resource "google_compute_backend_service" "main" {
+  name = "${var.project_name}-backend"
+  health_checks = [google_compute_health_check.main.id]
+  backend {
+    group = google_compute_instance_group.web.id
+    balancing_mode = "UTILIZATION"
+    capacity_scaler = 1.0
+  }
+}
+resource "google_compute_url_map" "main" {
+  name = "${var.project_name}-url-map"
+  default_service = google_compute_backend_service.main.id
+}
+resource "google_compute_target_https_proxy" "main" {
+  name = "${var.project_name}-https-proxy"
+  url_map = google_compute_url_map.main.id
+  ssl_certificates = [google_compute_managed_ssl_certificate.main.id]
+}
+resource "google_compute_global_forwarding_rule" "main" {
+  name = "${var.project_name}-fw-rule"
+  ip_protocol = "TCP"
+  load_balancing_scheme = "EXTERNAL"
+  port_range = "443"
+  target = google_compute_target_https_proxy.main.id
+  ip_address = google_compute_global_address.lb_ip.id
+}
+resource "google_compute_health_check" "main" {
+  name = "${var.project_name}-health-check"
+  check_interval_sec = 5
+  timeout_sec = 5
+  healthy_threshold = 2
+  unhealthy_threshold = 3
+  http_health_check {
+    port = 80
+    request_path = "/"
+  }
+}
+resource "google_compute_instance_template" "web" {
+  name = "${var.project_name}-web-template"
+  machine_type = "e2-micro"
+  tags = ["web"]
+  network_interface {
+    network = google_compute_network.main.id
+    subnetwork = google_compute_subnetwork.public.id
+    access_config {}
+  }
+  disk {
+    source_image = "debian-cloud/debian-12"
+    auto_delete = true
+    boot = true
+  }
+  metadata_startup_script = <<-EOF
+    #!/bin/bash
+    apt-get update
+    apt-get install -y nginx
+    systemctl start nginx
+  EOF
+}
+resource "google_compute_instance_group_manager" "web" {
+  name = "${var.project_name}-web-igm"
+  zone = "${var.gcp_region}-a"
+  version {
+    instance_template = google_compute_instance_template.web.id
+    name = "primary"
+  }
+  target_size = 2
+  named_port {
+    name = "http"
+    port = 80
+  }
+  auto_healing_policies {
+    health_check = google_compute_health_check.main.id
+    initial_delay_sec = 300
+  }
+}
+resource "google_compute_instance_group" "web" {
+  name = "${var.project_name}-web-ig"
+  zone = "${var.gcp_region}-a"
+  instances = google_compute_instance_group_manager.web.instance_group
+}
+resource "google_sql_database_instance" "main" {
+  name = "${var.project_name}-db"
+  database_version = "POSTGRES_15"
+  region = var.gcp_region
+  settings {
+    tier = "db-f1-micro"
+    availability_type = "REGIONAL"
+    backup_configuration {
+      enabled = true
+      start_time = "03:00"
+    }
+    ip_configuration {
+      ipv4_enabled = false
+      private_network = google_compute_network.main.id
+    }
+  }
+  deletion_protection = false
+}
+resource "google_sql_database" "main" {
+  name = "appdb"
+  instance = google_sql_database_instance.main.name
+}
+`;
+      if (o['Caching'] && Array.from(o['Caching']).some(x => x.includes('Redis'))) {
+        tf += `resource "google_redis_instance" "main" {
+  name = "${var.project_name}-redis"
+  tier = "STANDARD_HA"
+  memory_size_gb = 1
+  region = var.gcp_region
+  authorized_network = google_compute_network.main.id
+  redis_version = "REDIS_7_0"
+  display_name = "${var.project_name} Redis Cache"
+}
+`;
+      }
+    } else if (pattern === 'microservices') {
+      tf += `resource "google_container_cluster" "main" {
+  name = "${var.project_name}-gke"
+  location = var.gcp_region
+  network = google_compute_network.main.name
+  subnetwork = google_compute_subnetwork.private.name
+  remove_default_node_pool = true
+  initial_node_count = 1
+  networking_mode = "VPC_NATIVE"
+  ip_allocation_policy {
+    cluster_secondary_range_name = "pods"
+    services_secondary_range_name = "services"
+  }
+  release_channel { channel = "REGULAR" }
+  workload_identity_config {
+    workload_pool = "${var.gcp_project}.svc.id.goog"
+  }
+  monitoring_config {
+    enable_components = ["SYSTEM_COMPONENTS", "APISERVER", "CONTROLLER_MANAGER", "SCHEDULER"]
+    managed_prometheus { enabled = true }
+  }
+  logging_config {
+    enable_components = ["SYSTEM_COMPONENTS", "APISERVER", "CONTROLLER_MANAGER", "SCHEDULER"]
+  }
+}
+resource "google_container_node_pool" "primary" {
+  name = "${var.project_name}-node-pool"
+  location = var.gcp_region
+  cluster = google_container_cluster.main.name
+  node_count = 2
+  node_config {
+    machine_type = "e2-medium"
+    oauth_scopes = ["https://www.googleapis.com/auth/cloud-platform"]
+    workload_metadata_config { mode = "GKE_METADATA" }
+  }
+  management {
+    auto_repair = true
+    auto_upgrade = true
+  }
+}
+`;
+    } else if (pattern === 'serverless') {
+      tf += `resource "google_cloud_run_service" "main" {
+  name = "${var.project_name}-service"
+  location = var.gcp_region
+  template {
+    spec {
+      containers {
+        image = "gcr.io/cloudrun/hello"
+        resources {
+          limits = { cpu = "1" memory = "512Mi" }
+        }
+        env {
+          name = "ENVIRONMENT"
+          value = var.environment
+        }
+      }
+      service_account_name = google_service_account.cloud_run.email
+    }
+    metadata {
+      annotations = {
+        "autoscaling.knative.dev/maxScale" = "100"
+        "run.googleapis.com/execution-environment" = "gen2"
+      }
+    }
+  }
+  traffic {
+    percent = 100
+    latest_revision = true
+  }
+  depends_on = [google_project_service.run]
+}
+resource "google_project_service" "run" {
+  service = "run.googleapis.com"
+  disable_on_destroy = false
+}
+resource "google_service_account" "cloud_run" {
+  account_id = "${var.project_name}-cloud-run"
+  display_name = "Cloud Run Service Account"
+}
+resource "google_cloud_run_service_iam_member" "public" {
+  service = google_cloud_run_service.main.name
+  location = google_cloud_run_service.main.location
+  role = "roles/run.invoker"
+  member = "allUsers"
+}
+`;
+      if (o['Persistence'] && Array.from(o['Persistence']).some(x => x.includes('Firestore') || x.includes('Document'))) {
+        tf += `resource "google_firestore_database" "main" {
+  project = var.gcp_project
+  name = "(default)"
+  location_id = var.gcp_region
+  type = "FIRESTORE_NATIVE"
+  app_engine_integration_mode = "DISABLED"
+  concurrency_mode = "OPTIMISTIC"
+}
+`;
+      }
+    } else if (pattern === 'k8s') {
+      tf += `resource "google_container_cluster" "main" {
+  name = "${var.project_name}-gke"
+  location = var.gcp_region
+  network = google_compute_network.main.name
+  subnetwork = google_compute_subnetwork.private.name
+  remove_default_node_pool = true
+  initial_node_count = 1
+  networking_mode = "VPC_NATIVE"
+  ip_allocation_policy {
+    cluster_secondary_range_name = "pods"
+    services_secondary_range_name = "services"
+  }
+  release_channel { channel = "REGULAR" }
+  workload_identity_config {
+    workload_pool = "${var.gcp_project}.svc.id.goog"
+  }
+  monitoring_config {
+    enable_components = ["SYSTEM_COMPONENTS", "APISERVER", "CONTROLLER_MANAGER", "SCHEDULER"]
+    managed_prometheus { enabled = true }
+  }
+  logging_config {
+    enable_components = ["SYSTEM_COMPONENTS", "APISERVER", "CONTROLLER_MANAGER", "SCHEDULER"]
+  }
+  addons_config {
+    http_load_balancing { disabled = false }
+    horizontal_pod_autoscaling { disabled = false }
+  }
+}
+resource "google_container_node_pool" "primary" {
+  name = "${var.project_name}-node-pool"
+  location = var.gcp_region
+  cluster = google_container_cluster.main.name
+  node_count = 3
+  node_config {
+    machine_type = "e2-medium"
+    oauth_scopes = ["https://www.googleapis.com/auth/cloud-platform"]
+    workload_metadata_config { mode = "GKE_METADATA" }
+  }
+  management {
+    auto_repair = true
+    auto_upgrade = true
+  }
+}
+`;
+    } else if (pattern === 'datalake') {
+      tf += `resource "google_storage_bucket" "raw" {
+  name = "${var.project_name}-raw-data"
+  location = var.gcp_region
+  storage_class = "STANDARD"
+  uniform_bucket_level_access = true
+  versioning { enabled = true }
+  encryption {
+    default_kms_key_name = google_kms_crypto_key.main.id
+  }
+}
+resource "google_storage_bucket" "processed" {
+  name = "${var.project_name}-processed-data"
+  location = var.gcp_region
+  storage_class = "STANDARD"
+  uniform_bucket_level_access = true
+}
+resource "google_pubsub_topic" "main" {
+  name = "${var.project_name}-topic"
+  message_retention_duration = "86600s"
+}
+resource "google_pubsub_subscription" "main" {
+  name = "${var.project_name}-sub"
+  topic = google_pubsub_topic.main.name
+  ack_deadline_seconds = 20
+  message_retention_duration = "1200s"
+}
+resource "google_bigquery_dataset" "main" {
+  dataset_id = "${replace(var.project_name, "-", "_")}_dataset"
+  friendly_name = "${var.project_name} Dataset"
+  description = "Dataset for ${var.project_name} analytics"
+  location = var.gcp_region
+  default_table_expiration_ms = 3600000
+  labels = { env = var.environment }
+}
+resource "google_kms_key_ring" "main" {
+  name = "${var.project_name}-keyring"
+  location = var.gcp_region
+}
+resource "google_kms_crypto_key" "main" {
+  name = "${var.project_name}-key"
+  key_ring = google_kms_key_ring.main.id
+  rotation_period = "7776000s"
+}
+`;
+    } else if (pattern === 'multiregion') {
+      tf += `resource "google_dns_managed_zone" "main" {
+  name = "${var.project_name}-zone"
+  dns_name = "${var.project_name}.example.com."
+  description = "DNS zone for ${var.project_name}"
+}
+resource "google_dns_record_set" "primary" {
+  name = "app.${google_dns_managed_zone.main.dns_name}"
+  managed_zone = google_dns_managed_zone.main.name
+  type = "A"
+  ttl = 300
+  rrdatas = [google_compute_global_address.lb_ip.address]
+}
+resource "google_sql_database_instance" "primary" {
+  name = "${var.project_name}-primary"
+  database_version = "POSTGRES_15"
+  region = var.gcp_region
+  settings {
+    tier = "db-f1-micro"
+    availability_type = "REGIONAL"
+    backup_configuration { enabled = true start_time = "03:00" }
+  }
+  deletion_protection = false
+}
+resource "google_sql_database_instance" "replica" {
+  name = "${var.project_name}-replica"
+  database_version = "POSTGRES_15"
+  region = "europe-west1"
+  master_instance_name = google_sql_database_instance.primary.name
+  settings {
+    tier = "db-f1-micro"
+  }
+  deletion_protection = false
+}
+`;
+    } else if (pattern === 'ai') {
+      tf += `resource "google_vertex_ai_endpoint" "main" {
+  display_name = "${var.project_name}-endpoint"
+  location = var.gcp_region
+  description = "Vertex AI endpoint for ${var.project_name}"
+}
+resource "google_vertex_ai_model" "main" {
+  display_name = "${var.project_name}-model"
+  artifact_uri = "gs://${google_storage_bucket.raw.name}/model"
+  container_spec {
+    image_uri = "us-docker.pkg.dev/vertex-ai/prediction/tf2-cpu.2-12:latest"
+  }
+}
+resource "google_vertex_ai_deployed_model" "main" {
+  endpoint = google_vertex_ai_endpoint.main.id
+  model = google_vertex_ai_model.main.id
+  dedicated_resources {
+    machine_spec {
+      machine_type = "n1-standard-4"
+    }
+    min_replica_count = 1
+    max_replica_count = 3
+  }
+}
+resource "google_monitoring_alert_policy" "latency" {
+  display_name = "High Latency Alert"
+  combiner = "OR"
+  conditions {
+    display_name = "Latency > 500ms"
+    condition_threshold {
+      filter = "resource.type=\"aiplatform.googleapis.com/Endpoint\" AND metric.type=\"aiplatform.googleapis.com/prediction/online/latencies\""
+      duration = "300s"
+      comparison = "COMPARISON_GT"
+      threshold_value = 500
+      aggregations {
+        alignment_period = "300s"
+        per_series_aligner = "ALIGN_PERCENTILE_99"
+      }
+    }
+  }
+  notification_channels = [google_monitoring_notification_channel.email.id]
+}
+resource "google_monitoring_notification_channel" "email" {
+  display_name = "Email Notification"
+  type = "email"
+  labels = { email_address = "admin@example.com" }
+}
+`;
+    }
+    tf += `output "network_name" { description = "VPC network name" value = google_compute_network.main.name }
+output "public_subnet_id" { description = "Public subnet ID" value = google_compute_subnetwork.public.id }
+output "private_subnet_id" { description = "Private subnet ID" value = google_compute_subnetwork.private.id }
+`;
+  }
+  return tf;
 }
 
+function generateADR(provider, pattern, options) {
+  const patName = patterns[provider].find(p => p.key === pattern)?.name || pattern;
+  const optList = Object.entries(options).flatMap(([g, items]) => Array.from(items).map(i => `- ${g}: ${i}`));
+  return `# ADR-001: Architecture Decision for ${patName} on ${provider.toUpperCase()}
+
+## Status
+Accepted
+
+## Context
+We need to design a cloud architecture that meets scalability, reliability, and cost-efficiency requirements using ${provider.toUpperCase()}.
+
+## Decision
+We will implement a **${patName}** pattern on **${provider.toUpperCase()}** with the following components:
+
+${optList.join('\n') || '- Default configuration with core services'}
+
+## Consequences
+
+**Positive:**
+- Scalable and maintainable infrastructure
+- Industry-standard tooling and provider-native services
+- Strong community support and documentation
+- Built-in high availability and disaster recovery options
+
+**Negative:**
+- Operational complexity increases with component count
+- Learning curve for team members
+- Potential vendor lock-in with native services
+- Ongoing cost optimization required
+
+## Alternatives Considered
+- Monolithic architecture (rejected: lacks scalability)
+- Different cloud provider (rejected: existing organizational alignment)
+- Managed PaaS solutions (rejected: need for fine-grained control)
+
+## Compliance & Security
+- All data encrypted at rest and in transit
+- Private subnets for database and internal services
+- Least-privilege IAM/RBAC policies enforced
+- Network segmentation via VPC/VNet/firewall rules
+
+## Date
+${new Date().toISOString().split('T')[0]}
+
+## Author
+Matrix Architecture Builder`;
+}
+
+function generateC4(provider, pattern, options) {
+  const patName = patterns[provider].find(p => p.key === pattern)?.name || pattern;
+  return `@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+LAYOUT_WITH_LEGEND()
+
+Title System Context Diagram for ${patName} on ${provider.toUpperCase()}
+
+Person(user, "User", "End user accessing the system")
+System(app, "${patName}", "Core application built on ${provider.toUpperCase()}")
+System_Ext(dns, "DNS", "Cloud DNS / Route 53 / Azure DNS")
+System_Ext(cdn, "CDN", "Content delivery network")
+System_Ext(monitoring, "Monitoring", "CloudWatch / Azure Monitor / Cloud Operations")
+
+Rel(user, dns, "Resolves domain", "DNS")
+Rel(dns, cdn, "Routes to", "CNAME")
+Rel(cdn, app, "Serves traffic", "HTTPS")
+Rel(app, monitoring, "Sends metrics/logs", "HTTPS/GRPC")
+
+SHOW_LEGEND()
+@enduml`;
+}
+
+function copyOutput(id) {
+  const text = document.getElementById(id).textContent;
+  navigator.clipboard.writeText(text).then(() => alert('Copied to clipboard!'));
+}
 function copyText(id) {
   const text = document.getElementById(id).textContent;
   navigator.clipboard.writeText(text).then(() => alert('Copied to clipboard!'));
 }
-
-document.addEventListener('DOMContentLoaded', () => {
-  renderPatterns();
-  renderPalette();
-});
+function downloadFile(filename, elementId) {
+  const text = document.getElementById(elementId).textContent;
+  const blob = new Blob([text], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
 </script>
 </body>
 </html>
