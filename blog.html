@@ -3,484 +3,673 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Matrix | Blog & Tech</title>
+<title>Matrix | Tech Radar</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Share+Tech+Mono&display=swap');
-
   :root {
-    --bg: #000000;
-    --card: #0a0a0a;
-    --card-hover: #111111;
-    --border: #1a1a1a;
-    --border-hover: #f97316;
-    --orange: #f97316;
-    --orange-dark: #ea580c;
-    --gold: #fbbf24;
-    --gold-dim: #b45309;
-    --text: #e5e5e5;
-    --text-dim: #737373;
-    --text-muted: #404040;
-    --glow-orange: 0 0 20px rgba(249,115,22,0.15);
+    --bg: #000000; --card: #0a0a0a; --card-hover: #111111; --border: #1a1a1a;
+    --border-hover: #f97316; --orange: #f97316; --orange-dark: #ea580c;
+    --gold: #fbbf24; --gold-dim: #b45309; --text: #e5e5e5; --text-dim: #737373;
+    --text-muted: #404040; --glow-orange: 0 0 20px rgba(249,115,22,0.15);
     --glow-gold: 0 0 30px rgba(251,191,36,0.1);
+    --aws: #ff9900; --azure: #0078d4; --gcp: #4285f4;
   }
-
   * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Share Tech Mono', monospace;
-    min-height: 100vh;
-    overflow-x: hidden;
-    position: relative;
-  }
-
-  #matrix-canvas {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    z-index: 0;
-    pointer-events: none;
-    opacity: 0.25;
-  }
-
-  .container {
-    position: relative;
-    z-index: 1;
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 0 20px 40px;
-  }
-
-  /* Header */
-  header {
-    text-align: center;
-    padding: 40px 20px 30px;
-    position: relative;
-  }
-
-  header::before {
-    content: '';
-    position: absolute;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    width: 600px; height: 200px;
-    background: radial-gradient(ellipse, rgba(249,115,22,0.08) 0%, transparent 70%);
-    pointer-events: none;
-  }
-
-  h1 {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 3.5rem;
-    font-weight: 900;
-    color: var(--orange);
-    text-transform: uppercase;
-    letter-spacing: 12px;
-    text-shadow: 0 0 40px rgba(249,115,22,0.4), 0 0 80px rgba(249,115,22,0.1);
-    position: relative;
-    animation: flicker 4s infinite alternate;
-  }
-
-  @keyframes flicker {
-    0%, 100% { opacity: 1; text-shadow: 0 0 40px rgba(249,115,22,0.4), 0 0 80px rgba(249,115,22,0.1); }
-    50% { opacity: 0.92; text-shadow: 0 0 30px rgba(249,115,22,0.3), 0 0 60px rgba(249,115,22,0.05); }
-  }
-
-  .subtitle {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 1rem;
-    color: var(--gold);
-    margin-top: 10px;
-    letter-spacing: 3px;
-    opacity: 0.8;
-  }
-
-  .glitch-line {
-    width: 200px;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--orange), var(--gold), transparent);
-    margin: 20px auto;
-    opacity: 0.5;
-  }
-
-  /* Navigation */
-  nav {
-    display: flex;
-    justify-content: center;
-    gap: 8px;
-    flex-wrap: wrap;
-    margin-bottom: 30px;
-    padding: 0 20px;
-  }
-
-  nav a {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    color: var(--text-dim);
-    text-decoration: none;
-    padding: 10px 18px;
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    transition: all 0.3s;
-    background: var(--card);
-  }
-
-  nav a:hover, nav a.active {
-    border-color: var(--orange);
-    color: var(--orange);
-    box-shadow: var(--glow-orange);
-    background: rgba(249,115,22,0.05);
-  }
-
-  /* Page title */
-  .page-title {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 1.6rem;
-    color: var(--orange);
-    text-transform: uppercase;
-    letter-spacing: 3px;
-    margin-bottom: 8px;
-  }
-
-  .page-desc {
-    color: var(--text-dim);
-    font-size: 0.9rem;
-    margin-bottom: 30px;
-    letter-spacing: 0.5px;
-  }
-
-  /* Cards */
-  .card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 24px;
-    margin-bottom: 16px;
-    transition: all 0.3s;
-  }
-
-  .card:hover {
-    border-color: var(--gold-dim);
-    box-shadow: 0 0 15px rgba(249,115,22,0.05);
-  }
-
-  .card h3 {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 0.95rem;
-    color: var(--gold);
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    margin-bottom: 12px;
-  }
-
-  .card p {
-    color: var(--text-dim);
-    font-size: 0.85rem;
-    line-height: 1.6;
-  }
-
-  /* Buttons */
-  .btn {
-    display: inline-block;
-    padding: 10px 22px;
-    background: linear-gradient(135deg, var(--orange), var(--orange-dark));
-    border: none;
-    border-radius: 4px;
-    color: #000;
-    font-family: 'Orbitron', sans-serif;
-    font-weight: 700;
-    font-size: 0.78rem;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    cursor: pointer;
-    transition: all 0.3s;
-    text-decoration: none;
-  }
-
-  .btn:hover {
-    background: linear-gradient(135deg, var(--gold), var(--orange));
-    box-shadow: 0 0 20px rgba(249,115,22,0.3);
-    transform: translateY(-1px);
-  }
-
-  .btn-outline {
-    background: transparent;
-    border: 1px solid var(--border);
-    color: var(--text-dim);
-  }
-
-  .btn-outline:hover {
-    border-color: var(--gold);
-    color: var(--gold);
-    background: rgba(251,191,36,0.05);
-    box-shadow: var(--glow-gold);
-  }
-
-  /* Code blocks */
-  .code-block {
-    background: #050505;
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 14px 18px;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.82rem;
-    color: var(--gold);
-    overflow-x: auto;
-    white-space: pre-wrap;
-    line-height: 1.6;
-    margin: 8px 0;
-  }
-
-  /* Link tags */
-  .link-tag {
-    display: inline-block;
-    padding: 6px 14px;
-    background: rgba(249,115,22,0.08);
-    border: 1px solid rgba(249,115,22,0.2);
-    border-radius: 20px;
-    color: var(--orange);
-    font-size: 0.78rem;
-    text-decoration: none;
-    transition: all 0.3s;
-    letter-spacing: 0.5px;
-    margin: 4px 4px 4px 0;
-  }
-
-  .link-tag:hover {
-    background: rgba(249,115,22,0.2);
-    border-color: var(--orange);
-    box-shadow: var(--glow-orange);
-  }
-
-  /* Grid */
+  body { background: var(--bg); color: var(--text); font-family: 'Share Tech Mono', monospace; min-height: 100vh; overflow-x: hidden; position: relative; }
+  #matrix-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; opacity: 0.25; }
+  .container { position: relative; z-index: 1; max-width: 1400px; margin: 0 auto; padding: 0 20px 40px; }
+  header { text-align: center; padding: 40px 20px 30px; position: relative; }
+  header::before { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 600px; height: 200px; background: radial-gradient(ellipse, rgba(249,115,22,0.08) 0%, transparent 70%); pointer-events: none; }
+  h1 { font-family: 'Orbitron', sans-serif; font-size: 3.5rem; font-weight: 900; color: var(--orange); text-transform: uppercase; letter-spacing: 12px; text-shadow: 0 0 40px rgba(249,115,22,0.4), 0 0 80px rgba(249,115,22,0.1); position: relative; animation: flicker 4s infinite alternate; }
+  @keyframes flicker { 0%, 100% { opacity: 1; text-shadow: 0 0 40px rgba(249,115,22,0.4), 0 0 80px rgba(249,115,22,0.1); } 50% { opacity: 0.92; text-shadow: 0 0 30px rgba(249,115,22,0.3), 0 0 60px rgba(249,115,22,0.05); } }
+  .subtitle { font-family: 'Share Tech Mono', monospace; font-size: 1rem; color: var(--gold); margin-top: 10px; letter-spacing: 3px; opacity: 0.8; }
+  .glitch-line { width: 200px; height: 1px; background: linear-gradient(90deg, transparent, var(--orange), var(--gold), transparent); margin: 20px auto; opacity: 0.5; }
+  nav { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-bottom: 30px; padding: 0 20px; }
+  nav a { font-family: 'Orbitron', sans-serif; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-dim); text-decoration: none; padding: 10px 18px; border: 1px solid var(--border); border-radius: 4px; transition: all 0.3s; background: var(--card); }
+  nav a:hover, nav a.active { border-color: var(--orange); color: var(--orange); box-shadow: var(--glow-orange); background: rgba(249,115,22,0.05); }
+  .page-title { font-family: 'Orbitron', sans-serif; font-size: 1.6rem; color: var(--orange); text-transform: uppercase; letter-spacing: 3px; margin-bottom: 8px; }
+  .page-desc { color: var(--text-dim); font-size: 0.9rem; margin-bottom: 30px; letter-spacing: 0.5px; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 6px; padding: 24px; margin-bottom: 16px; transition: all 0.3s; }
+  .card:hover { border-color: var(--gold-dim); box-shadow: 0 0 15px rgba(249,115,22,0.05); }
+  .card h3 { font-family: 'Orbitron', sans-serif; font-size: 0.95rem; color: var(--gold); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 12px; }
+  .btn { display: inline-block; padding: 10px 22px; background: linear-gradient(135deg, var(--orange), var(--orange-dark)); border: none; border-radius: 4px; color: #000; font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 1.5px; cursor: pointer; transition: all 0.3s; text-decoration: none; }
+  .btn:hover { background: linear-gradient(135deg, var(--gold), var(--orange)); box-shadow: 0 0 20px rgba(249,115,22,0.3); transform: translateY(-1px); }
+  .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-dim); }
+  .btn-outline:hover { border-color: var(--gold); color: var(--gold); background: rgba(251,191,36,0.05); box-shadow: var(--glow-gold); }
+  .link-tag { display: inline-block; padding: 6px 14px; background: rgba(249,115,22,0.08); border: 1px solid rgba(249,115,22,0.2); border-radius: 20px; color: var(--orange); font-size: 0.78rem; text-decoration: none; transition: all 0.3s; letter-spacing: 0.5px; margin: 4px 4px 4px 0; }
+  .link-tag:hover { background: rgba(249,115,22,0.2); border-color: var(--orange); box-shadow: var(--glow-orange); }
+  .x-tag { display: inline-block; padding: 6px 14px; background: rgba(30,30,30,0.8); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; color: var(--text-dim); font-size: 0.78rem; text-decoration: none; transition: all 0.3s; letter-spacing: 0.5px; margin: 4px 4px 4px 0; }
+  .x-tag:hover { border-color: var(--text); color: var(--text); box-shadow: 0 0 10px rgba(255,255,255,0.05); }
+  .x-tag::before { content: 'X '; color: var(--text-muted); }
   .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
   .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-
-  @media (max-width: 900px) {
-    .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
-    h1 { font-size: 2.2rem; letter-spacing: 6px; }
-    nav a { padding: 8px 12px; font-size: 0.7rem; }
-  }
-
-  /* Footer */
-  footer {
-    text-align: center;
-    padding: 50px 20px 30px;
-    color: var(--text-muted);
-    font-size: 0.75rem;
-    letter-spacing: 2px;
-  }
-
-  .footer-line {
-    width: 100px;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
-    margin: 0 auto 16px;
-  }
-
-  /* Scrollbar */
+  @media (max-width: 900px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } h1 { font-size: 2.2rem; letter-spacing: 6px; } nav a { padding: 8px 12px; font-size: 0.7rem; } }
+  footer { text-align: center; padding: 50px 20px 30px; color: var(--text-muted); font-size: 0.75rem; letter-spacing: 2px; }
+  .footer-line { width: 100px; height: 1px; background: linear-gradient(90deg, transparent, var(--gold-dim), transparent); margin: 0 auto 16px; }
   ::-webkit-scrollbar { width: 6px; }
   ::-webkit-scrollbar-track { background: var(--bg); }
   ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
   ::-webkit-scrollbar-thumb:hover { background: var(--orange); }
 
-  .hidden { display: none !important; }
-
-  .resource-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-bottom: 30px; }
-  .resource-card { background: linear-gradient(145deg, #0d0d0d, #080808); border: 1px solid var(--border); border-radius: 6px; padding: 22px; transition: all 0.35s; position: relative; overflow: hidden; }
-  .resource-card::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--orange), var(--gold)); transform: scaleX(0); transform-origin: left; transition: transform 0.4s; }
-  .resource-card:hover { border-color: var(--orange); transform: translateY(-3px); box-shadow: var(--glow-orange); }
-  .resource-card:hover::after { transform: scaleX(1); }
-  .resource-card h4 { font-family: 'Orbitron', sans-serif; font-size: 0.9rem; color: var(--gold); margin-bottom: 8px; letter-spacing: 1px; }
-  .resource-card p { font-size: 0.78rem; color: var(--text-dim); line-height: 1.5; margin-bottom: 12px; }
-  .checklist { list-style: none; padding: 0; }
-  .checklist li { padding: 8px 0 8px 24px; position: relative; font-size: 0.84rem; color: var(--text-dim); border-bottom: 1px solid rgba(255,255,255,0.03); }
-  .checklist li::before { content: '☐'; position: absolute; left: 0; color: var(--orange); }
-  .checklist li.checked { color: var(--text); }
-  .checklist li.checked::before { content: '☑'; color: var(--gold); }
-  .platform-comparison { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.82rem; }
-  .platform-comparison th { text-align: left; padding: 10px 12px; background: rgba(249,115,22,0.08); color: var(--orange); font-family: 'Orbitron', sans-serif; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid var(--border); }
-  .platform-comparison td { padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,0.03); color: var(--text-dim); }
-  .platform-comparison tr:hover td { color: var(--text); background: rgba(249,115,22,0.02); }
-  .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
-  .badge-green { background: rgba(34,197,94,0.1); color: #22c55e; border: 1px solid rgba(34,197,94,0.2); }
-  .badge-orange { background: rgba(249,115,22,0.1); color: var(--orange); border: 1px solid rgba(249,115,22,0.2); }
-  .badge-blue { background: rgba(59,130,246,0.1); color: #3b82f6; border: 1px solid rgba(59,130,246,0.2); }
+  .category-header { font-family: 'Orbitron', sans-serif; font-size: 1.1rem; color: var(--orange); text-transform: uppercase; letter-spacing: 2px; margin: 30px 0 16px; padding-bottom: 8px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; }
+  .category-header::before { content: ''; width: 4px; height: 20px; background: linear-gradient(180deg, var(--orange), var(--gold)); border-radius: 2px; }
+  .feed-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; margin-bottom: 20px; }
+  .feed-card { background: linear-gradient(145deg, #0d0d0d, #080808); border: 1px solid var(--border); border-radius: 6px; padding: 18px; transition: all 0.35s; position: relative; overflow: hidden; }
+  .feed-card::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--orange), var(--gold)); transform: scaleX(0); transform-origin: left; transition: transform 0.4s; }
+  .feed-card:hover { border-color: var(--orange); transform: translateY(-3px); box-shadow: var(--glow-orange); }
+  .feed-card:hover::after { transform: scaleX(1); }
+  .feed-card h4 { font-family: 'Orbitron', sans-serif; font-size: 0.85rem; color: var(--gold); margin-bottom: 6px; letter-spacing: 1px; }
+  .feed-card p { font-size: 0.75rem; color: var(--text-dim); line-height: 1.5; margin-bottom: 10px; }
+  .feed-card a { color: var(--orange); text-decoration: none; font-size: 0.75rem; }
+  .feed-card a:hover { text-decoration: underline; }
+  .section-label { font-family: 'Orbitron', sans-serif; font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; margin: 20px 0 10px; }
+  .twitter-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
+  .stats-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin: 20px 0 30px; }
+  .stat-box { text-align: center; padding: 20px; background: linear-gradient(145deg, #0d0d0d, #080808); border: 1px solid var(--border); border-radius: 6px; }
+  .stat-number { font-family: 'Orbitron', sans-serif; font-size: 2rem; font-weight: 700; color: var(--orange); }
+  .stat-label { font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; margin-top: 6px; }
+  @media (max-width: 768px) { .stats-bar { grid-template-columns: repeat(2, 1fr); } }
 </style>
 </head>
 <body>
 <canvas id="matrix-canvas"></canvas>
 <div class="container">
-
   <header>
     <h1>MATRIX</h1>
     <div class="subtitle">There is no spoon. Only infrastructure.</div>
     <div class="glitch-line"></div>
   </header>
-
   <nav>
     <a href="index.html">Mind Map</a>
     <a href="arch.html">Architecture</a>
     <a href="search.html">Search</a>
-    <a href="blog.html">Blog & Tech</a>
+    <a href="blog.html">Tech Radar</a>
     <a href="about.html">About</a>
   </nav>
-
-
-<div style="margin-bottom:30px;">
-  <div class="page-title">Blog & Tech</div>
-  <div class="page-desc">Resources for technical writing, blogging, open source, and developer productivity.</div>
-</div>
-
-<!-- Dev.to & Blogging -->
-<div class="card">
-  <h3>Developer Blogging Platforms</h3>
-  <p style="margin-bottom:16px;">Where to publish your technical content and build your audience.</p>
-  <table class="platform-comparison">
-    <tr><th>Platform</th><th>Audience</th><th>SEO</th><th>Monetization</th><th>Best For</th></tr>
-    <tr><td><strong>Dev.to</strong></td><td>Developers</td><td><span class="badge badge-green">Good</span></td><td><span class="badge badge-orange">Limited</span></td><td>Community engagement</td></tr>
-    <tr><td><strong>Hashnode</strong></td><td>Developers</td><td><span class="badge badge-green">Excellent</span></td><td><span class="badge badge-green">Yes</span></td><td>Personal branding</td></tr>
-    <tr><td><strong>Medium</strong></td><td>General</td><td><span class="badge badge-green">Excellent</span></td><td><span class="badge badge-green">Partner Program</span></td><td>Broad reach</td></tr>
-    <tr><td><strong>Substack</strong></td><td>Niche</td><td><span class="badge badge-orange">Moderate</span></td><td><span class="badge badge-green">Paid newsletters</span></td><td>Newsletter format</td></tr>
-    <tr><td><strong>GitHub Pages</strong></td><td>Technical</td><td><span class="badge badge-green">Good</span></td><td><span class="badge badge-orange">None</span></td><td>Portfolio / docs</td></tr>
-  </table>
-  <div style="margin-top:12px;">
-    <a href="https://dev.to" target="_blank" class="link-tag">Dev.to</a>
-    <a href="https://hashnode.com" target="_blank" class="link-tag">Hashnode</a>
-    <a href="https://medium.com" target="_blank" class="link-tag">Medium</a>
-    <a href="https://substack.com" target="_blank" class="link-tag">Substack</a>
-    <a href="https://pages.github.com" target="_blank" class="link-tag">GitHub Pages</a>
+  <div style="margin-bottom:30px;">
+    <div class="page-title">Tech Radar</div>
+    <div class="page-desc">Curated blogs and X handles. No fluff. Just signal.</div>
   </div>
-</div>
 
-<!-- Technical Writing -->
-<div class="card">
-  <h3>Technical Writing Resources</h3>
-  <p style="margin-bottom:16px;">Tools and frameworks for creating documentation that developers actually read.</p>
-  <div class="resource-grid">
-    <div class="resource-card">
-      <h4>Docusaurus</h4>
-      <p>Facebook's documentation site generator. React-based, search, versioning, i18n.</p>
-      <a href="https://docusaurus.io" target="_blank" class="link-tag">docusaurus.io</a>
-    </div>
-    <div class="resource-card">
-      <h4>MkDocs</h4>
-      <p>Fast, simple static site generator for project documentation. Markdown-based.</p>
-      <a href="https://www.mkdocs.org" target="_blank" class="link-tag">mkdocs.org</a>
-    </div>
-    <div class="resource-card">
-      <h4>Vale Linter</h4>
-      <p>Prose linter for technical writing. Enforces style guides and catches errors.</p>
-      <a href="https://vale.sh" target="_blank" class="link-tag">vale.sh</a>
-    </div>
-    <div class="resource-card">
-      <h4>Read the Docs</h4>
-      <p>Documentation hosting with automatic builds from Git repositories.</p>
-      <a href="https://readthedocs.org" target="_blank" class="link-tag">readthedocs.org</a>
-    </div>
+  <div class="stats-bar">
+    <div class="stat-box"><div class="stat-number">60+</div><div class="stat-label">Blogs</div></div>
+    <div class="stat-box"><div class="stat-number">50+</div><div class="stat-label">X Handles</div></div>
+    <div class="stat-box"><div class="stat-number">9</div><div class="stat-label">Categories</div></div>
+    <div class="stat-box"><div class="stat-number">0</div><div class="stat-label">Noise</div></div>
   </div>
-</div>
 
-<!-- Writing Checklist -->
-<div class="card">
-  <h3>Technical Writing Checklist</h3>
-  <p style="margin-bottom:12px;">Before publishing your next technical article, run through this list.</p>
-  <ul class="checklist" id="writingChecklist">
-    <li onclick="this.classList.toggle('checked')">Define your target audience and their skill level</li>
-    <li onclick="this.classList.toggle('checked')">Start with a clear problem statement or hook</li>
-    <li onclick="this.classList.toggle('checked')">Include a table of contents for long articles</li>
-    <li onclick="this.classList.toggle('checked')">Add code examples that are copy-paste ready</li>
-    <li onclick="this.classList.toggle('checked')">Explain WHY, not just HOW</li>
-    <li onclick="this.classList.toggle('checked')">Use diagrams for complex architectures</li>
-    <li onclick="this.classList.toggle('checked')">Add a "Prerequisites" section</li>
-    <li onclick="this.classList.toggle('checked')">Include error handling and edge cases</li>
-    <li onclick="this.classList.toggle('checked')">Run spell check and grammar check (Vale)</li>
-    <li onclick="this.classList.toggle('checked')">Test all commands in a clean environment</li>
-    <li onclick="this.classList.toggle('checked')">Add alt text to all images</li>
-    <li onclick="this.classList.toggle('checked')">Include a conclusion with next steps</li>
-  </ul>
-</div>
-
-<!-- Open Source -->
-<div class="card">
-  <h3>Open Source Contribution Guide</h3>
-  <p style="margin-bottom:16px;">How to find, evaluate, and contribute to open source projects effectively.</p>
-  <div class="grid-2">
-    <div>
-      <h4 style="color:var(--gold);font-size:0.85rem;margin-bottom:10px;">Finding Projects</h4>
-      <ul class="checklist">
-        <li>Look for <code>good-first-issue</code> labels</li>
-        <li>Check recent commit activity</li>
-        <li>Review the CONTRIBUTING.md file</li>
-        <li>Assess community responsiveness</li>
-        <li>Start with documentation fixes</li>
-      </ul>
+  <!-- CLOUD & INFRASTRUCTURE -->
+  <div class="category-header">Cloud & Infrastructure</div>
+  <div class="feed-grid">
+    <div class="feed-card">
+      <h4>AWS News Blog</h4>
+      <p>Official AWS product launches, deep dives, and architecture patterns. First source for new service announcements.</p>
+      <a href="https://aws.amazon.com/blogs/aws/" target="_blank">aws.amazon.com/blogs/aws</a>
     </div>
-    <div>
-      <h4 style="color:var(--gold);font-size:0.85rem;margin-bottom:10px;">Best Practices</h4>
-      <ul class="checklist">
-        <li>Fork and create a feature branch</li>
-        <li>Write clear commit messages</li>
-        <li>Include tests with your changes</li>
-        <li>Update documentation</li>
-        <li>Be patient with maintainers</li>
-      </ul>
+    <div class="feed-card">
+      <h4>Last Week in AWS</h4>
+      <p>Corey Quinn's sarcastic, detailed weekly digest of AWS changes, pricing traps, and cloud economics.</p>
+      <a href="https://www.lastweekinaws.com/" target="_blank">lastweekinaws.com</a>
+    </div>
+    <div class="feed-card">
+      <h4>Cloudonaut</h4>
+      <p>Andreas & Michael Wittig's deep-dive AWS tutorials. Battle-tested patterns for production workloads.</p>
+      <a href="https://cloudonaut.io/" target="_blank">cloudonaut.io</a>
+    </div>
+    <div class="feed-card">
+      <h4>Azure Blog</h4>
+      <p>Official Microsoft Azure updates, case studies, and architecture guidance for enterprise workloads.</p>
+      <a href="https://azure.microsoft.com/en-us/blog/" target="_blank">azure.microsoft.com/blog</a>
+    </div>
+    <div class="feed-card">
+      <h4>John Savill's Azure Master Class</h4>
+      <p>Deep technical Azure content from a Microsoft MVP. Cert prep, architecture, and real-world scenarios.</p>
+      <a href="https://www.youtube.com/c/NTFAQGuy" target="_blank">youtube.com/c/NTFAQGuy</a>
+    </div>
+    <div class="feed-card">
+      <h4>Google Cloud Blog</h4>
+      <p>Official GCP product news, data analytics deep dives, and AI/ML infrastructure stories.</p>
+      <a href="https://cloud.google.com/blog" target="_blank">cloud.google.com/blog</a>
+    </div>
+    <div class="feed-card">
+      <h4>The Cloud Pod</h4>
+      <p>Multi-cloud weekly news covering AWS, Azure, GCP, and Kubernetes ecosystem updates.</p>
+      <a href="https://www.thecloudpod.net/" target="_blank">thecloudpod.net</a>
+    </div>
+    <div class="feed-card">
+      <h4>Build5Nines</h4>
+      <p>Chris Pietschmann's Azure, cloud, and DevOps content with certifications and architecture focus.</p>
+      <a href="https://build5nines.com/" target="_blank">build5nines.com</a>
     </div>
   </div>
-  <div style="margin-top:16px;">
-    <a href="https://github.com/explore" target="_blank" class="link-tag">GitHub Explore</a>
-    <a href="https://goodfirstissues.com" target="_blank" class="link-tag">Good First Issues</a>
-    <a href="https://opensource.guide" target="_blank" class="link-tag">Open Source Guide</a>
-    <a href="https://www.firsttimersonly.com" target="_blank" class="link-tag">First Timers Only</a>
+  <div class="section-label">Follow on X</div>
+  <div class="twitter-grid">
+    <a href="https://x.com/awscloud" target="_blank" class="x-tag">awscloud</a>
+    <a href="https://x.com/Azure" target="_blank" class="x-tag">Azure</a>
+    <a href="https://x.com/googlecloud" target="_blank" class="x-tag">googlecloud</a>
+    <a href="https://x.com/kelseyhightower" target="_blank" class="x-tag">kelseyhightower</a>
+    <a href="https://x.com/QuinnyPig" target="_blank" class="x-tag">QuinnyPig</a>
+    <a href="https://x.com/ned1313" target="_blank" class="x-tag">ned1313</a>
+    <a href="https://x.com/chrispietschmann" target="_blank" class="x-tag">chrispietschmann</a>
+    <a href="https://x.com/awswhatsnew" target="_blank" class="x-tag">awswhatsnew</a>
   </div>
-</div>
 
-<!-- Developer Tools -->
-<div class="card">
-  <h3>Essential Developer Tools</h3>
-  <p style="margin-bottom:16px;">Curated list of tools that boost productivity in cloud and DevOps workflows.</p>
-  <div class="resource-grid">
-    <div class="resource-card">
-      <h4>Terminal & Shell</h4>
-      <p>Warp, Fig (Amazon Q), Starship prompt, Zoxide, fzf, bat, exa</p>
+  <!-- DEVOPS & CI/CD -->
+  <div class="category-header">DevOps & CI/CD</div>
+  <div class="feed-grid">
+    <div class="feed-card">
+      <h4>The New Stack</h4>
+      <p>Contextual coverage of cloud-native, DevOps, platform engineering, and developer experience.</p>
+      <a href="https://thenewstack.io/" target="_blank">thenewstack.io</a>
     </div>
-    <div class="resource-card">
-      <h4>Git Workflow</h4>
-      <p>GitHub CLI, Lazygit, GitKraken, delta (diff viewer), commitizen</p>
+    <div class="feed-card">
+      <h4>DevOps.com</h4>
+      <p>DevOps news, tutorials, and industry reports. Strong coverage of CI/CD and platform engineering.</p>
+      <a href="https://devops.com/" target="_blank">devops.com</a>
     </div>
-    <div class="resource-card">
-      <h4>Cloud CLI</h4>
-      <p>awscli, azure-cli, gcloud, kubectl, helm, terraform, pulumi</p>
+    <div class="feed-card">
+      <h4>InfoQ DevOps</h4>
+      <p>High-signal architecture and DevOps articles with practitioner perspectives and conference talks.</p>
+      <a href="https://www.infoq.com/devops/" target="_blank">infoq.com/devops</a>
     </div>
-    <div class="resource-card">
-      <h4>Containers</h4>
-      <p>Docker, Podman, BuildKit, dive (image explorer), trivy (scanner)</p>
+    <div class="feed-card">
+      <h4>DZone DevOps</h4>
+      <p>Community-driven tutorials, cheat sheets, and opinion pieces on DevOps tooling and practices.</p>
+      <a href="https://dzone.com/devops" target="_blank">dzone.com/devops</a>
     </div>
-    <div class="resource-card">
-      <h4>Monitoring</h4>
-      <p>k9s (K8s TUI), lazydocker, btop, htop, glances</p>
+    <div class="feed-card">
+      <h4>Spacelift Blog</h4>
+      <p>Infrastructure as Code deep dives, Terraform best practices, and policy-as-code guidance.</p>
+      <a href="https://spacelift.io/blog" target="_blank">spacelift.io/blog</a>
     </div>
-    <div class="resource-card">
-      <h4>Dotfiles</h4>
-      <p>Chezmoi, Stow, GNU Stow, yadm, bare git repos</p>
+    <div class="feed-card">
+      <h4>GitHub Blog</h4>
+      <p>GitHub Actions updates, security advisories, Copilot features, and open source ecosystem news.</p>
+      <a href="https://github.blog/" target="_blank">github.blog</a>
+    </div>
+    <div class="feed-card">
+      <h4>Screaming in the Cloud</h4>
+      <p>Corey Quinn's podcast/blog dissecting cloud economics, AWS billing, and industry absurdities.</p>
+      <a href="https://www.lastweekinaws.com/podcast/screaming-in-the-cloud/" target="_blank">lastweekinaws.com/podcast</a>
+    </div>
+    <div class="feed-card">
+      <h4>Platform Engineering</h4>
+      <p>Platform engineering patterns, internal developer platforms, and golden path tutorials.</p>
+      <a href="https://platformengineering.org/blog" target="_blank">platformengineering.org/blog</a>
     </div>
   </div>
-</div>
+  <div class="section-label">Follow on X</div>
+  <div class="twitter-grid">
+    <a href="https://x.com/martinfowler" target="_blank" class="x-tag">martinfowler</a>
+    <a href="https://x.com/nicolefv" target="_blank" class="x-tag">nicolefv</a>
+    <a href="https://x.com/RealGeneKim" target="_blank" class="x-tag">RealGeneKim</a>
+    <a href="https://x.com/bretfisher" target="_blank" class="x-tag">bretfisher</a>
+    <a href="https://x.com/vfarcic" target="_blank" class="x-tag">vfarcic</a>
+    <a href="https://x.com/mipsytipsy" target="_blank" class="x-tag">mipsytipsy</a>
+    <a href="https://x.com/darinpope" target="_blank" class="x-tag">darinpope</a>
+    <a href="https://x.com/github" target="_blank" class="x-tag">github</a>
+  </div>
 
+  <!-- KUBERNETES & CONTAINERS -->
+  <div class="category-header">Kubernetes & Containers</div>
+  <div class="feed-grid">
+    <div class="feed-card">
+      <h4>Kubernetes Blog</h4>
+      <p>Official Kubernetes release notes, feature deep dives, and community updates from the CNCF.</p>
+      <a href="https://kubernetes.io/blog/" target="_blank">kubernetes.io/blog</a>
+    </div>
+    <div class="feed-card">
+      <h4>CNCF Blog</h4>
+      <p>Cloud Native Computing Foundation news, project updates, and ecosystem announcements.</p>
+      <a href="https://www.cncf.io/blog/" target="_blank">cncf.io/blog</a>
+    </div>
+    <div class="feed-card">
+      <h4>Learnk8s</h4>
+      <p>Daniele Polencic's Kubernetes tutorials, architecture patterns, and production troubleshooting.</p>
+      <a href="https://learnk8s.io/blog" target="_blank">learnk8s.io/blog</a>
+    </div>
+    <div class="feed-card">
+      <h4>Fairwinds Blog</h4>
+      <p>Kubernetes security, governance, cost optimization, and policy enforcement guides.</p>
+      <a href="https://www.fairwinds.com/blog" target="_blank">fairwinds.com/blog</a>
+    </div>
+    <div class="feed-card">
+      <h4>Kubecost Blog</h4>
+      <p>Kubernetes cost monitoring, right-sizing, and FinOps for containerized workloads.</p>
+      <a href="https://www.kubecost.com/blog" target="_blank">kubecost.com/blog</a>
+    </div>
+    <div class="feed-card">
+      <h4>Container Journal</h4>
+      <p>Container security, orchestration trends, and enterprise container adoption stories.</p>
+      <a href="https://containerjournal.com/" target="_blank">containerjournal.com</a>
+    </div>
+    <div class="feed-card">
+      <h4>Kubernetes Podcast</h4>
+      <p>Google's official Kubernetes podcast with community news and guest interviews.</p>
+      <a href="https://kubernetespodcast.com/" target="_blank">kubernetespodcast.com</a>
+    </div>
+    <div class="feed-card">
+      <h4>Weaveworks Blog</h4>
+      <p>GitOps, Flux CD, and progressive delivery patterns for Kubernetes clusters.</p>
+      <a href="https://www.weave.works/blog" target="_blank">weave.works/blog</a>
+    </div>
+  </div>
+  <div class="section-label">Follow on X</div>
+  <div class="twitter-grid">
+    <a href="https://x.com/kubernetesio" target="_blank" class="x-tag">kubernetesio</a>
+    <a href="https://x.com/learnk8s" target="_blank" class="x-tag">learnk8s</a>
+    <a href="https://x.com/cncf" target="_blank" class="x-tag">cncf</a>
+    <a href="https://x.com/danielepolencic" target="_blank" class="x-tag">danielepolencic</a>
+    <a href="https://x.com/KaslinFields" target="_blank" class="x-tag">KaslinFields</a>
+    <a href="https://x.com/solomonstre" target="_blank" class="x-tag">solomonstre</a>
+    <a href="https://x.com/justinbgarrison" target="_blank" class="x-tag">justinbgarrison</a>
+    <a href="https://x.com/mauilion" target="_blank" class="x-tag">mauilion</a>
+  </div>
+
+  <!-- AI / ML / LLMs -->
+  <div class="category-header">AI / ML / LLMs</div>
+  <div class="feed-grid">
+    <div class="feed-card">
+      <h4>OpenAI Blog</h4>
+      <p>Research papers, model releases, and API updates from the team behind GPT and ChatGPT.</p>
+      <a href="https://openai.com/blog" target="_blank">openai.com/blog</a>
+    </div>
+    <div class="feed-card">
+      <h4>DeepMind Blog</h4>
+      <p>Google DeepMind research on AGI, protein folding, reinforcement learning, and scientific discovery.</p>
+      <a href="https://deepmind.google/discover/blog/" target="_blank">deepmind.google/discover/blog</a>
+    </div>
+    <div class="feed-card">
+      <h4>Hugging Face Blog</h4>
+      <p>Transformers, open-source LLMs, fine-tuning guides, and the latest in NLP tooling.</p>
+      <a href="https://huggingface.co/blog" target="_blank">huggingface.co/blog</a>
+    </div>
+    <div class="feed-card">
+      <h4>Papers With Code</h4>
+      <p>State-of-the-art ML papers with implementations. The leaderboard for every benchmark.</p>
+      <a href="https://paperswithcode.com/" target="_blank">paperswithcode.com</a>
+    </div>
+    <div class="feed-card">
+      <h4>Google AI Blog</h4>
+      <p>Google Research publications, Gemini updates, and applied AI across Google products.</p>
+      <a href="https://ai.googleblog.com/" target="_blank">ai.googleblog.com</a>
+    </div>
+    <div class="feed-card">
+      <h4>Machine Learning Mastery</h4>
+      <p>Jason Brownlee's practical tutorials for applied machine learning with Python.</p>
+      <a href="https://machinelearningmastery.com/" target="_blank">machinelearningmastery.com</a>
+    </div>
+    <div class="feed-card">
+      <h4>Anthropic Research</h4>
+      <p>Constitutional AI, Claude capabilities, and AI safety research from Anthropic.</p>
+      <a href="https://www.anthropic.com/research" target="_blank">anthropic.com/research</a>
+    </div>
+    <div class="feed-card">
+      <h4>Weights & Biases</h4>
+      <p>MLOps tooling, experiment tracking, and production ML workflows.</p>
+      <a href="https://wandb.ai/site" target="_blank">wandb.ai</a>
+    </div>
+  </div>
+  <div class="section-label">Follow on X</div>
+  <div class="twitter-grid">
+    <a href="https://x.com/sama" target="_blank" class="x-tag">sama</a>
+    <a href="https://x.com/gdb" target="_blank" class="x-tag">gdb</a>
+    <a href="https://x.com/AndrewYNg" target="_blank" class="x-tag">AndrewYNg</a>
+    <a href="https://x.com/karpathy" target="_blank" class="x-tag">karpathy</a>
+    <a href="https://x.com/Thom_Wolf" target="_blank" class="x-tag">Thom_Wolf</a>
+    <a href="https://x.com/DeepMind" target="_blank" class="x-tag">DeepMind</a>
+    <a href="https://x.com/OpenAI" target="_blank" class="x-tag">OpenAI</a>
+    <a href="https://x.com/OfficialLoganK" target="_blank" class="x-tag">OfficialLoganK</a>
+    <a href="https://x.com/steipete" target="_blank" class="x-tag">steipete</a>
+    <a href="https://x.com/demishassabis" target="_blank" class="x-tag">demishassabis</a>
+    <a href="https://x.com/drfeifei" target="_blank" class="x-tag">drfeifei</a>
+    <a href="https://x.com/ylecun" target="_blank" class="x-tag">ylecun</a>
+  </div>
+
+  <!-- SECURITY -->
+  <div class="category-header">Security & Zero Trust</div>
+  <div class="feed-grid">
+    <div class="feed-card">
+      <h4>Krebs on Security</h4>
+      <p>Brian Krebs' investigative reporting on cybercrime, breaches, and threat actor operations.</p>
+      <a href="https://krebsonsecurity.com/" target="_blank">krebsonsecurity.com</a>
+    </div>
+    <div class="feed-card">
+      <h4>Dark Reading</h4>
+      <p>Enterprise security news, vulnerability disclosures, and CISO-focused analysis.</p>
+      <a href="https://www.darkreading.com/" target="_blank">darkreading.com</a>
+    </div>
+    <div class="feed-card">
+      <h4>Bleeping Computer</h4>
+      <p>Breaking security news, malware analysis, and ransomware tracker. Fastest incident coverage.</p>
+      <a href="https://www.bleepingcomputer.com/" target="_blank">bleepingcomputer.com</a>
+    </div>
+    <div class="feed-card">
+      <h4>PortSwigger Research</h4>
+      <p>Web application security research, Burp Suite updates, and exploit techniques.</p>
+      <a href="https://portswigger.net/research" target="_blank">portswigger.net/research</a>
+    </div>
+    <div class="feed-card">
+      <h4>AWS Security Blog</h4>
+      <p>AWS security best practices, IAM guidance, and compliance frameworks.</p>
+      <a href="https://aws.amazon.com/blogs/security/" target="_blank">aws.amazon.com/blogs/security</a>
+    </div>
+    <div class="feed-card">
+      <h4>Cloud Security Alliance</h4>
+      <p>Cloud security standards, STAR registry, and enterprise cloud governance guidance.</p>
+      <a href="https://cloudsecurityalliance.org/blog/" target="_blank">cloudsecurityalliance.org/blog</a>
+    </div>
+    <div class="feed-card">
+      <h4>Microsoft Security Blog</h4>
+      <p>Threat intelligence, Defender updates, and Zero Trust architecture guidance.</p>
+      <a href="https://www.microsoft.com/en-us/security/blog/" target="_blank">microsoft.com/security/blog</a>
+    </div>
+    <div class="feed-card">
+      <h4>Google Project Zero</h4>
+      <p>Zero-day vulnerability research and exploit analysis from Google's elite security team.</p>
+      <a href="https://googleprojectzero.blogspot.com/" target="_blank">googleprojectzero.blogspot.com</a>
+    </div>
+  </div>
+  <div class="section-label">Follow on X</div>
+  <div class="twitter-grid">
+    <a href="https://x.com/taviso" target="_blank" class="x-tag">taviso</a>
+    <a href="https://x.com/campuscodi" target="_blank" class="x-tag">campuscodi</a>
+    <a href="https://x.com/SwiftOnSecurity" target="_blank" class="x-tag">SwiftOnSecurity</a>
+    <a href="https://x.com/BrianKrebs" target="_blank" class="x-tag">BrianKrebs</a>
+    <a href="https://x.com/projectzero" target="_blank" class="x-tag">projectzero</a>
+    <a href="https://x.com/malwareunicorn" target="_blank" class="x-tag">malwareunicorn</a>
+    <a href="https://x.com/DanielGallagher" target="_blank" class="x-tag">DanielGallagher</a>
+    <a href="https://x.com/cybersecboardrm" target="_blank" class="x-tag">cybersecboardrm</a>
+  </div>
+
+  <!-- DATABASES & STORAGE -->
+  <div class="category-header">Databases & Storage</div>
+  <div class="feed-grid">
+    <div class="feed-card">
+      <h4>Planet PostgreSQL</h4>
+      <p>Aggregated PostgreSQL blogs from core developers and community contributors worldwide.</p>
+      <a href="https://planet.postgresql.org/" target="_blank">planet.postgresql.org</a>
+    </div>
+    <div class="feed-card">
+      <h4>MongoDB Blog</h4>
+      <p>Document database patterns, Atlas updates, and developer productivity features.</p>
+      <a href="https://www.mongodb.com/blog" target="_blank">mongodb.com/blog</a>
+    </div>
+    <div class="feed-card">
+      <h4>Redis Blog</h4>
+      <p>In-memory data store use cases, Redis Stack features, and real-time analytics patterns.</p>
+      <a href="https://redis.io/blog/" target="_blank">redis.io/blog</a>
+    </div>
+    <div class="feed-card">
+      <h4>CockroachDB Blog</h4>
+      <p>Distributed SQL architecture, multi-region patterns, and consistency guarantees.</p>
+      <a href="https://www.cockroachlabs.com/blog/" target="_blank">cockroachlabs.com/blog</a>
+    </div>
+    <div class="feed-card">
+      <h4>Percona Blog</h4>
+      <p>MySQL, PostgreSQL, and MongoDB performance tuning, backups, and high availability.</p>
+      <a href="https://www.percona.com/blog/" target="_blank">percona.com/blog</a>
+    </div>
+    <div class="feed-card">
+      <h4>TimescaleDB Blog</h4>
+      <p>Time-series database optimization, SQL analytics, and IoT data ingestion patterns.</p>
+      <a href="https://www.timescale.com/blog" target="_blank">timescale.com/blog</a>
+    </div>
+    <div class="feed-card">
+      <h4>ClickHouse Blog</h4>
+      <p>Columnar OLAP database performance, real-time analytics, and data engineering.</p>
+      <a href="https://clickhouse.com/blog" target="_blank">clickhouse.com/blog</a>
+    </div>
+    <div class="feed-card">
+      <h4>MinIO Blog</h4>
+      <p>High-performance object storage, S3-compatible APIs, and data lake architectures.</p>
+      <a href="https://blog.min.io/" target="_blank">blog.min.io</a>
+    </div>
+  </div>
+  <div class="section-label">Follow on X</div>
+  <div class="twitter-grid">
+    <a href="https://x.com/PostgreSQL" target="_blank" class="x-tag">PostgreSQL</a>
+    <a href="https://x.com/MongoDB" target="_blank" class="x-tag">MongoDB</a>
+    <a href="https://x.com/Redisinc" target="_blank" class="x-tag">Redisinc</a>
+    <a href="https://x.com/CockroachDB" target="_blank" class="x-tag">CockroachDB</a>
+    <a href="https://x.com/Percona" target="_blank" class="x-tag">Percona</a>
+    <a href="https://x.com/ClickHouseDB" target="_blank" class="x-tag">ClickHouseDB</a>
+    <a href="https://x.com/MinIO" target="_blank" class="x-tag">MinIO</a>
+    <a href="https://x.com/TimescaleDB" target="_blank" class="x-tag">TimescaleDB</a>
+  </div>
+
+  <!-- OBSERVABILITY & SRE -->
+  <div class="category-header">Observability & SRE</div>
+  <div class="feed-grid">
+    <div class="feed-card">
+      <h4>Honeycomb Blog</h4>
+      <p>Charity Majors on observability, high-cardinality events, and debugging production systems.</p>
+      <a href="https://www.honeycomb.io/blog" target="_blank">honeycomb.io/blog</a>
+    </div>
+    <div class="feed-card">
+      <h4>Datadog Blog</h4>
+      <p>Monitoring, APM, security monitoring, and cloud-scale observability patterns.</p>
+      <a href="https://www.datadoghq.com/blog/" target="_blank">datadoghq.com/blog</a>
+    </div>
+    <div class="feed-card">
+      <h4>Grafana Blog</h4>
+      <p>Metrics visualization, Loki logging, Tempo tracing, and open-source observability stacks.</p>
+      <a href="https://grafana.com/blog/" target="_blank">grafana.com/blog</a>
+    </div>
+    <div class="feed-card">
+      <h4>Google SRE Book</h4>
+      <p>The canonical reference for Site Reliability Engineering. Free online.</p>
+      <a href="https://sre.google/sre-book/table-of-contents/" target="_blank">sre.google/sre-book</a>
+    </div>
+    <div class="feed-card">
+      <h4>Lightstep Blog</h4>
+      <p>Distributed tracing, OpenTelemetry adoption, and microservices observability.</p>
+      <a href="https://lightstep.com/blog" target="_blank">lightstep.com/blog</a>
+    </div>
+    <div class="feed-card">
+      <h4>SRE Weekly</h4>
+      <p>Curated newsletter of SRE articles, postmortems, and reliability engineering resources.</p>
+      <a href="https://sreweekly.com/" target="_blank">sreweekly.com</a>
+    </div>
+    <div class="feed-card">
+      <h4>Chaos Engineering</h4>
+      <p>Chaos Monkey, Gremlin, and resilience testing patterns for production systems.</p>
+      <a href="https://www.gremlin.com/blog" target="_blank">gremlin.com/blog</a>
+    </div>
+    <div class="feed-card">
+      <h4>OpenTelemetry Blog</h4>
+      <p>Vendor-neutral observability standards, instrumentation guides, and collector configs.</p>
+      <a href="https://opentelemetry.io/blog/" target="_blank">opentelemetry.io/blog</a>
+    </div>
+  </div>
+  <div class="section-label">Follow on X</div>
+  <div class="twitter-grid">
+    <a href="https://x.com/mipsytipsy" target="_blank" class="x-tag">mipsytipsy</a>
+    <a href="https://x.com/lizthegrey" target="_blank" class="x-tag">lizthegrey</a>
+    <a href="https://x.com/brendangregg" target="_blank" class="x-tag">brendangregg</a>
+    <a href="https://x.com/copyconstruct" target="_blank" class="x-tag">copyconstruct</a>
+    <a href="https://x.com/DotanHorovits" target="_blank" class="x-tag">DotanHorovits</a>
+    <a href="https://x.com/alex_gaynor" target="_blank" class="x-tag">alex_gaynor</a>
+    <a href="https://x.com/GremlinInc" target="_blank" class="x-tag">GremlinInc</a>
+    <a href="https://x.com/opentelemetry" target="_blank" class="x-tag">opentelemetry</a>
+  </div>
+
+  <!-- SYSTEM DESIGN & ARCHITECTURE -->
+  <div class="category-header">System Design & Architecture</div>
+  <div class="feed-grid">
+    <div class="feed-card">
+      <h4>Martin Fowler</h4>
+      <p>The definitive source on software architecture, refactoring, and design patterns.</p>
+      <a href="https://martinfowler.com/" target="_blank">martinfowler.com</a>
+    </div>
+    <div class="feed-card">
+      <h4>High Scalability</h4>
+      <p>Real-world architecture stories from Netflix, Uber, Twitter, and other scale giants.</p>
+      <a href="http://highscalability.com/" target="_blank">highscalability.com</a>
+    </div>
+    <div class="feed-card">
+      <h4>InfoQ Architecture</h4>
+      <p>Architecture QCon talks, design patterns, and enterprise system design case studies.</p>
+      <a href="https://www.infoq.com/architecture-design/" target="_blank">infoq.com/architecture-design</a>
+    </div>
+    <div class="feed-card">
+      <h4>System Design Primer</h4>
+      <p>Donne Martin's open-source guide to designing large-scale systems. Interview prep gold.</p>
+      <a href="https://github.com/donnemartin/system-design-primer" target="_blank">github.com/donnemartin/system-design-primer</a>
+    </div>
+    <div class="feed-card">
+      <h4>AWS Architecture Blog</h4>
+      <p>Reference architectures, Well-Architected reviews, and solution patterns.</p>
+      <a href="https://aws.amazon.com/blogs/architecture/" target="_blank">aws.amazon.com/blogs/architecture</a>
+    </div>
+    <div class="feed-card">
+      <h4>Azure Architecture Center</h4>
+      <p>Microsoft's pattern library, reference architectures, and cloud design patterns.</p>
+      <a href="https://learn.microsoft.com/en-us/azure/architecture/" target="_blank">learn.microsoft.com/azure/architecture</a>
+    </div>
+    <div class="feed-card">
+      <h4>Refactoring Guru</h4>
+      <p>Visual explanations of design patterns and refactoring techniques in multiple languages.</p>
+      <a href="https://refactoring.guru/" target="_blank">refactoring.guru</a>
+    </div>
+    <div class="feed-card">
+      <h4>ByteByteGo Newsletter</h4>
+      <p>Alex Xu's system design newsletter. Weekly deep dives on scaling, distributed systems, and interviews.</p>
+      <a href="https://blog.bytebytego.com/" target="_blank">blog.bytebytego.com</a>
+    </div>
+  </div>
+  <div class="section-label">Follow on X</div>
+  <div class="twitter-grid">
+    <a href="https://x.com/martinfowler" target="_blank" class="x-tag">martinfowler</a>
+    <a href="https://x.com/skamille" target="_blank" class="x-tag">skamille</a>
+    <a href="https://x.com/KentBeck" target="_blank" class="x-tag">KentBeck</a>
+    <a href="https://x.com/shanselman" target="_blank" class="x-tag">shanselman</a>
+    <a href="https://x.com/jeresig" target="_blank" class="x-tag">jeresig</a>
+    <a href="https://x.com/addyosmani" target="_blank" class="x-tag">addyosmani</a>
+    <a href="https://x.com/jasonfried" target="_blank" class="x-tag">jasonfried</a>
+    <a href="https://x.com/codinghorror" target="_blank" class="x-tag">codinghorror</a>
+  </div>
+
+  <!-- PROGRAMMING & ENGINEERING -->
+  <div class="category-header">Programming & Engineering</div>
+  <div class="feed-grid">
+    <div class="feed-card">
+      <h4>Hacker News</h4>
+      <p>The front page of tech. Breaking news, Show HN projects, and deep technical discussions.</p>
+      <a href="https://news.ycombinator.com/" target="_blank">news.ycombinator.com</a>
+    </div>
+    <div class="feed-card">
+      <h4>Stack Overflow Blog</h4>
+      <p>Developer surveys, technology trends, and community insights from the largest dev Q&A site.</p>
+      <a href="https://stackoverflow.blog/" target="_blank">stackoverflow.blog</a>
+    </div>
+    <div class="feed-card">
+      <h4>Ars Technica</h4>
+      <p>In-depth technology journalism with strong science, security, and policy coverage.</p>
+      <a href="https://arstechnica.com/" target="_blank">arstechnica.com</a>
+    </div>
+    <div class="feed-card">
+      <h4>Wired</h4>
+      <p>How technology shapes culture, business, and politics. Long-form investigative pieces.</p>
+      <a href="https://www.wired.com/" target="_blank">wired.com</a>
+    </div>
+    <div class="feed-card">
+      <h4>TechCrunch</h4>
+      <p>Startup news, funding rounds, and product launches. Essential for tracking industry moves.</p>
+      <a href="https://techcrunch.com/" target="_blank">techcrunch.com</a>
+    </div>
+    <div class="feed-card">
+      <h4>The Pragmatic Engineer</h4>
+      <p>Gergely Orosz's newsletter on Big Tech engineering practices, hiring, and career growth.</p>
+      <a href="https://blog.pragmaticengineer.com/" target="_blank">blog.pragmaticengineer.com</a>
+    </div>
+    <div class="feed-card">
+      <h4>Changelog</h4>
+      <p>Open source, developer tooling, and software engineering culture. Podcast + newsletter.</p>
+      <a href="https://changelog.com/" target="_blank">changelog.com</a>
+    </div>
+    <div class="feed-card">
+      <h4>Software Engineering Daily</h4>
+      <p>Daily interviews on distributed systems, infrastructure, and software engineering practices.</p>
+      <a href="https://softwareengineeringdaily.com/" target="_blank">softwareengineeringdaily.com</a>
+    </div>
+  </div>
+  <div class="section-label">Follow on X</div>
+  <div class="twitter-grid">
+    <a href="https://x.com/newsycombinator" target="_blank" class="x-tag">newsycombinator</a>
+    <a href="https://x.com/StackOverflow" target="_blank" class="x-tag">StackOverflow</a>
+    <a href="https://x.com/TechCrunch" target="_blank" class="x-tag">TechCrunch</a>
+    <a href="https://x.com/arstechnica" target="_blank" class="x-tag">arstechnica</a>
+    <a href="https://x.com/WIRED" target="_blank" class="x-tag">WIRED</a>
+    <a href="https://x.com/GergelyOrosz" target="_blank" class="x-tag">GergelyOrosz</a>
+    <a href="https://x.com/changelog" target="_blank" class="x-tag">changelog</a>
+    <a href="https://x.com/se_daily" target="_blank" class="x-tag">se_daily</a>
+  </div>
+
+  <!-- DATA ENGINEERING -->
+  <div class="category-header">Data Engineering</div>
+  <div class="feed-grid">
+    <div class="feed-card">
+      <h4>Towards Data Science</h4>
+      <p>Medium's data science and engineering publication. Practical ML and pipeline articles.</p>
+      <a href="https://towardsdatascience.com/" target="_blank">towardsdatascience.com</a>
+    </div>
+    <div class="feed-card">
+      <h4>Data Engineering Weekly</h4>
+      <p>Curated newsletter of data engineering articles, tools, and conference talks.</p>
+      <a href="https://www.dataengineeringweekly.com/" target="_blank">dataengineeringweekly.com</a>
+    </div>
+    <div class="feed-card">
+      <h4>Start Data Engineering</h4>
+      <p>Airflow, dbt, Spark, and data pipeline architecture with production-ready examples.</p>
+      <a href="https://www.startdataengineering.com/" target="_blank">startdataengineering.com</a>
+    </div>
+    <div class="feed-card">
+      <h4>Airflow Blog</h4>
+      <p>Apache Airflow orchestration patterns, DAG best practices, and provider updates.</p>
+      <a href="https://airflow.apache.org/blog/" target="_blank">airflow.apache.org/blog</a>
+    </div>
+    <div class="feed-card">
+      <h4>dbt Blog</h4>
+      <p>Analytics engineering, data transformations, and the modern data stack.</p>
+      <a href="https://www.getdbt.com/blog" target="_blank">getdbt.com/blog</a>
+    </div>
+    <div class="feed-card">
+      <h4>Snowflake Blog</h4>
+      <p>Cloud data warehouse patterns, Snowpark, and enterprise data architecture.</p>
+      <a href="https://www.snowflake.com/blog/" target="_blank">snowflake.com/blog</a>
+    </div>
+    <div class="feed-card">
+      <h4>Databricks Blog</h4>
+      <p>Lakehouse architecture, Delta Lake, Spark optimization, and Unity Catalog.</p>
+      <a href="https://www.databricks.com/blog" target="_blank">databricks.com/blog</a>
+    </div>
+    <div class="feed-card">
+      <h4>Data on Kubernetes</h4>
+      <p>Running stateful workloads, databases, and analytics on Kubernetes clusters.</p>
+      <a href="https://dok.community/blog/" target="_blank">dok.community/blog</a>
+    </div>
+  </div>
+  <div class="section-label">Follow on X</div>
+  <div class="twitter-grid">
+    <a href="https://x.com/dbt_labs" target="_blank" class="x-tag">dbt_labs</a>
+    <a href="https://x.com/snowflakedb" target="_blank" class="x-tag">snowflakedb</a>
+    <a href="https://x.com/databricks" target="_blank" class="x-tag">databricks</a>
+    <a href="https://x.com/ApacheAirflow" target="_blank" class="x-tag">ApacheAirflow</a>
+    <a href="https://x.com/data_engineer" target="_blank" class="x-tag">data_engineer</a>
+    <a href="https://x.com/DataOnK8s" target="_blank" class="x-tag">DataOnK8s</a>
+    <a href="https://x.com/StartDataEng" target="_blank" class="x-tag">StartDataEng</a>
+    <a href="https://x.com/Ronald_vanLoon" target="_blank" class="x-tag">Ronald_vanLoon</a>
+  </div>
 
   <footer>
     <div class="footer-line"></div>
     <div>Matrix &mdash; Built for GitHub Pages</div>
     <div style="margin-top:6px; font-size:0.7rem; color:#333;">Wake up, Neo...</div>
   </footer>
-
 </div>
+
 <script>
-// Matrix rain
 (function initMatrix() {
   const canvas = document.getElementById('matrix-canvas');
   if (!canvas) return;
@@ -489,8 +678,9 @@
   resize(); window.addEventListener('resize', resize);
   const chars = '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
   const fontSize = 14;
-  const columns = Math.floor(canvas.width / fontSize);
-  const drops = Array(columns).fill(1);
+  let columns = Math.floor(canvas.width / fontSize);
+  let drops = Array(columns).fill(1);
+  window.addEventListener('resize', () => { columns = Math.floor(canvas.width / fontSize); drops = Array(columns).fill(1); });
   function draw() {
     ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -505,12 +695,8 @@
   }
   setInterval(draw, 50);
 })();
-
-// Active nav
 const currentPage = window.location.pathname.split('/').pop() || 'index.html';
-document.querySelectorAll('nav a').forEach(a => {
-  if (a.getAttribute('href') === currentPage) a.classList.add('active');
-});
+document.querySelectorAll('nav a').forEach(a => { if (a.getAttribute('href') === currentPage) a.classList.add('active'); });
 </script>
 </body>
 </html>
