@@ -15,7 +15,7 @@
   nav a{color:var(--muted);text-decoration:none;margin-left:1.5rem;font-size:0.9rem;transition:color 0.2s}
   nav a:hover{color:var(--accent)}
   nav a.active{color:var(--accent)}
-  .container{max-width:1200px;margin:0 auto;padding:2rem}
+  .container{max-width:900px;margin:0 auto;padding:2rem}
   .hero{text-align:center;padding:3rem 1rem}
   .hero h1{font-family:var(--font-mono);font-size:2.5rem;color:var(--accent);margin-bottom:0.5rem;text-shadow:0 0 20px rgba(0,255,65,0.3)}
   .hero p{color:var(--muted);font-size:1.1rem;max-width:600px;margin:0 auto}
@@ -23,18 +23,14 @@
   .mode-btn{padding:0.75rem 2rem;border:1px solid var(--accent);background:transparent;color:var(--accent);font-family:var(--font-mono);cursor:pointer;border-radius:4px;transition:all 0.3s;font-size:0.95rem}
   .mode-btn:hover{background:rgba(0,255,65,0.1)}
   .mode-btn.active{background:var(--accent);color:var(--bg);font-weight:700}
-  .build-grid{display:grid;grid-template-columns:300px 1fr;gap:2rem;margin-top:2rem}
-  @media(max-width:900px){.build-grid{grid-template-columns:1fr}}
-  .sidebar{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:1.5rem;height:fit-content;position:sticky;top:90px}
-  .sidebar h3{font-family:var(--font-mono);color:var(--accent);margin-bottom:1rem;font-size:0.9rem;text-transform:uppercase;letter-spacing:1px}
-  .cat-btn{display:flex;align-items:center;gap:0.75rem;width:100%;padding:0.75rem 1rem;margin-bottom:0.5rem;background:transparent;border:1px solid var(--border);color:var(--text);border-radius:6px;cursor:pointer;transition:all 0.2s;font-family:var(--font-sans);font-size:0.9rem}
-  .cat-btn:hover{border-color:var(--accent2);color:var(--accent)}
-  .cat-btn.active{background:rgba(0,255,65,0.08);border-color:var(--accent);color:var(--accent)}
-  .cat-icon{width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:0.8rem}
   .main-panel{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:2rem}
   .panel-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem}
   .panel-header h2{font-family:var(--font-mono);color:var(--accent);font-size:1.3rem}
   .tag{display:inline-block;padding:0.25rem 0.75rem;background:rgba(0,255,65,0.1);color:var(--accent);border-radius:4px;font-size:0.75rem;font-family:var(--font-mono);border:1px solid var(--accent2)}
+  .stack-row{display:flex;gap:1rem;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap}
+  .stack-row label{font-family:var(--font-mono);color:var(--muted);font-size:0.85rem}
+  .stack-row select{min-width:200px;padding:0.6rem 1rem;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:6px;font-family:var(--font-sans);font-size:0.9rem;cursor:pointer}
+  .stack-row select:focus{outline:none;border-color:var(--accent)}
   .form-group{margin-bottom:1.25rem}
   .form-group label{display:block;margin-bottom:0.5rem;color:var(--muted);font-size:0.85rem;font-family:var(--font-mono)}
   .form-group input,.form-group select,.form-group textarea{width:100%;padding:0.75rem;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:6px;font-family:var(--font-sans);font-size:0.9rem;transition:border-color 0.2s}
@@ -53,7 +49,6 @@
   .copy-btn.copied{background:var(--accent2);border-color:var(--accent2);color:var(--bg)}
   pre{margin:0;padding:1.5rem;background:var(--bg);overflow-x:auto;font-family:var(--font-mono);font-size:0.85rem;line-height:1.5;color:var(--text);white-space:pre-wrap;word-break:break-word;max-height:600px;overflow-y:auto}
   .hint{color:var(--muted);font-size:0.8rem;margin-top:0.5rem;font-style:italic}
-  .hidden{display:none!important}
   .fade-in{animation:fadeIn 0.4s ease}
   @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
   footer{text-align:center;padding:3rem 1rem;color:var(--muted);font-size:0.8rem;border-top:1px solid var(--border);margin-top:4rem}
@@ -81,41 +76,9 @@
     <button class="mode-btn active" data-mode="template" onclick="setMode('template')">Template Forge</button>
     <button class="mode-btn" data-mode="prompt" onclick="setMode('prompt')">Agent Forge</button>
   </div>
-  <div class="build-grid">
-    <aside class="sidebar">
-      <h3>Stack</h3>
-      <button class="cat-btn active" data-cat="ansible" onclick="setCategory('ansible')">
-        <span class="cat-icon">A</span> Ansible
-      </button>
-      <button class="cat-btn" data-cat="terraform" onclick="setCategory('terraform')">
-        <span class="cat-icon">T</span> Terraform
-      </button>
-      <button class="cat-btn" data-cat="kubernetes" onclick="setCategory('kubernetes')">
-        <span class="cat-icon">K</span> Kubernetes
-      </button>
-      <button class="cat-btn" data-cat="cicd" onclick="setCategory('cicd')">
-        <span class="cat-icon">C</span> CI/CD
-      </button>
-      <button class="cat-btn" data-cat="sql" onclick="setCategory('sql')">
-        <span class="cat-icon">S</span> SQL
-      </button>
-      <button class="cat-btn" data-cat="powershell" onclick="setCategory('powershell')">
-        <span class="cat-icon">P</span> PowerShell
-      </button>
-      <button class="cat-btn" data-cat="nginx" onclick="setCategory('nginx')">
-        <span class="cat-icon">N</span> Nginx
-      </button>
-      <button class="cat-btn" data-cat="monitoring" onclick="setCategory('monitoring')">
-        <span class="cat-icon">M</span> Monitoring
-      </button>
-      <button class="cat-btn" data-cat="go" onclick="setCategory('go')">
-        <span class="cat-icon">G</span> Go
-      </button>
-    </aside>
-    <main class="main-panel" id="mainPanel">
-      <!-- Dynamic form injected here -->
-    </main>
-  </div>
+  <main class="main-panel" id="mainPanel">
+    <!-- Dynamic form injected here -->
+  </main>
   <div class="output-area" id="outputArea">
     <div class="output-header">
       <span id="outputLabel">OUTPUT</span>
@@ -164,7 +127,6 @@ function setMode(mode){
 
 function setCategory(cat){
   currentCat=cat;
-  document.querySelectorAll('.cat-btn').forEach(b=>b.classList.toggle('active',b.dataset.cat===cat));
   renderForm();
   hideOutput();
 }
@@ -280,6 +242,12 @@ function renderForm(){
   const cfg=forms[currentCat];
   const panel=document.getElementById('mainPanel');
   let html='<div class="panel-header"><h2>'+cfg.title+'</h2><span class="tag">'+cfg.tag+'</span></div>';
+  html+='<div class="stack-row"><label>Stack:</label><select id="stackSelect" onchange="setCategory(this.value)">';
+  const stackNames={ansible:'Ansible',terraform:'Terraform',kubernetes:'Kubernetes',cicd:'CI/CD',sql:'SQL',powershell:'PowerShell',nginx:'Nginx',monitoring:'Monitoring',go:'Go'};
+  for(const[k,v]of Object.entries(stackNames)){
+    html+='<option value="'+k+'"'+(k===currentCat?' selected':'')+'>'+v+'</option>';
+  }
+  html+='</select></div>';
   html+='<div id="formFields">';
   cfg.fields.forEach(f=>{
     html+='<div class="form-group">';
@@ -316,7 +284,7 @@ function getVals(){
 
 // ===== TEMPLATE GENERATORS =====
 function genAnsible(v){
-  const vars=v.vars.split('\n').filter(Boolean).map(l=>{const[p,...rest]=l.split('=');return '    - name: Set '+p.trim()+'\n      set_fact:\n        '+p.trim()+': "'+rest.join('=').trim()+'"';}).join('\n');
+  const vars=v.vars.split('\n').filter(Boolean).map(l=>{const[p,...rest]=l.split('=');return '    - name: Set '+p.trim()+'\n      set_fact:\n        '+p.trim()+': "'+rest.join('=').trim()+'"';}).join('\n\n');
   const varUse=v.vars.split('\n').filter(Boolean).map(l=>l.split('=')[0].trim()).map(k=>'        '+k+': "{{ '+k+' }}"').join('\n');
   return `---
 - name: ${v.task}
@@ -634,7 +602,7 @@ ${stepYaml}
           echo "Deploying to ${v.deploy_target}..."
           # Add deployment commands`;
   }else if(v.platform==='GitLab CI'){
-    const stageList=steps.map((s,i)=>`  - ${s}`).join('\n');
+    const stageList=steps.map(s=>`  - ${s}`).join('\n');
     const jobYaml=steps.map(s=>`${s}:
   stage: ${s}
   script:
@@ -821,7 +789,7 @@ try {
     # Add your implementation here
     Write-Output "Task completed successfully"
 } catch {
-    Write-Error "Error occurred: \$_.Exception.Message"
+    Write-Error "Error occurred: $_.Exception.Message"
     exit 1
 }`;
   }else if(v.target==='Azure'){
@@ -837,7 +805,7 @@ try {
     # Add your Azure-specific implementation
     Write-Output "Azure task completed successfully"
 } catch {
-    Write-Error "Error occurred: \$_.Exception.Message"
+    Write-Error "Error occurred: $_.Exception.Message"
     exit 1
 }`;
   }else if(v.target==='Active Directory'){
@@ -851,7 +819,7 @@ try {
     # Example: Get-ADUser -Filter * | Export-Csv users.csv
     Write-Output "AD task completed successfully"
 } catch {
-    Write-Error "Error occurred: \$_.Exception.Message"
+    Write-Error "Error occurred: $_.Exception.Message"
     exit 1
 }`;
   }else if(v.target==='Exchange'){
@@ -865,7 +833,7 @@ try {
     # Add your Exchange-specific implementation
     Write-Output "Exchange task completed successfully"
 } catch {
-    Write-Error "Error occurred: \$_.Exception.Message"
+    Write-Error "Error occurred: $_.Exception.Message"
     exit 1
 }`;
   }else{
@@ -876,7 +844,7 @@ try {
     # Add your local machine implementation
     Write-Output "Local task completed successfully"
 } catch {
-    Write-Error "Error occurred: \$_.Exception.Message"
+    Write-Error "Error occurred: $_.Exception.Message"
     exit 1
 }`;
   }
@@ -1094,7 +1062,7 @@ func main() {
   // Health endpoint
   mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
     w.WriteHeader(http.StatusOK)
-    w.Write([]byte(\`{"status":"ok"}\`))
+    w.Write([]byte(\`{\"status\":\"ok\"}\`))
   })
 
   // Request logging middleware
@@ -1278,7 +1246,6 @@ func main() {
 }`;
   }
   const deps=v.deps.split('\n').filter(Boolean);
-  const depImports=deps.map(d=>'  "'+d.trim()+'"').join('\n');
   const goMod=`module ${v.name}
 
 go 1.21
@@ -1296,11 +1263,11 @@ ${code}`;
 // ===== PROMPT BUILDERS =====
 function buildPrompt(cat,vals){
   const cfg=forms[cat];
-  let prompt=`You are an expert ${cfg.title} engineer. Your task is to generate a complete, production-ready ${cfg.title.toLowerCase()} based on the following specifications.\n\n`;
+  let prompt='You are an expert '+cfg.title+' engineer. Your task is to generate a complete, production-ready '+cfg.title.toLowerCase()+' based on the following specifications.\n\n';
   prompt+='## Requirements\n';
   cfg.fields.forEach(f=>{
     const v=vals[f.id]||'(not specified)';
-    prompt+=`- ${f.label}: ${v.replace(/\n/g,'; ')}\n`;
+    prompt+='- '+f.label+': '+v.replace(/\n/g,'; ')+'\n';
   });
   prompt+='\n## Instructions\n';
   prompt+='1. Generate clean, well-commented code following industry best practices.\n';
@@ -1329,10 +1296,10 @@ function generate(){
       case 'monitoring': out=genMonitoring(v); break;
       case 'go': out=genGo(v); break;
     }
-    document.getElementById('outputLabel').textContent='OUTPUT — '+forms[currentCat].tag;
+    document.getElementById('outputLabel').textContent='OUTPUT - '+forms[currentCat].tag;
   }else{
     out=buildPrompt(currentCat,v);
-    document.getElementById('outputLabel').textContent='PROMPT — LLM Agent';
+    document.getElementById('outputLabel').textContent='PROMPT - LLM Agent';
   }
   const pre=document.getElementById('outputPre');
   pre.textContent=out;
