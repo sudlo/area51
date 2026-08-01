@@ -1,0 +1,1362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Build — Agent Forge</title>
+<style>
+  :root{--bg:#050505;--card:#0a0a0a;--accent:#00ff41;--accent2:#008f11;--text:#e0e0e0;--muted:#888;--border:#1a1a1a;--font-mono:'Courier New',Courier,monospace;--font-sans:system-ui,-apple-system,sans-serif;}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:var(--font-sans);min-height:100vh;line-height:1.6}
+  .matrix-bg{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;opacity:0.03;pointer-events:none}
+  header{padding:1.5rem 2rem;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;background:rgba(5,5,5,0.9);backdrop-filter:blur(10px);position:sticky;top:0;z-index:100}
+  .logo{font-family:var(--font-mono);font-size:1.3rem;color:var(--accent);text-decoration:none;font-weight:700;letter-spacing:2px}
+  .logo span{color:var(--text)}
+  nav a{color:var(--muted);text-decoration:none;margin-left:1.5rem;font-size:0.9rem;transition:color 0.2s}
+  nav a:hover{color:var(--accent)}
+  nav a.active{color:var(--accent)}
+  .container{max-width:1200px;margin:0 auto;padding:2rem}
+  .hero{text-align:center;padding:3rem 1rem}
+  .hero h1{font-family:var(--font-mono);font-size:2.5rem;color:var(--accent);margin-bottom:0.5rem;text-shadow:0 0 20px rgba(0,255,65,0.3)}
+  .hero p{color:var(--muted);font-size:1.1rem;max-width:600px;margin:0 auto}
+  .mode-switch{display:flex;justify-content:center;gap:1rem;margin:2rem 0}
+  .mode-btn{padding:0.75rem 2rem;border:1px solid var(--accent);background:transparent;color:var(--accent);font-family:var(--font-mono);cursor:pointer;border-radius:4px;transition:all 0.3s;font-size:0.95rem}
+  .mode-btn:hover{background:rgba(0,255,65,0.1)}
+  .mode-btn.active{background:var(--accent);color:var(--bg);font-weight:700}
+  .build-grid{display:grid;grid-template-columns:300px 1fr;gap:2rem;margin-top:2rem}
+  @media(max-width:900px){.build-grid{grid-template-columns:1fr}}
+  .sidebar{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:1.5rem;height:fit-content;position:sticky;top:90px}
+  .sidebar h3{font-family:var(--font-mono);color:var(--accent);margin-bottom:1rem;font-size:0.9rem;text-transform:uppercase;letter-spacing:1px}
+  .cat-btn{display:flex;align-items:center;gap:0.75rem;width:100%;padding:0.75rem 1rem;margin-bottom:0.5rem;background:transparent;border:1px solid var(--border);color:var(--text);border-radius:6px;cursor:pointer;transition:all 0.2s;font-family:var(--font-sans);font-size:0.9rem}
+  .cat-btn:hover{border-color:var(--accent2);color:var(--accent)}
+  .cat-btn.active{background:rgba(0,255,65,0.08);border-color:var(--accent);color:var(--accent)}
+  .cat-icon{width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:0.8rem}
+  .main-panel{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:2rem}
+  .panel-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem}
+  .panel-header h2{font-family:var(--font-mono);color:var(--accent);font-size:1.3rem}
+  .tag{display:inline-block;padding:0.25rem 0.75rem;background:rgba(0,255,65,0.1);color:var(--accent);border-radius:4px;font-size:0.75rem;font-family:var(--font-mono);border:1px solid var(--accent2)}
+  .form-group{margin-bottom:1.25rem}
+  .form-group label{display:block;margin-bottom:0.5rem;color:var(--muted);font-size:0.85rem;font-family:var(--font-mono)}
+  .form-group input,.form-group select,.form-group textarea{width:100%;padding:0.75rem;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:6px;font-family:var(--font-sans);font-size:0.9rem;transition:border-color 0.2s}
+  .form-group input:focus,.form-group select:focus,.form-group textarea:focus{outline:none;border-color:var(--accent)}
+  .form-group textarea{min-height:80px;resize:vertical;font-family:var(--font-mono)}
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+  @media(max-width:600px){.form-row{grid-template-columns:1fr}}
+  .generate-btn{width:100%;padding:1rem;background:var(--accent);color:var(--bg);border:none;border-radius:6px;font-family:var(--font-mono);font-size:1rem;font-weight:700;cursor:pointer;transition:all 0.3s;margin-top:1rem;letter-spacing:1px;text-transform:uppercase}
+  .generate-btn:hover{background:var(--accent2);box-shadow:0 0 20px rgba(0,255,65,0.2)}
+  .output-area{margin-top:2rem;border:1px solid var(--border);border-radius:8px;overflow:hidden;display:none}
+  .output-area.visible{display:block}
+  .output-header{display:flex;justify-content:space-between;align-items:center;padding:0.75rem 1rem;background:rgba(0,255,65,0.05);border-bottom:1px solid var(--border)}
+  .output-header span{font-family:var(--font-mono);color:var(--accent);font-size:0.8rem}
+  .copy-btn{padding:0.4rem 1rem;background:transparent;border:1px solid var(--accent);color:var(--accent);border-radius:4px;font-family:var(--font-mono);font-size:0.8rem;cursor:pointer;transition:all 0.2s}
+  .copy-btn:hover{background:var(--accent);color:var(--bg)}
+  .copy-btn.copied{background:var(--accent2);border-color:var(--accent2);color:var(--bg)}
+  pre{margin:0;padding:1.5rem;background:var(--bg);overflow-x:auto;font-family:var(--font-mono);font-size:0.85rem;line-height:1.5;color:var(--text);white-space:pre-wrap;word-break:break-word;max-height:600px;overflow-y:auto}
+  .hint{color:var(--muted);font-size:0.8rem;margin-top:0.5rem;font-style:italic}
+  .hidden{display:none!important}
+  .fade-in{animation:fadeIn 0.4s ease}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+  footer{text-align:center;padding:3rem 1rem;color:var(--muted);font-size:0.8rem;border-top:1px solid var(--border);margin-top:4rem}
+</style>
+</head>
+<body>
+<canvas class="matrix-bg" id="matrixCanvas"></canvas>
+<header>
+  <a href="index.html" class="logo">AGENT<span>FORGE</span></a>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="about.html">About</a>
+    <a href="arch.html">Architecture</a>
+    <a href="blog.html">Blog</a>
+    <a href="search.html">Search</a>
+    <a href="build.html" class="active">Build</a>
+  </nav>
+</header>
+<div class="container">
+  <div class="hero">
+    <h1>&lt;BUILD /&gt;</h1>
+    <p>Production-ready templates and structured LLM prompts. Pick a stack, set parameters, forge your artifact.</p>
+  </div>
+  <div class="mode-switch">
+    <button class="mode-btn active" data-mode="template" onclick="setMode('template')">Template Forge</button>
+    <button class="mode-btn" data-mode="prompt" onclick="setMode('prompt')">Agent Forge</button>
+  </div>
+  <div class="build-grid">
+    <aside class="sidebar">
+      <h3>Stack</h3>
+      <button class="cat-btn active" data-cat="ansible" onclick="setCategory('ansible')">
+        <span class="cat-icon">A</span> Ansible
+      </button>
+      <button class="cat-btn" data-cat="terraform" onclick="setCategory('terraform')">
+        <span class="cat-icon">T</span> Terraform
+      </button>
+      <button class="cat-btn" data-cat="kubernetes" onclick="setCategory('kubernetes')">
+        <span class="cat-icon">K</span> Kubernetes
+      </button>
+      <button class="cat-btn" data-cat="cicd" onclick="setCategory('cicd')">
+        <span class="cat-icon">C</span> CI/CD
+      </button>
+      <button class="cat-btn" data-cat="sql" onclick="setCategory('sql')">
+        <span class="cat-icon">S</span> SQL
+      </button>
+      <button class="cat-btn" data-cat="powershell" onclick="setCategory('powershell')">
+        <span class="cat-icon">P</span> PowerShell
+      </button>
+      <button class="cat-btn" data-cat="nginx" onclick="setCategory('nginx')">
+        <span class="cat-icon">N</span> Nginx
+      </button>
+      <button class="cat-btn" data-cat="monitoring" onclick="setCategory('monitoring')">
+        <span class="cat-icon">M</span> Monitoring
+      </button>
+      <button class="cat-btn" data-cat="go" onclick="setCategory('go')">
+        <span class="cat-icon">G</span> Go
+      </button>
+    </aside>
+    <main class="main-panel" id="mainPanel">
+      <!-- Dynamic form injected here -->
+    </main>
+  </div>
+  <div class="output-area" id="outputArea">
+    <div class="output-header">
+      <span id="outputLabel">OUTPUT</span>
+      <button class="copy-btn" id="copyBtn" onclick="copyOutput()">COPY</button>
+    </div>
+    <pre id="outputPre"></pre>
+  </div>
+</div>
+<footer>
+  <p>Agent Forge — Built for builders. No limits, no lock-in.</p>
+</footer>
+
+<script>
+// ===== MATRIX BACKGROUND =====
+const canvas=document.getElementById('matrixCanvas');
+const ctx=canvas.getContext('2d');
+let cols,rows,size=14;
+function resize(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;cols=Math.floor(canvas.width/size);rows=Math.floor(canvas.height/size);}
+resize();window.addEventListener('resize',resize);
+const chars='ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*<>/=~';
+let drops=Array(cols).fill(1);
+function draw(){
+  ctx.fillStyle='rgba(5,5,5,0.05)';
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle='#00ff41';
+  ctx.font=size+'px monospace';
+  for(let i=0;i<drops.length;i++){
+    const text=chars.charAt(Math.floor(Math.random()*chars.length));
+    ctx.fillText(text,i*size,drops[i]*size);
+    if(drops[i]*size>canvas.height&&Math.random()>0.975)drops[i]=0;
+    drops[i]++;
+  }
+}
+setInterval(draw,50);
+
+// ===== STATE =====
+let currentMode='template';
+let currentCat='ansible';
+
+function setMode(mode){
+  currentMode=mode;
+  document.querySelectorAll('.mode-btn').forEach(b=>b.classList.toggle('active',b.dataset.mode===mode));
+  renderForm();
+  hideOutput();
+}
+
+function setCategory(cat){
+  currentCat=cat;
+  document.querySelectorAll('.cat-btn').forEach(b=>b.classList.toggle('active',b.dataset.cat===cat));
+  renderForm();
+  hideOutput();
+}
+
+function hideOutput(){
+  document.getElementById('outputArea').classList.remove('visible');
+}
+
+// ===== FORM DEFINITIONS =====
+const forms={
+  ansible:{
+    title:'Ansible Playbook',
+    tag:'YAML',
+    fields:[
+      {id:'hosts',label:'Target Hosts',type:'text',placeholder:'webservers',value:'webservers'},
+      {id:'task',label:'Task Description',type:'text',placeholder:'Install nginx and configure firewall',value:'Install nginx and configure UFW'},
+      {id:'become',label:'Privilege Escalation',type:'select',options:['yes','no'],value:'yes'},
+      {id:'vars',label:'Extra Variables (key=value per line)',type:'textarea',placeholder:'http_port=80\nmax_clients=200',value:'http_port=80\nmax_clients=200'}
+    ]
+  },
+  terraform:{
+    title:'Terraform Module',
+    tag:'HCL',
+    fields:[
+      {id:'provider',label:'Cloud Provider',type:'select',options:['aws','azure','gcp'],value:'aws'},
+      {id:'resource',label:'Resource Type',type:'text',placeholder:'ec2_instance',value:'ec2_instance'},
+      {id:'region',label:'Region',type:'text',placeholder:'us-east-1',value:'us-east-1'},
+      {id:'count_num',label:'Instance Count',type:'text',placeholder:'2',value:'2'},
+      {id:'tags',label:'Tags (key=value per line)',type:'textarea',placeholder:'Environment=prod\nProject=webapp',value:'Environment=prod\nProject=webapp'}
+    ]
+  },
+  kubernetes:{
+    title:'Kubernetes Manifest',
+    tag:'YAML',
+    fields:[
+      {id:'kind',label:'Resource Kind',type:'select',options:['Deployment','Service','ConfigMap','Secret','Ingress','StatefulSet','DaemonSet','Job'],value:'Deployment'},
+      {id:'name',label:'Resource Name',type:'text',placeholder:'my-app',value:'my-app'},
+      {id:'namespace',label:'Namespace',type:'text',placeholder:'default',value:'default'},
+      {id:'image',label:'Container Image',type:'text',placeholder:'nginx:latest',value:'nginx:latest'},
+      {id:'replicas',label:'Replicas',type:'text',placeholder:'3',value:'3'},
+      {id:'port',label:'Container Port',type:'text',placeholder:'80',value:'80'},
+      {id:'env',label:'Environment Variables (KEY=VALUE per line)',type:'textarea',placeholder:'LOG_LEVEL=info\nDB_HOST=postgres',value:'LOG_LEVEL=info'}
+    ]
+  },
+  cicd:{
+    title:'CI/CD Pipeline',
+    tag:'YAML',
+    fields:[
+      {id:'platform',label:'Platform',type:'select',options:['GitHub Actions','GitLab CI','Azure DevOps','Jenkins','CircleCI'],value:'GitHub Actions'},
+      {id:'lang',label:'Primary Language',type:'select',options:['Node.js','Python','Go','Java','.NET','Rust','Docker'],value:'Node.js'},
+      {id:'steps',label:'Pipeline Steps (one per line)',type:'textarea',placeholder:'lint\ntest\nbuild\ndeploy',value:'lint\ntest\nbuild\ndeploy'},
+      {id:'branch',label:'Trigger Branch',type:'text',placeholder:'main',value:'main'},
+      {id:'deploy_target',label:'Deploy Target',type:'text',placeholder:'AWS ECS / Kubernetes / VM',value:'Kubernetes'}
+    ]
+  },
+  sql:{
+    title:'SQL Schema & Queries',
+    tag:'SQL',
+    fields:[
+      {id:'db',label:'Database',type:'select',options:['PostgreSQL','MySQL','SQLite','SQL Server','Oracle'],value:'PostgreSQL'},
+      {id:'action',label:'Action',type:'select',options:['CREATE TABLE','SELECT Query','INSERT Statement','UPDATE Statement','Stored Procedure','Index','View'],value:'CREATE TABLE'},
+      {id:'table',label:'Table Name',type:'text',placeholder:'users',value:'users'},
+      {id:'columns',label:'Columns (name:type per line)',type:'textarea',placeholder:'id:SERIAL PRIMARY KEY\nemail:VARCHAR(255) UNIQUE\ncreated_at:TIMESTAMP DEFAULT NOW()',value:'id:SERIAL PRIMARY KEY\nemail:VARCHAR(255) UNIQUE\ncreated_at:TIMESTAMP DEFAULT NOW()'},
+      {id:'conditions',label:'Conditions / WHERE Clause',type:'text',placeholder:'active = true',value:''}
+    ]
+  },
+  powershell:{
+    title:'PowerShell Script',
+    tag:'PS1',
+    fields:[
+      {id:'target',label:'Target Environment',type:'select',options:['Windows Server','Azure','Active Directory','Exchange','Local Machine'],value:'Windows Server'},
+      {id:'task',label:'Task Description',type:'text',placeholder:'Create user accounts from CSV',value:'Create user accounts from CSV'},
+      {id:'params',label:'Parameters (name per line)',type:'textarea',placeholder:'CsvPath\nOuPath\nPassword',value:'CsvPath\nOuPath'},
+      {id:'requires_admin',label:'Requires Admin',type:'select',options:['yes','no'],value:'yes'}
+    ]
+  },
+  nginx:{
+    title:'Nginx Configuration',
+    tag:'CONF',
+    fields:[
+      {id:'use_case',label:'Use Case',type:'select',options:['Reverse Proxy','Load Balancer','Static Site','SSL/TLS Termination','Rate Limiting','Cache'],value:'Reverse Proxy'},
+      {id:'domain',label:'Domain',type:'text',placeholder:'example.com',value:'example.com'},
+      {id:'upstream',label:'Upstream / Backend',type:'text',placeholder:'localhost:3000',value:'localhost:3000'},
+      {id:'ssl',label:'Enable SSL',type:'select',options:['yes','no'],value:'no'},
+      {id:'extra',label:'Extra Directives (one per line)',type:'textarea',placeholder:'client_max_body_size 50M',value:'client_max_body_size 50M'}
+    ]
+  },
+  monitoring:{
+    title:'Monitoring Config',
+    tag:'YAML',
+    fields:[
+      {id:'tool',label:'Tool',type:'select',options:['Prometheus','Grafana','Datadog','New Relic','Zabbix','Nagios'],value:'Prometheus'},
+      {id:'target',label:'Scrape Target',type:'text',placeholder:'localhost:9090',value:'localhost:9090'},
+      {id:'interval',label:'Scrape Interval',type:'text',placeholder:'15s',value:'15s'},
+      {id:'alerts',label:'Alert Rules (condition per line)',type:'textarea',placeholder:'up == 0 for 5m\ncpu_usage > 80%',value:'up == 0 for 5m'},
+      {id:'labels',label:'Labels (key=value per line)',type:'textarea',placeholder:'env=prod\nteam=backend',value:'env=prod'}
+    ]
+  },
+  go:{
+    title:'Go Program',
+    tag:'GO',
+    fields:[
+      {id:'type',label:'Program Type',type:'select',options:['HTTP Server','CLI Tool','Worker / Cron','gRPC Service','Middleware','Database Connector'],value:'HTTP Server'},
+      {id:'name',label:'Package Name',type:'text',placeholder:'myapp',value:'myapp'},
+      {id:'port',label:'Port (if applicable)',type:'text',placeholder:'8080',value:'8080'},
+      {id:'deps',label:'Key Dependencies (one per line)',type:'textarea',placeholder:'github.com/gin-gonic/gin\ngithub.com/lib/pq',value:'github.com/gin-gonic/gin'},
+      {id:'features',label:'Features (one per line)',type:'textarea',placeholder:'Health endpoint\nRequest logging\nGraceful shutdown',value:'Health endpoint\nRequest logging\nGraceful shutdown'}
+    ]
+  }
+};
+
+function renderForm(){
+  const cfg=forms[currentCat];
+  const panel=document.getElementById('mainPanel');
+  let html='<div class="panel-header"><h2>'+cfg.title+'</h2><span class="tag">'+cfg.tag+'</span></div>';
+  html+='<div id="formFields">';
+  cfg.fields.forEach(f=>{
+    html+='<div class="form-group">';
+    html+='<label for="'+f.id+'">'+f.label+'</label>';
+    if(f.type==='select'){
+      html+='<select id="'+f.id+'">';
+      f.options.forEach(o=>html+='<option value="'+o+'"'+(o===f.value?' selected':'')+'>'+o+'</option>');
+      html+='</select>';
+    }else if(f.type==='textarea'){
+      html+='<textarea id="'+f.id+'" placeholder="'+f.placeholder+'">'+f.value.replace(/\\n/g,'\n')+'</textarea>';
+    }else{
+      html+='<input type="text" id="'+f.id+'" placeholder="'+f.placeholder+'" value="'+f.value+'">';
+    }
+    html+='</div>';
+  });
+  html+='</div>';
+  html+='<button class="generate-btn" onclick="generate()">GENERATE '+currentMode.toUpperCase()+'</button>';
+  html+='<p class="hint">'+ (currentMode==='template' ? 'Generates production-ready code you can copy and use immediately.' : 'Generates a structured prompt to feed into your LLM agent for autonomous building.') +'</p>';
+  panel.innerHTML=html;
+  panel.classList.remove('fade-in');
+  void panel.offsetWidth;
+  panel.classList.add('fade-in');
+}
+
+function getVals(){
+  const cfg=forms[currentCat];
+  const vals={};
+  cfg.fields.forEach(f=>{
+    const el=document.getElementById(f.id);
+    vals[f.id]=el?el.value:'';
+  });
+  return vals;
+}
+
+// ===== TEMPLATE GENERATORS =====
+function genAnsible(v){
+  const vars=v.vars.split('\n').filter(Boolean).map(l=>{const[p,...rest]=l.split('=');return '    - name: Set '+p.trim()+'\n      set_fact:\n        '+p.trim()+': "'+rest.join('=').trim()+'"';}).join('\n');
+  const varUse=v.vars.split('\n').filter(Boolean).map(l=>l.split('=')[0].trim()).map(k=>'        '+k+': "{{ '+k+' }}"').join('\n');
+  return `---
+- name: ${v.task}
+  hosts: ${v.hosts}
+  become: ${v.become}
+  gather_facts: yes
+  tasks:
+    ${vars ? vars + '\n\n' : ''}- name: ${v.task}
+      ansible.builtin.package:
+        name: nginx
+        state: present
+      when: ansible_os_family == "Debian"
+
+    - name: Ensure service is running
+      ansible.builtin.service:
+        name: nginx
+        state: started
+        enabled: yes
+
+    - name: Configure firewall
+      ansible.builtin.ufw:
+        rule: allow
+        port: "{{ http_port | default('80') }}"
+        proto: tcp
+      ${varUse ? '\n      vars:\n' + varUse : ''}
+  handlers:
+    - name: Reload nginx
+      ansible.builtin.service:
+        name: nginx
+        state: reloaded`;
+}
+
+function genTerraform(v){
+  const tags=v.tags.split('\n').filter(Boolean).map(l=>{const[p,...rest]=l.split('=');return '    '+p.trim()+' = "'+rest.join('=').trim()+'"';}).join('\n');
+  let resourceBlock='';
+  if(v.provider==='aws'){
+    resourceBlock=`resource "aws_instance" "${v.resource}" {
+  count         = ${v.count_num}
+  ami           = data.aws_ami.ubuntu.id
+  instance_type = "t3.micro"
+  subnet_id     = aws_subnet.main.id
+
+  tags = {
+${tags || '    Name = "'+v.resource+'"'}
+  }
+}`;
+  }else if(v.provider==='azure'){
+    resourceBlock=`resource "azurerm_linux_virtual_machine" "${v.resource}" {
+  count               = ${v.count_num}
+  name                = "${v.resource}-\${count.index}"
+  resource_group_name = azurerm_resource_group.main.name
+  location            = "${v.region}"
+  size                = "Standard_B1s"
+  admin_username      = "adminuser"
+
+  os_disk {
+    caching              = "ReadWrite"
+    storage_account_type = "Standard_LRS"
+  }
+
+  source_image_reference {
+    publisher = "Canonical"
+    offer     = "UbuntuServer"
+    sku       = "18.04-LTS"
+    version   = "latest"
+  }
+}`;
+  }else{
+    resourceBlock=`resource "google_compute_instance" "${v.resource}" {
+  count        = ${v.count_num}
+  name         = "${v.resource}-\${count.index}"
+  machine_type = "e2-micro"
+  zone         = "${v.region}-a"
+
+  boot_disk {
+    initialize_params {
+      image = "ubuntu-os-cloud/ubuntu-2004-lts"
+    }
+  }
+
+  network_interface {
+    network = "default"
+    access_config {}
+  }
+
+  labels = {
+${tags || '    name = "'+v.resource+'"'}
+  }
+}`;
+  }
+  return `terraform {
+  required_providers {
+    ${v.provider} = {
+      source  = "hashicorp/${v.provider}"
+      version = "~> 5.0"
+    }
+  }
+}
+
+provider "${v.provider}" {
+  region = "${v.region}"
+}
+
+${resourceBlock}`;
+}
+
+function genKubernetes(v){
+  const envVars=v.env.split('\n').filter(Boolean).map(l=>{const[p,...rest]=l.split('=');return '        - name: '+p.trim()+'\n          value: "'+rest.join('=').trim()+'"';}).join('\n');
+  if(v.kind==='Deployment'){
+    return `apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ${v.name}
+  namespace: ${v.namespace}
+  labels:
+    app: ${v.name}
+spec:
+  replicas: ${v.replicas}
+  selector:
+    matchLabels:
+      app: ${v.name}
+  template:
+    metadata:
+      labels:
+        app: ${v.name}
+    spec:
+      containers:
+      - name: ${v.name}
+        image: ${v.image}
+        ports:
+        - containerPort: ${v.port}
+        ${envVars ? 'env:\n' + envVars : ''}
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ${v.name}-svc
+  namespace: ${v.namespace}
+spec:
+  selector:
+    app: ${v.name}
+  ports:
+  - port: 80
+    targetPort: ${v.port}
+  type: ClusterIP`;
+  }else if(v.kind==='Service'){
+    return `apiVersion: v1
+kind: Service
+metadata:
+  name: ${v.name}
+  namespace: ${v.namespace}
+spec:
+  selector:
+    app: ${v.name}
+  ports:
+  - port: 80
+    targetPort: ${v.port}
+    protocol: TCP
+  type: LoadBalancer`;
+  }else if(v.kind==='ConfigMap'){
+    return `apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ${v.name}
+  namespace: ${v.namespace}
+data:
+  app.conf: |
+    server {
+      listen ${v.port};
+      server_name ${v.name};
+    }`;
+  }else if(v.kind==='Secret'){
+    return `apiVersion: v1
+kind: Secret
+metadata:
+  name: ${v.name}
+  namespace: ${v.namespace}
+type: Opaque
+data:
+  # Base64 encoded values
+  username: YWRtaW4=
+  password: cGFzc3dvcmQxMjM=`;
+  }else if(v.kind==='Ingress'){
+    return `apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ${v.name}
+  namespace: ${v.namespace}
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+  - host: ${v.name}.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: ${v.name}-svc
+            port:
+              number: ${v.port}`;
+  }else if(v.kind==='StatefulSet'){
+    return `apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: ${v.name}
+  namespace: ${v.namespace}
+spec:
+  serviceName: "${v.name}-headless"
+  replicas: ${v.replicas}
+  selector:
+    matchLabels:
+      app: ${v.name}
+  template:
+    metadata:
+      labels:
+        app: ${v.name}
+    spec:
+      containers:
+      - name: ${v.name}
+        image: ${v.image}
+        ports:
+        - containerPort: ${v.port}
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 1Gi`;
+  }else if(v.kind==='DaemonSet'){
+    return `apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: ${v.name}
+  namespace: ${v.namespace}
+spec:
+  selector:
+    matchLabels:
+      app: ${v.name}
+  template:
+    metadata:
+      labels:
+        app: ${v.name}
+    spec:
+      containers:
+      - name: ${v.name}
+        image: ${v.image}
+        ports:
+        - containerPort: ${v.port}
+        resources:
+          limits:
+            memory: "200Mi"
+          requests:
+            cpu: "100m"
+            memory: "200Mi"`;
+  }else{
+    return `apiVersion: batch/v1
+kind: Job
+metadata:
+  name: ${v.name}
+  namespace: ${v.namespace}
+spec:
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+      - name: ${v.name}
+        image: ${v.image}
+        command: ["sh", "-c", "echo Job completed"]`;
+  }
+}
+
+function genCICD(v){
+  const steps=v.steps.split('\n').filter(Boolean);
+  if(v.platform==='GitHub Actions'){
+    const stepYaml=steps.map(s=>`      - name: ${s.charAt(0).toUpperCase()+s.slice(1)}
+        run: |
+          echo "Running ${s}..."
+          # Add your ${s} commands here`).join('\n\n');
+    return `name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ ${v.branch} ]
+  pull_request:
+    branches: [ ${v.branch} ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup ${v.lang}
+        uses: actions/setup-${v.lang.toLowerCase().replace('.','')}@v4
+        with:
+          ${v.lang==='Node.js'?'node-version':v.lang==='Python'?'python-version':v.lang==='Go'?'go-version':v.lang==='Java'?'java-version':v.lang==='.NET'?'dotnet-version':'version'}: 'latest'
+
+${stepYaml}
+
+      - name: Deploy to ${v.deploy_target}
+        if: github.ref == 'refs/heads/${v.branch}'
+        run: |
+          echo "Deploying to ${v.deploy_target}..."
+          # Add deployment commands`;
+  }else if(v.platform==='GitLab CI'){
+    const stageList=steps.map((s,i)=>`  - ${s}`).join('\n');
+    const jobYaml=steps.map(s=>`${s}:
+  stage: ${s}
+  script:
+    - echo "Running ${s}..."
+    # Add ${s} commands
+  only:
+    - ${v.branch}`).join('\n\n');
+    return `stages:
+${stageList}
+
+${jobYaml}
+
+deploy:
+  stage: deploy
+  script:
+    - echo "Deploying to ${v.deploy_target}..."
+  only:
+    - ${v.branch}
+  environment:
+    name: production`;
+  }else if(v.platform==='Azure DevOps'){
+    const stageYaml=steps.map(s=>`  - stage: ${s}
+    jobs:
+    - job: ${s}_job
+      steps:
+      - script: |
+          echo "Running ${s}..."
+          # Add ${s} commands
+        displayName: '${s}'`).join('\n\n');
+    return `trigger:
+  branches:
+    include:
+    - ${v.branch}
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+stages:
+${stageYaml}
+  - stage: Deploy
+    jobs:
+    - job: Deploy
+      steps:
+      - script: |
+          echo "Deploying to ${v.deploy_target}..."
+        displayName: 'Deploy to ${v.deploy_target}'`;
+  }else if(v.platform==='Jenkins'){
+    const stepGroovy=steps.map(s=>`        stage('${s.charAt(0).toUpperCase()+s.slice(1)}') {
+            steps {
+                echo "Running ${s}..."
+                // Add ${s} commands
+            }
+        }`).join('\n');
+    return `pipeline {
+    agent any
+    triggers {
+        githubPush()
+    }
+    stages {
+${stepGroovy}
+        stage('Deploy') {
+            when {
+                branch '${v.branch}'
+            }
+            steps {
+                echo "Deploying to ${v.deploy_target}..."
+                // Add deployment commands
+            }
+        }
+    }
+    post {
+        always {
+            cleanWs()
+        }
+    }
+}`;
+  }else{
+    const stepYaml=steps.map(s=>`      - run:
+          name: ${s.charAt(0).toUpperCase()+s.slice(1)}
+          command: |
+            echo "Running ${s}..."
+            # Add ${s} commands`).join('\n\n');
+    return `version: 2.1
+
+jobs:
+  build:
+    docker:
+      - image: cimg/${v.lang.toLowerCase().replace('.','')}:latest
+    steps:
+      - checkout
+${stepYaml}
+      - deploy:
+          name: Deploy to ${v.deploy_target}
+          command: |
+            echo "Deploying..."
+
+workflows:
+  build_and_deploy:
+    jobs:
+      - build:
+          filters:
+            branches:
+              only: ${v.branch}`;
+  }
+}
+
+function genSQL(v){
+  const cols=v.columns.split('\n').filter(Boolean).map(l=>{const[p,...rest]=l.split(':');return '  '+p.trim()+' '+rest.join(':').trim();}).join(',\n');
+  if(v.action==='CREATE TABLE'){
+    let extra='';
+    if(v.db==='PostgreSQL') extra='\n\nCREATE INDEX idx_'+v.table+'_email ON '+v.table+'(email);';
+    else if(v.db==='MySQL') extra='\n\nALTER TABLE '+v.table+' ADD INDEX idx_email (email);';
+    return `CREATE TABLE ${v.table} (
+${cols}
+);${extra}`;
+  }else if(v.action==='SELECT Query'){
+    return `SELECT *
+FROM ${v.table}
+${v.conditions ? 'WHERE ' + v.conditions : ''}
+ORDER BY id DESC
+LIMIT 100;`;
+  }else if(v.action==='INSERT Statement'){
+    const colNames=v.columns.split('\n').filter(Boolean).map(l=>l.split(':')[0].trim()).join(', ');
+    const placeholders=v.columns.split('\n').filter(Boolean).map((l,i)=>'$'+(i+1)).join(', ');
+    return `INSERT INTO ${v.table} (${colNames})
+VALUES (${placeholders})
+RETURNING id;`;
+  }else if(v.action==='UPDATE Statement'){
+    const setClause=v.columns.split('\n').filter(Boolean).map(l=>l.split(':')[0].trim()+' = ?').join(', ');
+    return `UPDATE ${v.table}
+SET ${setClause}
+${v.conditions ? 'WHERE ' + v.conditions : ''}
+RETURNING *;`;
+  }else if(v.action==='Stored Procedure'){
+    if(v.db==='PostgreSQL'){
+      return `CREATE OR REPLACE FUNCTION process_${v.table}()
+RETURNS TRIGGER AS $$
+BEGIN
+  -- Add your logic here
+  NEW.updated_at := NOW();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_${v.table}_update
+  BEFORE UPDATE ON ${v.table}
+  FOR EACH ROW
+  EXECUTE FUNCTION process_${v.table}();`;
+    }else{
+      return `CREATE PROCEDURE sp_Process${v.table.charAt(0).toUpperCase()+v.table.slice(1)}
+AS
+BEGIN
+  SET NOCOUNT ON;
+  -- Add your logic here
+  SELECT * FROM ${v.table} ${v.conditions ? 'WHERE ' + v.conditions : ''};
+END;`;
+    }
+  }else if(v.action==='Index'){
+    const idxCol=v.columns.split('\n')[0]?.split(':')[0].trim()||'id';
+    return `CREATE INDEX idx_${v.table}_${idxCol}
+ON ${v.table} (${idxCol});`;
+  }else{
+    return `CREATE VIEW vw_${v.table}_summary AS
+SELECT ${v.columns.split('\n').filter(Boolean).map(l=>l.split(':')[0].trim()).join(', ')}
+FROM ${v.table}
+${v.conditions ? 'WHERE ' + v.conditions : ''};`;
+  }
+}
+
+function genPowerShell(v){
+  const params=v.params.split('\n').filter(Boolean).map(p=>'[Parameter(Mandatory=$true)]\n    [string]$'+p.trim().charAt(0).toUpperCase()+p.trim().slice(1)).join(',\n    ');
+  const paramBlock=params?'[CmdletBinding()]\nparam(
+    '+params+'
+)\n\n':'';
+  let body='';
+  if(v.target==='Windows Server'){
+    body=`# Import required modules if needed
+# Import-Module ActiveDirectory
+
+Write-Host "Starting: ${v.task}" -ForegroundColor Green
+
+# Main logic
+try {
+    # Add your implementation here
+    Write-Output "Task completed successfully"
+} catch {
+    Write-Error "Error occurred: \$_.Exception.Message"
+    exit 1
+}`;
+  }else if(v.target==='Azure'){
+    body=`# Ensure Az module is installed
+# Install-Module -Name Az -AllowClobber
+
+Connect-AzAccount
+
+Write-Host "Starting: ${v.task}" -ForegroundColor Green
+
+# Main logic
+try {
+    # Add your Azure-specific implementation
+    Write-Output "Azure task completed successfully"
+} catch {
+    Write-Error "Error occurred: \$_.Exception.Message"
+    exit 1
+}`;
+  }else if(v.target==='Active Directory'){
+    body=`Import-Module ActiveDirectory
+
+Write-Host "Starting: ${v.task}" -ForegroundColor Green
+
+# Main logic
+try {
+    # Add your AD-specific implementation
+    # Example: Get-ADUser -Filter * | Export-Csv users.csv
+    Write-Output "AD task completed successfully"
+} catch {
+    Write-Error "Error occurred: \$_.Exception.Message"
+    exit 1
+}`;
+  }else if(v.target==='Exchange'){
+    body=`# Connect to Exchange Online
+# Connect-ExchangeOnline
+
+Write-Host "Starting: ${v.task}" -ForegroundColor Green
+
+# Main logic
+try {
+    # Add your Exchange-specific implementation
+    Write-Output "Exchange task completed successfully"
+} catch {
+    Write-Error "Error occurred: \$_.Exception.Message"
+    exit 1
+}`;
+  }else{
+    body=`Write-Host "Starting: ${v.task}" -ForegroundColor Green
+
+# Main logic
+try {
+    # Add your local machine implementation
+    Write-Output "Local task completed successfully"
+} catch {
+    Write-Error "Error occurred: \$_.Exception.Message"
+    exit 1
+}`;
+  }
+  return `${paramBlock}${v.requires_admin==='yes'?'# Requires -RunAsAdministrator
+
+':''}${body}`;
+}
+
+function genNginx(v){
+  let serverBlock='';
+  if(v.use_case==='Reverse Proxy'){
+    serverBlock=`location / {
+    proxy_pass http://${v.upstream};
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection 'upgrade';
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_cache_bypass $http_upgrade;
+  }`;
+  }else if(v.use_case==='Load Balancer'){
+    serverBlock=`upstream backend {
+  ${v.upstream.split(',').map(u=>'  server '+u.trim()+';').join('\n')}
+  least_conn;
+}
+
+server {
+  location / {
+    proxy_pass http://backend;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+  }
+}`;
+  }else if(v.use_case==='Static Site'){
+    serverBlock=`location / {
+    root /var/www/${v.domain};
+    index index.html index.htm;
+    try_files $uri $uri/ =404;
+  }
+
+  location ~* \.(jpg|jpeg|png|gif|ico|css|js)$ {
+    expires 30d;
+    add_header Cache-Control "public, immutable";
+  }`;
+  }else if(v.use_case==='SSL/TLS Termination'){
+    serverBlock=`listen 443 ssl http2;
+  ssl_certificate /etc/nginx/ssl/${v.domain}.crt;
+  ssl_certificate_key /etc/nginx/ssl/${v.domain}.key;
+  ssl_protocols TLSv1.2 TLSv1.3;
+  ssl_ciphers 'ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256';
+  ssl_prefer_server_ciphers off;
+
+  location / {
+    proxy_pass http://${v.upstream};
+    proxy_set_header Host $host;
+  }`;
+  }else if(v.use_case==='Rate Limiting'){
+    serverBlock=`limit_req_zone $binary_remote_addr zone=one:10m rate=10r/s;
+
+server {
+  location / {
+    limit_req zone=one burst=20 nodelay;
+    proxy_pass http://${v.upstream};
+  }
+}`;
+  }else{
+    serverBlock=`proxy_cache_path /var/cache/nginx levels=1:2 keys_zone=STATIC:10m inactive=24h max_size=1g;
+
+server {
+  location / {
+    proxy_pass http://${v.upstream};
+    proxy_cache STATIC;
+    proxy_cache_valid 200 30m;
+    proxy_cache_use_stale error timeout invalid_header updating;
+    proxy_cache_lock on;
+  }
+}`;
+  }
+  const extra=v.extra.split('\n').filter(Boolean).map(l=>'  '+l.trim()).join('\n');
+  return `server {
+  listen 80;
+  server_name ${v.domain} www.${v.domain};
+  ${v.ssl==='yes' ? 'return 301 https://$server_name$request_uri;' : ''}
+
+  ${serverBlock}
+  ${extra ? '\n  ' + extra : ''}
+
+  error_page 500 502 503 504 /50x.html;
+  location = /50x.html {
+    root /usr/share/nginx/html;
+  }
+}`;
+}
+
+function genMonitoring(v){
+  if(v.tool==='Prometheus'){
+    const alertRules=v.alerts.split('\n').filter(Boolean).map((a,i)=>`  - alert: Alert${i+1}
+    expr: ${a}
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Alert triggered: ${a}"`).join('\n');
+    const lbls=v.labels.split('\n').filter(Boolean).map(l=>{const[p,...rest]=l.split('=');return '      '+p.trim()+': "'+rest.join('=').trim()+'"';}).join('\n');
+    return `global:
+  scrape_interval: ${v.interval}
+  evaluation_interval: ${v.interval}
+
+scrape_configs:
+  - job_name: '${v.target.replace(/[:/]/g,'_')}'
+    static_configs:
+      - targets: ['${v.target}']
+${lbls ? '        labels:
+' + lbls : ''}
+
+rule_files:
+  - "alerts.yml"
+
+# alerts.yml
+groups:
+  - name: default
+    rules:
+${alertRules}`;
+  }else if(v.tool==='Grafana'){
+    return `apiVersion: 1
+
+datasources:
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    url: http://${v.target}
+    isDefault: true
+    editable: true
+
+# Dashboard JSON would be imported here
+# Use Grafana UI to export and version control dashboards`;
+  }else if(v.tool==='Datadog'){
+    return `init_config:
+
+instances:
+  - openmetrics_endpoint: http://${v.target}/metrics
+    namespace: "custom"
+    metrics:
+      - .*
+
+# monitors:
+#   - name: "High Error Rate"
+#     type: metric alert
+#     query: "avg(last_5m):sum:${v.target.replace(/[:/]/g,'_')}.errors{*} > 10"`;
+  }else if(v.tool==='New Relic'){
+    return `integrations:
+  - name: nri-prometheus
+    config:
+      standalone: false
+      cluster_name: production
+      match:
+        - target: http://${v.target}/metrics
+      transformations:
+        - description: "General metrics"
+
+# Alerts would be configured via New Relic UI or Terraform`;
+  }else if(v.tool==='Zabbix'){
+    return `# Zabbix agent configuration
+Server=127.0.0.1
+ServerActive=127.0.0.1
+Hostname=${v.target.replace(/[:/]/g,'_')}
+
+# User parameters
+UserParameter=custom.metric[*],echo $1
+
+# Include additional configs
+Include=/etc/zabbix/zabbix_agentd.d/*.conf`;
+  }else{
+    return `define host{
+  use                     generic-host
+  host_name               ${v.target.replace(/[:/]/g,'_')}
+  address                 ${v.target.split(':')[0]}
+  check_command           check-host-alive
+  max_check_attempts      3
+  check_period            24x7
+  notification_interval   30
+  notification_period     24x7
+}
+
+define service{
+  use                     generic-service
+  host_name               ${v.target.replace(/[:/]/g,'_')}
+  service_description     HTTP
+  check_command           check_http
+  check_interval          ${v.interval}
+}`;
+  }
+}
+
+function genGo(v){
+  let code='';
+  if(v.type==='HTTP Server'){
+    code=`package main
+
+import (
+  "fmt"
+  "log"
+  "net/http"
+  "os"
+  "os/signal"
+  "syscall"
+  "time"
+)
+
+func main() {
+  mux := http.NewServeMux()
+
+  // Health endpoint
+  mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+    w.WriteHeader(http.StatusOK)
+    w.Write([]byte(\`{"status":"ok"}\`))
+  })
+
+  // Request logging middleware
+  loggedMux := loggingMiddleware(mux)
+
+  srv := &http.Server{
+    Addr:    ":${v.port}",
+    Handler: loggedMux,
+    ReadTimeout:  15 * time.Second,
+    WriteTimeout: 15 * time.Second,
+    IdleTimeout:  60 * time.Second,
+  }
+
+  // Graceful shutdown
+  done := make(chan bool, 1)
+  quit := make(chan os.Signal, 1)
+  signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+
+  go func() {
+    <-quit
+    log.Println("Server is shutting down...")
+    // srv.Shutdown(context.Background())
+    done <- true
+  }()
+
+  log.Println("Server starting on port ${v.port}...")
+  go func() {
+    if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+      log.Fatalf("Listen: %s\n", err)
+    }
+  }()
+
+  <-done
+  log.Println("Server stopped")
+}
+
+func loggingMiddleware(next http.Handler) http.Handler {
+  return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+    start := time.Now()
+    next.ServeHTTP(w, r)
+    log.Printf("%s %s %s", r.Method, r.URL.Path, time.Since(start))
+  })
+}`;
+  }else if(v.type==='CLI Tool'){
+    code=`package main
+
+import (
+  "flag"
+  "fmt"
+  "os"
+)
+
+func main() {
+  var name string
+  flag.StringVar(&name, "name", "world", "name to greet")
+  flag.Parse()
+
+  fmt.Printf("Hello, %s!\n", name)
+  os.Exit(0)
+}`;
+  }else if(v.type==='Worker / Cron'){
+    code=`package main
+
+import (
+  "fmt"
+  "log"
+  "time"
+)
+
+func main() {
+  ticker := time.NewTicker(1 * time.Minute)
+  defer ticker.Stop()
+
+  log.Println("Worker started")
+
+  for {
+    select {
+    case t := <-ticker.C:
+      if err := doWork(); err != nil {
+        log.Printf("Work failed: %v", err)
+        continue
+      }
+      log.Printf("Work completed at %v", t)
+    }
+  }
+}
+
+func doWork() error {
+  fmt.Println("Processing task...")
+  // Add your worker logic here
+  return nil
+}`;
+  }else if(v.type==='gRPC Service'){
+    code=`package main
+
+import (
+  "context"
+  "log"
+  "net"
+  "google.golang.org/grpc"
+)
+
+// proto definition would be in .proto file
+type server struct {
+  // pb.UnimplementedYourServiceServer
+}
+
+func main() {
+  lis, err := net.Listen("tcp", ":${v.port}")
+  if err != nil {
+    log.Fatalf("failed to listen: %v", err)
+  }
+  s := grpc.NewServer()
+  // pb.RegisterYourServiceServer(s, &server{})
+  log.Printf("gRPC server listening on :${v.port}")
+  if err := s.Serve(lis); err != nil {
+    log.Fatalf("failed to serve: %v", err)
+  }
+}`;
+  }else if(v.type==='Middleware'){
+    code=`package middleware
+
+import (
+  "net/http"
+  "time"
+)
+
+// Chain chains multiple middlewares
+func Chain(h http.Handler, middleware ...func(http.Handler) http.Handler) http.Handler {
+  for i := len(middleware) - 1; i >= 0; i-- {
+    h = middleware[i](h)
+  }
+  return h
+}
+
+// Recoverer recovers from panics
+func Recoverer(next http.Handler) http.Handler {
+  return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+    defer func() {
+      if err := recover(); err != nil {
+        http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+      }
+    }()
+    next.ServeHTTP(w, r)
+  })
+}
+
+// Timeout adds request timeout
+func Timeout(duration time.Duration) func(http.Handler) http.Handler {
+  return func(next http.Handler) http.Handler {
+    return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+      // Implementation using context.WithTimeout
+      next.ServeHTTP(w, r)
+    })
+  }
+}`;
+  }else{
+    code=`package main
+
+import (
+  "database/sql"
+  "fmt"
+  "log"
+  _ "github.com/lib/pq"
+)
+
+func main() {
+  connStr := "host=localhost port=5432 user=postgres password=secret dbname=mydb sslmode=disable"
+  db, err := sql.Open("postgres", connStr)
+  if err != nil {
+    log.Fatal(err)
+  }
+  defer db.Close()
+
+  if err := db.Ping(); err != nil {
+    log.Fatal(err)
+  }
+
+  fmt.Println("Connected to database")
+  // Add your queries here
+}`;
+  }
+  const deps=v.deps.split('\n').filter(Boolean);
+  const depImports=deps.map(d=>'  "'+d.trim()+'"').join('\n');
+  const goMod=`module ${v.name}
+
+go 1.21
+
+require (
+${deps.map(d=>'  '+d.trim()+' latest').join('\n')}
+)`;
+  return `// go.mod
+${goMod}
+
+// main.go
+${code}`;
+}
+
+// ===== PROMPT BUILDERS =====
+function buildPrompt(cat,vals){
+  const cfg=forms[cat];
+  let prompt=`You are an expert ${cfg.title} engineer. Your task is to generate a complete, production-ready ${cfg.title.toLowerCase()} based on the following specifications.\n\n`;
+  prompt+='## Requirements\n';
+  cfg.fields.forEach(f=>{
+    const v=vals[f.id]||'(not specified)';
+    prompt+=`- ${f.label}: ${v.replace(/\n/g,'; ')}\n`;
+  });
+  prompt+='\n## Instructions\n';
+  prompt+='1. Generate clean, well-commented code following industry best practices.\n';
+  prompt+='2. Include error handling and security considerations where applicable.\n';
+  prompt+='3. Add inline comments explaining non-obvious logic.\n';
+  prompt+='4. Ensure the output is copy-paste ready for immediate use.\n';
+  prompt+='5. If configuration requires secrets or sensitive data, use placeholder values and add a SECURITY note.\n';
+  prompt+='\n## Output Format\n';
+  prompt+='Provide the complete artifact in a single code block. Do not include explanations outside the code unless necessary for security warnings.\n';
+  return prompt;
+}
+
+// ===== GENERATE =====
+function generate(){
+  const v=getVals();
+  let out='';
+  if(currentMode==='template'){
+    switch(currentCat){
+      case 'ansible': out=genAnsible(v); break;
+      case 'terraform': out=genTerraform(v); break;
+      case 'kubernetes': out=genKubernetes(v); break;
+      case 'cicd': out=genCICD(v); break;
+      case 'sql': out=genSQL(v); break;
+      case 'powershell': out=genPowerShell(v); break;
+      case 'nginx': out=genNginx(v); break;
+      case 'monitoring': out=genMonitoring(v); break;
+      case 'go': out=genGo(v); break;
+    }
+    document.getElementById('outputLabel').textContent='OUTPUT — '+forms[currentCat].tag;
+  }else{
+    out=buildPrompt(currentCat,v);
+    document.getElementById('outputLabel').textContent='PROMPT — LLM Agent';
+  }
+  const pre=document.getElementById('outputPre');
+  pre.textContent=out;
+  const area=document.getElementById('outputArea');
+  area.classList.add('visible');
+  area.classList.remove('fade-in');
+  void area.offsetWidth;
+  area.classList.add('fade-in');
+  area.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+// ===== COPY =====
+function copyOutput(){
+  const text=document.getElementById('outputPre').textContent;
+  navigator.clipboard.writeText(text).then(()=>{
+    const btn=document.getElementById('copyBtn');
+    btn.textContent='COPIED!';
+    btn.classList.add('copied');
+    setTimeout(()=>{btn.textContent='COPY';btn.classList.remove('copied');},2000);
+  });
+}
+
+// ===== INIT =====
+renderForm();
+</script>
+</body>
+</html>
