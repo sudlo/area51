@@ -274,53 +274,6 @@
       </div>
     </div>
   </div>
-  <div class="card">
-    <h3>C4 Model Templates</h3>
-    <div class="grid-2">
-      <div class="template-section">
-        <h4>System Context <button class="copy-btn" onclick="copyText('c4-context')">Copy</button></h4>
-        <pre class="code-block" id="c4-context" style="font-size:0.75rem;">@startuml
-!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
-LAYOUT_WITH_LEGEND()
-Person(user, "User", "End user of the system")
-System(app, "Application", "The core system being built")
-System_Ext(payment, "Payment Gateway", "External payment processor")
-System_Ext(email, "Email Service", "External email provider")
-Rel(user, app, "Uses", "HTTPS")
-Rel(app, payment, "Processes payments", "HTTPS/JSON")
-Rel(app, email, "Sends notifications", "HTTPS/REST")
-SHOW_LEGEND()
-@enduml</pre>
-      </div>
-      <div class="template-section">
-        <h4>Container Diagram <button class="copy-btn" onclick="copyText('c4-container')">Copy</button></h4>
-        <pre class="code-block" id="c4-container" style="font-size:0.75rem;">@startuml
-!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
-LAYOUT_WITH_LEGEND()
-Person(user, "User", "End user")
-System_Boundary(app, "Application Boundary") {
-  Container(web, "Web App", "React/Vue", "Delivers static content")
-  Container(api, "API Gateway", "NGINX/AWS ALB/Azure APIM", "Routes requests")
-  Container(backend, "Backend Service", "Node.js/Go/Python", "Business logic")
-  Container(worker, "Background Worker", "Python/Rust", "Async job processing")
-  ContainerDb(db, "Primary Database", "PostgreSQL/MySQL", "Relational data")
-  ContainerDb(cache, "Cache", "Redis/Memcached", "Session & hot data")
-  ContainerDb(queue, "Message Queue", "RabbitMQ/SQS", "Async messaging")
-}
-System_Ext(s3, "Object Storage", "S3/Blob/GCS")
-Rel(user, web, "Uses", "HTTPS")
-Rel(web, api, "Calls", "HTTPS/JSON")
-Rel(api, backend, "Forwards", "HTTP/JSON")
-Rel(backend, db, "Reads/Writes", "SQL/TCP")
-Rel(backend, cache, "Caches", "Redis protocol")
-Rel(backend, queue, "Publishes", "AMQP/HTTPS")
-Rel(worker, queue, "Consumes", "AMQP/HTTPS")
-Rel(worker, s3, "Stores files", "HTTPS")
-SHOW_LEGEND()
-@enduml</pre>
-      </div>
-    </div>
-  </div>
   <footer>
     <div class="footer-line"></div>
     <div>Matrix &mdash; Built for GitHub Pages</div>
