@@ -28,428 +28,752 @@
   nav a:hover, nav a.active { border-color: var(--orange); color: var(--orange); box-shadow: var(--glow-orange); background: rgba(249,115,22,0.05); }
   .page-title { font-family: 'Orbitron', sans-serif; font-size: 1.6rem; color: var(--orange); text-transform: uppercase; letter-spacing: 3px; margin-bottom: 8px; text-align: center; }
   .page-desc { color: var(--text-dim); font-size: 0.9rem; margin-bottom: 30px; letter-spacing: 0.5px; text-align: center; }
-  .card { background: var(--card); border: 1px solid var(--border); border-radius: 6px; padding: 24px; margin-bottom: 16px; transition: all 0.3s; }
-  .card:hover { border-color: var(--gold-dim); box-shadow: 0 0 15px rgba(249,115,22,0.05); }
-  .btn { display: inline-block; padding: 10px 22px; background: linear-gradient(135deg, var(--orange), var(--orange-dark)); border: none; border-radius: 4px; color: #000; font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 1.5px; cursor: pointer; transition: all 0.3s; text-decoration: none; }
-  .btn:hover { background: linear-gradient(135deg, var(--gold), var(--orange)); box-shadow: 0 0 20px rgba(249,115,22,0.3); transform: translateY(-1px); }
-  .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-dim); }
-  .btn-outline:hover { border-color: var(--gold); color: var(--gold); background: rgba(251,191,36,0.05); box-shadow: var(--glow-gold); }
-  .mode-switch { display: flex; justify-content: center; gap: 1rem; margin: 2rem 0; }
-  .mode-btn { padding: 0.75rem 2rem; border: 1px solid var(--orange); background: transparent; color: var(--orange); font-family: 'Orbitron', sans-serif; cursor: pointer; border-radius: 4px; transition: all 0.3s; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; }
-  .mode-btn:hover { background: rgba(249,115,22,0.1); }
-  .mode-btn.active { background: var(--orange); color: #000; font-weight: 700; }
-  .main-panel { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 2rem; }
-  .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; }
-  .panel-header h2 { font-family: 'Orbitron', sans-serif; color: var(--orange); font-size: 1.1rem; text-transform: uppercase; letter-spacing: 2px; }
-  .tag { display: inline-block; padding: 0.25rem 0.75rem; background: rgba(249,115,22,0.1); color: var(--orange); border-radius: 4px; font-size: 0.75rem; font-family: 'Share Tech Mono', monospace; border: 1px solid rgba(249,115,22,0.3); }
-  .stack-row { display: flex; gap: 1rem; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; }
-  .stack-row label { font-family: 'Share Tech Mono', monospace; color: var(--text-dim); font-size: 0.85rem; }
-  .stack-row select { min-width: 200px; padding: 0.6rem 1rem; background: #050505; border: 1px solid var(--border); color: var(--text); border-radius: 6px; font-family: 'Share Tech Mono', monospace; font-size: 0.9rem; cursor: pointer; }
-  .stack-row select:focus { outline: none; border-color: var(--orange); }
-  .form-group { margin-bottom: 1.25rem; }
-  .form-group label { display: block; margin-bottom: 0.5rem; color: var(--text-dim); font-size: 0.85rem; font-family: 'Share Tech Mono', monospace; }
-  .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 0.75rem; background: #050505; border: 1px solid var(--border); color: var(--text); border-radius: 6px; font-family: 'Share Tech Mono', monospace; font-size: 0.9rem; transition: border-color 0.2s; }
-  .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--orange); }
-  .form-group textarea { min-height: 80px; resize: vertical; }
-  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-  @media(max-width:600px){.form-row{grid-template-columns:1fr}}
-  .generate-btn { width: 100%; padding: 1rem; background: linear-gradient(135deg, var(--orange), var(--orange-dark)); color: #000; border: none; border-radius: 6px; font-family: 'Orbitron', sans-serif; font-size: 1rem; font-weight: 700; cursor: pointer; transition: all 0.3s; margin-top: 1rem; letter-spacing: 1px; text-transform: uppercase; }
-  .generate-btn:hover { background: linear-gradient(135deg, var(--gold), var(--orange)); box-shadow: 0 0 20px rgba(249,115,22,0.3); }
-  .output-area { margin-top: 2rem; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; display: none; }
-  .output-area.visible { display: block; }
-  .output-header { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; background: rgba(249,115,22,0.05); border-bottom: 1px solid var(--border); }
-  .output-header span { font-family: 'Share Tech Mono', monospace; color: var(--orange); font-size: 0.8rem; }
-  .copy-btn { padding: 0.4rem 1rem; background: transparent; border: 1px solid var(--orange); color: var(--orange); border-radius: 4px; font-family: 'Share Tech Mono', monospace; font-size: 0.8rem; cursor: pointer; transition: all 0.2s; }
-  .copy-btn:hover { background: var(--orange); color: #000; }
-  .copy-btn.copied { background: var(--gold-dim); border-color: var(--gold-dim); color: #000; }
-  pre { margin: 0; padding: 1.5rem; background: #050505; overflow-x: auto; font-family: 'Share Tech Mono', monospace; font-size: 0.85rem; line-height: 1.5; color: var(--gold); white-space: pre-wrap; word-break: break-word; max-height: 600px; overflow-y: auto; }
-  .hint { color: var(--text-muted); font-size: 0.8rem; margin-top: 0.5rem; font-style: italic; }
-  .fade-in { animation: fadeIn 0.4s ease; }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-  footer { text-align: center; padding: 50px 20px 30px; color: var(--text-muted); font-size: 0.75rem; letter-spacing: 2px; }
-  .footer-line { width: 100px; height: 1px; background: linear-gradient(90deg, transparent, var(--gold-dim), transparent); margin: 0 auto 16px; }
-  ::-webkit-scrollbar { width: 6px; }
-  ::-webkit-scrollbar-track { background: var(--bg); }
-  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-  ::-webkit-scrollbar-thumb:hover { background: var(--orange); }
-  @media (max-width: 900px) { h1 { font-size: 2.2rem; letter-spacing: 6px; } nav a { padding: 8px 12px; font-size: 0.7rem; } }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 6px; padding: 24px; margin-bottom: 20px; transition: all 0.3s; }
+  .card:hover { border-color: var(--border-hover); box-shadow: var(--glow-orange); }
+  .card-title { font-family: 'Orbitron', sans-serif; font-size: 1.1rem; color: var(--gold); margin-bottom: 16px; letter-spacing: 1px; display: flex; align-items: center; gap: 10px; }
+  .card-title .icon { color: var(--orange); font-size: 1.2rem; }
+  label { display: block; font-size: 0.8rem; color: var(--text-dim); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1px; }
+  select, input[type="text"], textarea {
+    width: 100%; background: #050505; border: 1px solid var(--border); color: var(--text);
+    padding: 12px 14px; border-radius: 4px; font-family: 'Share Tech Mono', monospace; font-size: 0.9rem;
+    transition: all 0.3s; outline: none; margin-bottom: 16px;
+  }
+  select:focus, input:focus, textarea:focus { border-color: var(--orange); box-shadow: 0 0 10px rgba(249,115,22,0.1); }
+  select option { background: #0a0a0a; color: var(--text); }
+  textarea { min-height: 120px; resize: vertical; }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 600px) { .row { grid-template-columns: 1fr; } }
+  .btn {
+    font-family: 'Orbitron', sans-serif; font-size: 0.85rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 2px; padding: 14px 32px;
+    background: linear-gradient(135deg, var(--orange), var(--orange-dark));
+    color: #000; border: none; border-radius: 4px; cursor: pointer;
+    transition: all 0.3s; display: inline-flex; align-items: center; gap: 10px;
+    box-shadow: 0 0 20px rgba(249,115,22,0.2);
+  }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 0 30px rgba(249,115,22,0.4); }
+  .btn-secondary {
+    background: transparent; color: var(--orange); border: 1px solid var(--orange);
+    box-shadow: none; padding: 10px 20px; font-size: 0.75rem;
+  }
+  .btn-secondary:hover { background: rgba(249,115,22,0.1); }
+  .output-area {
+    background: #050505; border: 1px solid var(--border); border-radius: 6px;
+    padding: 20px; margin-top: 20px; display: none;
+  }
+  .output-area.active { display: block; }
+  .tabs { display: flex; gap: 4px; margin-bottom: 16px; flex-wrap: wrap; }
+  .tab {
+    font-family: 'Orbitron', sans-serif; font-size: 0.7rem; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 1px; padding: 8px 16px;
+    background: var(--card); border: 1px solid var(--border); color: var(--text-dim);
+    cursor: pointer; border-radius: 4px; transition: all 0.3s;
+  }
+  .tab:hover { border-color: var(--orange); color: var(--orange); }
+  .tab.active { background: rgba(249,115,22,0.1); border-color: var(--orange); color: var(--orange); }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+  pre {
+    background: #000; border: 1px solid var(--border); border-radius: 4px;
+    padding: 16px; overflow-x: auto; font-size: 0.8rem; line-height: 1.6;
+    color: var(--text); position: relative;
+  }
+  .copy-btn {
+    position: absolute; top: 8px; right: 8px;
+    font-family: 'Orbitron', sans-serif; font-size: 0.6rem;
+    padding: 6px 12px; background: var(--card); border: 1px solid var(--border);
+    color: var(--text-dim); cursor: pointer; border-radius: 3px;
+    text-transform: uppercase; letter-spacing: 1px;
+  }
+  .copy-btn:hover { border-color: var(--orange); color: var(--orange); }
+  .tag { display: inline-block; padding: 4px 10px; background: rgba(249,115,22,0.1); border: 1px solid rgba(249,115,22,0.3); color: var(--orange); border-radius: 3px; font-size: 0.7rem; margin-right: 6px; margin-bottom: 6px; cursor: pointer; transition: all 0.2s; }
+  .tag:hover { background: rgba(249,115,22,0.2); border-color: var(--orange); }
+  .tags-row { margin-bottom: 16px; }
+  footer { text-align: center; padding: 40px 20px; color: var(--text-muted); font-size: 0.75rem; letter-spacing: 1px; border-top: 1px solid var(--border); margin-top: 40px; }
+  .status { font-size: 0.8rem; color: var(--gold); margin-top: 10px; min-height: 20px; }
+  .status.error { color: #ef4444; }
+  .status.success { color: #22c55e; }
+  .checkbox-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--orange); cursor: pointer; }
+  .checkbox-row label { margin: 0; text-transform: none; letter-spacing: 0; font-size: 0.85rem; cursor: pointer; }
 </style>
 </head>
 <body>
 <canvas id="matrix-canvas"></canvas>
-<div class="container">
 
+<div class="container">
   <header>
     <h1>MATRIX</h1>
-    <div class="subtitle">There is no spoon. Only infrastructure.</div>
+    <div class="subtitle">Infrastructure Build Generator</div>
     <div class="glitch-line"></div>
   </header>
 
   <nav>
-    <a href="index.html">Mind Map</a>
+    <a href="index.html">Home</a>
     <a href="arch.html">Architecture</a>
-    <a href="search.html">Search</a>
-    <a href="blog.html">Blog & Tech</a>
     <a href="build.html" class="active">Build</a>
+    <a href="blog.html">Blog</a>
     <a href="about.html">About</a>
+    <a href="search.html">Search</a>
   </nav>
 
-  <div style="text-align:center;margin-bottom:10px;">
-    <div class="page-title">Build Forge</div>
-    <div class="page-desc">Production-ready templates and structured LLM prompts. Pick a stack, set parameters, forge your artifact.</div>
-  </div>
+  <div class="page-title">Build Configuration</div>
+  <div class="page-desc">Select your stack, configure parameters, and generate deployment artifacts.</div>
 
-  <div class="mode-switch">
-    <button class="mode-btn active" data-mode="template" onclick="setMode('template')">Template Forge</button>
-    <button class="mode-btn" data-mode="prompt" onclick="setMode('prompt')">Agent Forge</button>
-  </div>
+  <div class="card">
+    <div class="card-title"><span class="icon">&#9881;</span> Stack Selector</div>
+    <label for="stack">Target Stack</label>
+    <select id="stack">
+      <option value="">-- Select Stack --</option>
+      <option value="terraform-aws">Terraform + AWS</option>
+      <option value="terraform-azure">Terraform + Azure</option>
+      <option value="terraform-gcp">Terraform + GCP</option>
+      <option value="ansible">Ansible Playbook</option>
+      <option value="docker">Docker Compose</option>
+      <option value="k8s">Kubernetes Manifests</option>
+      <option value="github-actions">GitHub Actions CI/CD</option>
+      <option value="azure-devops">Azure DevOps Pipeline</option>
+      <option value="pulumi">Pulumi (TypeScript)</option>
+      <option value="bicep">Azure Bicep</option>
+    </select>
 
-  <main class="main-panel" id="mainPanel">
-    <!-- Dynamic form injected here -->
-  </main>
-
-  <div class="output-area" id="outputArea">
-    <div class="output-header">
-      <span id="outputLabel">OUTPUT</span>
-      <button class="copy-btn" id="copyBtn" onclick="copyOutput()">COPY</button>
+    <div class="tags-row">
+      <span class="tag" onclick="setStack('terraform-aws')">AWS</span>
+      <span class="tag" onclick="setStack('terraform-azure')">Azure</span>
+      <span class="tag" onclick="setStack('terraform-gcp')">GCP</span>
+      <span class="tag" onclick="setStack('k8s')">K8s</span>
+      <span class="tag" onclick="setStack('docker')">Docker</span>
+      <span class="tag" onclick="setStack('github-actions')">GitHub Actions</span>
+      <span class="tag" onclick="setStack('ansible')">Ansible</span>
     </div>
-    <pre id="outputPre"></pre>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon">&#9998;</span> Configuration</div>
+    <div class="row">
+      <div>
+        <label for="project-name">Project Name</label>
+        <input type="text" id="project-name" placeholder="my-infra-project" value="area51">
+      </div>
+      <div>
+        <label for="region">Region / Location</label>
+        <input type="text" id="region" placeholder="us-east-1" value="us-east-1">
+      </div>
+    </div>
+    <div class="row">
+      <div>
+        <label for="env">Environment</label>
+        <select id="env">
+          <option value="dev">Development</option>
+          <option value="staging">Staging</option>
+          <option value="prod" selected>Production</option>
+        </select>
+      </div>
+      <div>
+        <label for="instance-type">Instance Type / SKU</label>
+        <input type="text" id="instance-type" placeholder="t3.medium" value="t3.medium">
+      </div>
+    </div>
+    <label for="description">Description / Notes</label>
+    <textarea id="description" placeholder="Describe what this build should do...">Multi-tier web application with load balancer, auto-scaling group, and RDS backend.</textarea>
+
+    <div class="checkbox-row">
+      <input type="checkbox" id="enable-monitoring" checked>
+      <label for="enable-monitoring">Enable Monitoring (CloudWatch / Prometheus)</label>
+    </div>
+    <div class="checkbox-row">
+      <input type="checkbox" id="enable-backup">
+      <label for="enable-backup">Enable Automated Backups</label>
+    </div>
+    <div class="checkbox-row">
+      <input type="checkbox" id="enable-ssl" checked>
+      <label for="enable-ssl">Enable SSL / TLS Termination</label>
+    </div>
+    <div class="checkbox-row">
+      <input type="checkbox" id="enable-vpc" checked>
+      <label for="enable-vpc">Create VPC / Network Isolation</label>
+    </div>
+
+    <div style="text-align: center; margin-top: 20px;">
+      <button class="btn" onclick="generateBuild()">&#9881; Generate Build</button>
+    </div>
+    <div class="status" id="status"></div>
+  </div>
+
+  <div class="output-area" id="output-area">
+    <div class="card-title"><span class="icon">&#9632;</span> Generated Artifacts</div>
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('main')" data-tab="main">Main</button>
+      <button class="tab" onclick="switchTab('variables')" data-tab="variables">Variables</button>
+      <button class="tab" onclick="switchTab('outputs')" data-tab="outputs">Outputs</button>
+      <button class="tab" onclick="switchTab('readme')" data-tab="readme">README</button>
+    </div>
+    <div class="tab-content active" id="tab-main">
+      <pre><button class="copy-btn" onclick="copyCode('code-main')">Copy</button><code id="code-main"></code></pre>
+    </div>
+    <div class="tab-content" id="tab-variables">
+      <pre><button class="copy-btn" onclick="copyCode('code-variables')">Copy</button><code id="code-variables"></code></pre>
+    </div>
+    <div class="tab-content" id="tab-outputs">
+      <pre><button class="copy-btn" onclick="copyCode('code-outputs')">Copy</button><code id="code-outputs"></code></pre>
+    </div>
+    <div class="tab-content" id="tab-readme">
+      <pre><button class="copy-btn" onclick="copyCode('code-readme')">Copy</button><code id="code-readme"></code></pre>
+    </div>
   </div>
 
   <footer>
-    <div class="footer-line"></div>
-    <div>Matrix &mdash; Built for GitHub Pages</div>
-    <div style="margin-top:6px; font-size:0.7rem; color:#333;">Wake up, Neo...</div>
+    <div style="color: var(--orange); font-family: 'Orbitron', sans-serif; letter-spacing: 4px; margin-bottom: 8px;">MATRIX</div>
+    <div>Built for engineers who ship. &copy; 2026</div>
   </footer>
-
 </div>
 
 <script>
-// ===== MATRIX BACKGROUND =====
-const canvas=document.getElementById('matrixCanvas');
-const ctx=canvas.getContext('2d');
-let cols,rows,size=14;
-function resize(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;cols=Math.floor(canvas.width/size);rows=Math.floor(canvas.height/size);}
-resize();window.addEventListener('resize',resize);
-const chars='ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*<>/=~';
-let drops=Array(cols).fill(1);
-function draw(){
-  ctx.fillStyle='rgba(5,5,5,0.05)';
-  ctx.fillRect(0,0,canvas.width,canvas.height);
-  ctx.fillStyle='#00ff41';
-  ctx.font=size+'px monospace';
-  for(let i=0;i<drops.length;i++){
-    const text=chars.charAt(Math.floor(Math.random()*chars.length));
-    ctx.fillText(text,i*size,drops[i]*size);
-    if(drops[i]*size>canvas.height&&Math.random()>0.975)drops[i]=0;
-    drops[i]++;
+// Matrix Rain Effect
+const canvas = document.getElementById('matrix-canvas');
+const ctx = canvas.getContext('2d');
+let width, height;
+const cols = [];
+const fontSize = 14;
+const chars = '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
+
+function resize() {
+  width = canvas.width = window.innerWidth;
+  height = canvas.height = window.innerHeight;
+  const colCount = Math.floor(width / fontSize);
+  cols.length = 0;
+  for (let i = 0; i < colCount; i++) cols[i] = Math.random() * height;
+}
+window.addEventListener('resize', resize);
+resize();
+
+function draw() {
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+  ctx.fillRect(0, 0, width, height);
+  ctx.fillStyle = '#f97316';
+  ctx.font = fontSize + 'px monospace';
+  for (let i = 0; i < cols.length; i++) {
+    const char = chars[Math.floor(Math.random() * chars.length)];
+    ctx.fillText(char, i * fontSize, cols[i]);
+    cols[i] += fontSize;
+    if (cols[i] > height && Math.random() > 0.975) cols[i] = 0;
   }
+  requestAnimationFrame(draw);
 }
-setInterval(draw,50);
+draw();
 
-// ===== STATE =====
-let currentMode='template';
-let currentCat='ansible';
-
-function setMode(mode){
-  currentMode=mode;
-  document.querySelectorAll('.mode-btn').forEach(b=>b.classList.toggle('active',b.dataset.mode===mode));
-  renderForm();
-  hideOutput();
+// Stack selector shortcut
+function setStack(val) {
+  document.getElementById('stack').value = val;
 }
 
-function setCategory(cat){
-  currentCat=cat;
-  renderForm();
-  hideOutput();
+// Tab switching
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.querySelector('.tab[data-tab="' + name + '"]').classList.add('active');
+  document.getElementById('tab-' + name).classList.add('active');
 }
 
-function hideOutput(){
-  document.getElementById('outputArea').classList.remove('visible');
+// Copy to clipboard
+function copyCode(id) {
+  const text = document.getElementById(id).innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.querySelector('#tab-' + id.replace('code-', '') + ' .copy-btn');
+    const old = btn.innerText;
+    btn.innerText = 'Copied!';
+    setTimeout(() => btn.innerText = old, 1500);
+  });
 }
 
-// ===== FORM DEFINITIONS =====
-const forms={
-  ansible:{
-    title:'Ansible Playbook',
-    tag:'YAML',
-    fields:[
-      {id:'hosts',label:'Target Hosts',type:'text',placeholder:'webservers',value:'webservers'},
-      {id:'task',label:'Task Description',type:'text',placeholder:'Install nginx and configure firewall',value:'Install nginx and configure UFW'},
-      {id:'become',label:'Privilege Escalation',type:'select',options:['yes','no'],value:'yes'},
-      {id:'vars',label:'Extra Variables (key=value per line)',type:'textarea',placeholder:'http_port=80\nmax_clients=200',value:'http_port=80\nmax_clients=200'}
-    ]
-  },
-  terraform:{
-    title:'Terraform Module',
-    tag:'HCL',
-    fields:[
-      {id:'provider',label:'Cloud Provider',type:'select',options:['aws','azure','gcp'],value:'aws'},
-      {id:'resource',label:'Resource Type',type:'text',placeholder:'ec2_instance',value:'ec2_instance'},
-      {id:'region',label:'Region',type:'text',placeholder:'us-east-1',value:'us-east-1'},
-      {id:'count_num',label:'Instance Count',type:'text',placeholder:'2',value:'2'},
-      {id:'tags',label:'Tags (key=value per line)',type:'textarea',placeholder:'Environment=prod\nProject=webapp',value:'Environment=prod\nProject=webapp'}
-    ]
-  },
-  kubernetes:{
-    title:'Kubernetes Manifest',
-    tag:'YAML',
-    fields:[
-      {id:'kind',label:'Resource Kind',type:'select',options:['Deployment','Service','ConfigMap','Secret','Ingress','StatefulSet','DaemonSet','Job'],value:'Deployment'},
-      {id:'name',label:'Resource Name',type:'text',placeholder:'my-app',value:'my-app'},
-      {id:'namespace',label:'Namespace',type:'text',placeholder:'default',value:'default'},
-      {id:'image',label:'Container Image',type:'text',placeholder:'nginx:latest',value:'nginx:latest'},
-      {id:'replicas',label:'Replicas',type:'text',placeholder:'3',value:'3'},
-      {id:'port',label:'Container Port',type:'text',placeholder:'80',value:'80'},
-      {id:'env',label:'Environment Variables (KEY=VALUE per line)',type:'textarea',placeholder:'LOG_LEVEL=info\nDB_HOST=postgres',value:'LOG_LEVEL=info'}
-    ]
-  },
-  cicd:{
-    title:'CI/CD Pipeline',
-    tag:'YAML',
-    fields:[
-      {id:'platform',label:'Platform',type:'select',options:['GitHub Actions','GitLab CI','Azure DevOps','Jenkins','CircleCI'],value:'GitHub Actions'},
-      {id:'lang',label:'Primary Language',type:'select',options:['Node.js','Python','Go','Java','.NET','Rust','Docker'],value:'Node.js'},
-      {id:'steps',label:'Pipeline Steps (one per line)',type:'textarea',placeholder:'lint\ntest\nbuild\ndeploy',value:'lint\ntest\nbuild\ndeploy'},
-      {id:'branch',label:'Trigger Branch',type:'text',placeholder:'main',value:'main'},
-      {id:'deploy_target',label:'Deploy Target',type:'text',placeholder:'AWS ECS / Kubernetes / VM',value:'Kubernetes'}
-    ]
-  },
-  sql:{
-    title:'SQL Schema & Queries',
-    tag:'SQL',
-    fields:[
-      {id:'db',label:'Database',type:'select',options:['PostgreSQL','MySQL','SQLite','SQL Server','Oracle'],value:'PostgreSQL'},
-      {id:'action',label:'Action',type:'select',options:['CREATE TABLE','SELECT Query','INSERT Statement','UPDATE Statement','Stored Procedure','Index','View'],value:'CREATE TABLE'},
-      {id:'table',label:'Table Name',type:'text',placeholder:'users',value:'users'},
-      {id:'columns',label:'Columns (name:type per line)',type:'textarea',placeholder:'id:SERIAL PRIMARY KEY\nemail:VARCHAR(255) UNIQUE\ncreated_at:TIMESTAMP DEFAULT NOW()',value:'id:SERIAL PRIMARY KEY\nemail:VARCHAR(255) UNIQUE\ncreated_at:TIMESTAMP DEFAULT NOW()'},
-      {id:'conditions',label:'Conditions / WHERE Clause',type:'text',placeholder:'active = true',value:''}
-    ]
-  },
-  powershell:{
-    title:'PowerShell Script',
-    tag:'PS1',
-    fields:[
-      {id:'target',label:'Target Environment',type:'select',options:['Windows Server','Azure','Active Directory','Exchange','Local Machine'],value:'Windows Server'},
-      {id:'task',label:'Task Description',type:'text',placeholder:'Create user accounts from CSV',value:'Create user accounts from CSV'},
-      {id:'params',label:'Parameters (name per line)',type:'textarea',placeholder:'CsvPath\nOuPath\nPassword',value:'CsvPath\nOuPath'},
-      {id:'requires_admin',label:'Requires Admin',type:'select',options:['yes','no'],value:'yes'}
-    ]
-  },
-  nginx:{
-    title:'Nginx Configuration',
-    tag:'CONF',
-    fields:[
-      {id:'use_case',label:'Use Case',type:'select',options:['Reverse Proxy','Load Balancer','Static Site','SSL/TLS Termination','Rate Limiting','Cache'],value:'Reverse Proxy'},
-      {id:'domain',label:'Domain',type:'text',placeholder:'example.com',value:'example.com'},
-      {id:'upstream',label:'Upstream / Backend',type:'text',placeholder:'localhost:3000',value:'localhost:3000'},
-      {id:'ssl',label:'Enable SSL',type:'select',options:['yes','no'],value:'no'},
-      {id:'extra',label:'Extra Directives (one per line)',type:'textarea',placeholder:'client_max_body_size 50M',value:'client_max_body_size 50M'}
-    ]
-  },
-  monitoring:{
-    title:'Monitoring Config',
-    tag:'YAML',
-    fields:[
-      {id:'tool',label:'Tool',type:'select',options:['Prometheus','Grafana','Datadog','New Relic','Zabbix','Nagios'],value:'Prometheus'},
-      {id:'target',label:'Scrape Target',type:'text',placeholder:'localhost:9090',value:'localhost:9090'},
-      {id:'interval',label:'Scrape Interval',type:'text',placeholder:'15s',value:'15s'},
-      {id:'alerts',label:'Alert Rules (condition per line)',type:'textarea',placeholder:'up == 0 for 5m\ncpu_usage > 80%',value:'up == 0 for 5m'},
-      {id:'labels',label:'Labels (key=value per line)',type:'textarea',placeholder:'env=prod\nteam=backend',value:'env=prod'}
-    ]
-  },
-  go:{
-    title:'Go Program',
-    tag:'GO',
-    fields:[
-      {id:'type',label:'Program Type',type:'select',options:['HTTP Server','CLI Tool','Worker / Cron','gRPC Service','Middleware','Database Connector'],value:'HTTP Server'},
-      {id:'name',label:'Package Name',type:'text',placeholder:'myapp',value:'myapp'},
-      {id:'port',label:'Port (if applicable)',type:'text',placeholder:'8080',value:'8080'},
-      {id:'deps',label:'Key Dependencies (one per line)',type:'textarea',placeholder:'github.com/gin-gonic/gin\ngithub.com/lib/pq',value:'github.com/gin-gonic/gin'},
-      {id:'features',label:'Features (one per line)',type:'textarea',placeholder:'Health endpoint\nRequest logging\nGraceful shutdown',value:'Health endpoint\nRequest logging\nGraceful shutdown'}
-    ]
-  }
+// Build generators
+const generators = {
+  'terraform-aws': (p) => generateTerraformAWS(p),
+  'terraform-azure': (p) => generateTerraformAzure(p),
+  'terraform-gcp': (p) => generateTerraformGCP(p),
+  'ansible': (p) => generateAnsible(p),
+  'docker': (p) => generateDocker(p),
+  'k8s': (p) => generateK8s(p),
+  'github-actions': (p) => generateGitHubActions(p),
+  'azure-devops': (p) => generateAzureDevOps(p),
+  'pulumi': (p) => generatePulumi(p),
+  'bicep': (p) => generateBicep(p)
 };
 
-function renderForm(){
-  const cfg=forms[currentCat];
-  const panel=document.getElementById('mainPanel');
-  let html='<div class="panel-header"><h2>'+cfg.title+'</h2><span class="tag">'+cfg.tag+'</span></div>';
-  html+='<div class="stack-row"><label>Stack:</label><select id="stackSelect" onchange="setCategory(this.value)">';
-  const stackNames={ansible:'Ansible',terraform:'Terraform',kubernetes:'Kubernetes',cicd:'CI/CD',sql:'SQL',powershell:'PowerShell',nginx:'Nginx',monitoring:'Monitoring',go:'Go'};
-  for(const[k,v]of Object.entries(stackNames)){
-    html+='<option value="'+k+'"'+(k===currentCat?' selected':'')+'>'+v+'</option>';
+function generateBuild() {
+  const stack = document.getElementById('stack').value;
+  const status = document.getElementById('status');
+  if (!stack) {
+    status.innerText = 'ERROR: Select a stack first.';
+    status.className = 'status error';
+    return;
   }
-  html+='</select></div>';
-  html+='<div id="formFields">';
-  cfg.fields.forEach(f=>{
-    html+='<div class="form-group">';
-    html+='<label for="'+f.id+'">'+f.label+'</label>';
-    if(f.type==='select'){
-      html+='<select id="'+f.id+'">';
-      f.options.forEach(o=>html+='<option value="'+o+'"'+(o===f.value?' selected':'')+'>'+o+'</option>');
-      html+='</select>';
-    }else if(f.type==='textarea'){
-      html+='<textarea id="'+f.id+'" placeholder="'+f.placeholder+'">'+f.value.replace(/\\n/g,'\n')+'</textarea>';
-    }else{
-      html+='<input type="text" id="'+f.id+'" placeholder="'+f.placeholder+'" value="'+f.value+'">';
-    }
-    html+='</div>';
-  });
-  html+='</div>';
-  html+='<button class="generate-btn" onclick="generate()">GENERATE '+currentMode.toUpperCase()+'</button>';
-  html+='<p class="hint">'+ (currentMode==='template' ? 'Generates production-ready code you can copy and use immediately.' : 'Generates a structured prompt to feed into your LLM agent for autonomous building.') +'</p>';
-  panel.innerHTML=html;
-  panel.classList.remove('fade-in');
-  void panel.offsetWidth;
-  panel.classList.add('fade-in');
-}
+  status.innerText = 'Generating artifacts...';
+  status.className = 'status';
 
-function getVals(){
-  const cfg=forms[currentCat];
-  const vals={};
-  cfg.fields.forEach(f=>{
-    const el=document.getElementById(f.id);
-    vals[f.id]=el?el.value:'';
-  });
-  return vals;
-}
+  const params = {
+    name: document.getElementById('project-name').value || 'project',
+    region: document.getElementById('region').value || 'us-east-1',
+    env: document.getElementById('env').value,
+    instance: document.getElementById('instance-type').value || 't3.medium',
+    desc: document.getElementById('description').value,
+    monitoring: document.getElementById('enable-monitoring').checked,
+    backup: document.getElementById('enable-backup').checked,
+    ssl: document.getElementById('enable-ssl').checked,
+    vpc: document.getElementById('enable-vpc').checked
+  };
 
-// ===== TEMPLATE GENERATORS =====
-function genAnsible(v){
-  const vars=v.vars.split('\n').filter(Boolean).map(l=>{const[p,...rest]=l.split('=');return '    - name: Set '+p.trim()+'\n      set_fact:\n        '+p.trim()+': "'+rest.join('=').trim()+'"';}).join('\n\n');
-  const varUse=v.vars.split('\n').filter(Boolean).map(l=>l.split('=')[0].trim()).map(k=>'        '+k+': "{{ '+k+' }}"').join('\n');
-  return `---
-- name: ${v.task}
-  hosts: ${v.hosts}
-  become: ${v.become}
-  gather_facts: yes
-  tasks:
-    ${vars ? vars + '\n\n' : ''}- name: ${v.task}
-      ansible.builtin.package:
-        name: nginx
-        state: present
-      when: ansible_os_family == "Debian"
-
-    - name: Ensure service is running
-      ansible.builtin.service:
-        name: nginx
-        state: started
-        enabled: yes
-
-    - name: Configure firewall
-      ansible.builtin.ufw:
-        rule: allow
-        port: "{{ http_port | default('80') }}"
-        proto: tcp
-      ${varUse ? '\n      vars:\n' + varUse : ''}
-  handlers:
-    - name: Reload nginx
-      ansible.builtin.service:
-        name: nginx
-        state: reloaded`;
-}
-
-function genTerraform(v){
-  const tags=v.tags.split('\n').filter(Boolean).map(l=>{const[p,...rest]=l.split('=');return '    '+p.trim()+' = "'+rest.join('=').trim()+'"';}).join('\n');
-  let resourceBlock='';
-  if(v.provider==='aws'){
-    resourceBlock=`resource "aws_instance" "${v.resource}" {
-  count         = ${v.count_num}
-  ami           = data.aws_ami.ubuntu.id
-  instance_type = "t3.micro"
-  subnet_id     = aws_subnet.main.id
-
-  tags = {
-${tags || '    Name = "'+v.resource+'"'}
+  const gen = generators[stack];
+  if (gen) {
+    const result = gen(params);
+    document.getElementById('code-main').innerText = result.main;
+    document.getElementById('code-variables').innerText = result.variables;
+    document.getElementById('code-outputs').innerText = result.outputs;
+    document.getElementById('code-readme').innerText = result.readme;
+    document.getElementById('output-area').classList.add('active');
+    status.innerText = 'SUCCESS: Artifacts generated for ' + stack;
+    status.className = 'status success';
+    window.scrollTo({ top: document.getElementById('output-area').offsetTop - 20, behavior: 'smooth' });
   }
-}`;
-  }else if(v.provider==='azure'){
-    resourceBlock=`resource "azurerm_linux_virtual_machine" "${v.resource}" {
-  count               = ${v.count_num}
-  name                = "${v.resource}-\${count.index}"
+}
+
+function generateTerraformAWS(p) {
+  return {
+    main: `terraform {
+  required_providers {
+    aws = { source = "hashicorp/aws", version = "~> 5.0" }
+  }
+}
+
+provider "aws" {
+  region = var.region
+}
+
+${p.vpc ? `resource "aws_vpc" "main" {
+  cidr_block           = "10.0.0.0/16"
+  enable_dns_hostnames = true
+  enable_dns_support   = true
+  tags = { Name = "\${var.project_name}-vpc", Environment = var.environment }
+}
+
+resource "aws_subnet" "public" {
+  count             = 2
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = cidrsubnet(aws_vpc.main.cidr_block, 8, count.index)
+  availability_zone = data.aws_availability_zones.available.names[count.index]
+  tags = { Name = "\${var.project_name}-public-\${count.index}" }
+}
+
+data "aws_availability_zones" "available" { state = "available" }` : "# VPC disabled — using default VPC"}
+
+resource "aws_security_group" "app" {
+  name_prefix = "\${var.project_name}-"
+  ${p.vpc ? 'vpc_id = aws_vpc.main.id' : ''}
+
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  ${p.ssl ? `ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }` : ''}
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+resource "aws_launch_template" "app" {
+  name_prefix   = "\${var.project_name}-"
+  image_id      = data.aws_ami.amazon_linux.id
+  instance_type = var.instance_type
+  vpc_security_group_ids = [aws_security_group.app.id]
+  user_data = base64encode(<<-EOF
+    #!/bin/bash
+    yum update -y
+    yum install -y httpd
+    systemctl start httpd
+    systemctl enable httpd
+    echo "<h1>\${var.project_name} — \${var.environment}</h1>" > /var/www/html/index.html
+  EOF
+  )
+}
+
+data "aws_ami" "amazon_linux" {
+  most_recent = true
+  owners      = ["amazon"]
+  filter { name = "name"; values = ["amzn2-ami-hvm-*-x86_64-gp2"] }
+}
+
+resource "aws_autoscaling_group" "app" {
+  name                = "\${var.project_name}-asg"
+  vpc_zone_identifier = ${p.vpc ? '[aws_subnet.public[0].id, aws_subnet.public[1].id]' : 'data.aws_subnets.default.ids'}
+  target_group_arns   = [aws_lb_target_group.app.arn]
+  health_check_type   = "ELB"
+  min_size            = 2
+  max_size            = 6
+  desired_capacity    = 2
+  launch_template { id = aws_launch_template.app.id; version = "$Latest" }
+  tag { key = "Name"; value = "\${var.project_name}-instance"; propagate_at_launch = true }
+}
+
+resource "aws_lb" "app" {
+  name               = "\${var.project_name}-alb"
+  internal           = false
+  load_balancer_type = "application"
+  security_groups    = [aws_security_group.app.id]
+  subnets            = ${p.vpc ? '[aws_subnet.public[0].id, aws_subnet.public[1].id]' : 'data.aws_subnets.default.ids'}
+}
+
+resource "aws_lb_target_group" "app" {
+  name     = "\${var.project_name}-tg"
+  port     = 80
+  protocol = "HTTP"
+  vpc_id   = ${p.vpc ? 'aws_vpc.main.id' : 'data.aws_vpc.default.id'}
+  health_check { path = "/"; port = "traffic-port" }
+}
+
+resource "aws_lb_listener" "app" {
+  load_balancer_arn = aws_lb.app.arn
+  port              = ${p.ssl ? '443' : '80'}
+  protocol          = ${p.ssl ? '"HTTPS"' : '"HTTP"'}
+  ${p.ssl ? 'ssl_policy = "ELBSecurityPolicy-TLS13-1-2-2021-06"
+  certificate_arn = aws_acm_certificate.app.arn' : ''}
+  default_action { type = "forward"; target_group_arn = aws_lb_target_group.app.arn }
+}
+
+${p.monitoring ? `resource "aws_cloudwatch_dashboard" "main" {
+  dashboard_name = "\${var.project_name}-dashboard"
+  dashboard_body = jsonencode({
+    widgets = [{
+      type   = "metric"
+      x      = 0; y = 0; width = 12; height = 6
+      properties = { metrics = [["AWS/EC2", "CPUUtilization", "AutoScalingGroupName", aws_autoscaling_group.app.name]], period = 300, stat = "Average", region = var.region, title = "CPU Utilization" }
+    }]
+  })
+}` : '# Monitoring disabled'}
+
+${p.backup ? `resource "aws_backup_vault" "main" {
+  name = "\${var.project_name}-vault"
+}` : '# Backup disabled'}`,
+
+    variables: `variable "project_name" {
+  description = "Project name"
+  type        = string
+  default     = "${p.name}"
+}
+
+variable "region" {
+  description = "AWS region"
+  type        = string
+  default     = "${p.region}"
+}
+
+variable "environment" {
+  description = "Environment name"
+  type        = string
+  default     = "${p.env}"
+}
+
+variable "instance_type" {
+  description = "EC2 instance type"
+  type        = string
+  default     = "${p.instance}"
+}`,
+
+    outputs: `output "load_balancer_dns" {
+  description = "DNS name of the load balancer"
+  value       = aws_lb.app.dns_name
+}
+
+output "autoscaling_group_name" {
+  description = "Name of the auto scaling group"
+  value       = aws_autoscaling_group.app.name
+}
+
+output "security_group_id" {
+  description = "ID of the application security group"
+  value       = aws_security_group.app.id
+}`,
+
+    readme: `# ${p.name} — Terraform AWS
+
+## Overview
+${p.desc}
+
+## Prerequisites
+- Terraform >= 1.5
+- AWS CLI configured
+
+## Usage
+\`\`\`bash
+terraform init
+terraform plan
+terraform apply
+\`\`\`
+
+## Features
+${p.vpc ? '- Custom VPC with public subnets\n' : '- Default VPC usage\n'}${p.ssl ? '- SSL/TLS termination on ALB\n' : ''}${p.monitoring ? '- CloudWatch dashboard\n' : ''}${p.backup ? '- AWS Backup vault\n' : ''}
+
+## Outputs
+- load_balancer_dns
+- autoscaling_group_name
+- security_group_id`
+  };
+}
+
+function generateTerraformAzure(p) {
+  return {
+    main: `terraform {
+  required_providers {
+    azurerm = { source = "hashicorp/azurerm", version = "~> 3.0" }
+  }
+}
+
+provider "azurerm" {
+  features {}
+}
+
+resource "azurerm_resource_group" "main" {
+  name     = "\${var.project_name}-\${var.environment}-rg"
+  location = var.location
+}
+
+resource "azurerm_virtual_network" "main" {
+  name                = "\${var.project_name}-vnet"
+  address_space       = ["10.0.0.0/16"]
+  location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
-  location            = "${v.region}"
-  size                = "Standard_B1s"
+}
+
+resource "azurerm_subnet" "main" {
+  name                 = "\${var.project_name}-subnet"
+  resource_group_name  = azurerm_resource_group.main.name
+  virtual_network_name = azurerm_virtual_network.main.name
+  address_prefixes     = ["10.0.1.0/24"]
+}
+
+resource "azurerm_network_security_group" "main" {
+  name                = "\${var.project_name}-nsg"
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
+
+  security_rule {
+    name                       = "HTTP"
+    priority                   = 100
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "80"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+  ${p.ssl ? `security_rule {
+    name                       = "HTTPS"
+    priority                   = 110
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "443"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }` : ''}
+}
+
+resource "azurerm_linux_virtual_machine_scale_set" "main" {
+  name                = "\${var.project_name}-vmss"
+  resource_group_name = azurerm_resource_group.main.name
+  location            = azurerm_resource_group.main.location
+  sku                 = var.instance_sku
+  instances           = 2
   admin_username      = "adminuser"
 
-  os_disk {
-    caching              = "ReadWrite"
-    storage_account_type = "Standard_LRS"
+  admin_ssh_key {
+    username   = "adminuser"
+    public_key = file("~/.ssh/id_rsa.pub")
   }
 
   source_image_reference {
     publisher = "Canonical"
-    offer     = "UbuntuServer"
-    sku       = "18.04-LTS"
+    offer     = "0001-com-ubuntu-server-jammy"
+    sku       = "22_04-lts"
     version   = "latest"
   }
-}`;
-  }else{
-    resourceBlock=`resource "google_compute_instance" "${v.resource}" {
-  count        = ${v.count_num}
-  name         = "${v.resource}-\${count.index}"
-  machine_type = "e2-micro"
-  zone         = "${v.region}-a"
 
-  boot_disk {
-    initialize_params {
-      image = "ubuntu-os-cloud/ubuntu-2004-lts"
-    }
+  os_disk {
+    storage_account_type = "Standard_LRS"
+    caching              = "ReadWrite"
   }
 
   network_interface {
-    network = "default"
-    access_config {}
-  }
-
-  labels = {
-${tags || '    name = "'+v.resource+'"'}
-  }
-}`;
-  }
-  return `terraform {
-  required_providers {
-    ${v.provider} = {
-      source  = "hashicorp/${v.provider}"
-      version = "~> 5.0"
+    name    = "nic"
+    primary = true
+    ip_configuration {
+      name      = "internal"
+      primary   = true
+      subnet_id = azurerm_subnet.main.id
+      load_balancer_backend_address_pool_ids = [azurerm_lb_backend_address_pool.main.id]
     }
   }
+
+  custom_data = base64encode(<<-EOF
+    #!/bin/bash
+    apt-get update
+    apt-get install -y nginx
+    systemctl start nginx
+    echo "<h1>${p.name} — ${p.env}</h1>" > /var/www/html/index.html
+  EOF
+  )
 }
 
-provider "${v.provider}" {
-  region = "${v.region}"
+resource "azurerm_lb" "main" {
+  name                = "\${var.project_name}-lb"
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
+  sku                 = "Standard"
+  frontend_ip_configuration {
+    name                 = "PublicIPAddress"
+    public_ip_address_id = azurerm_public_ip.main.id
+  }
 }
 
-${resourceBlock}`;
+resource "azurerm_public_ip" "main" {
+  name                = "\${var.project_name}-pip"
+  resource_group_name = azurerm_resource_group.main.name
+  location            = azurerm_resource_group.main.location
+  allocation_method   = "Static"
+  sku                 = "Standard"
 }
 
-function genKubernetes(v){
-  const envVars=v.env.split('\n').filter(Boolean).map(l=>{const[p,...rest]=l.split('=');return '        - name: '+p.trim()+'\n          value: "'+rest.join('=').trim()+'"';}).join('\n');
-  if(v.kind==='Deployment'){
-    return `apiVersion: apps/v1
+resource "azurerm_lb_backend_address_pool" "main" {
+  loadbalancer_id = azurerm_lb.main.id
+  name            = "BackEndAddressPool"
+}
+
+resource "azurerm_lb_probe" "main" {
+  loadbalancer_id = azurerm_lb.main.id
+  name            = "http-probe"
+  port            = 80
+}
+
+resource "azurerm_lb_rule" "main" {
+  loadbalancer_id                = azurerm_lb.main.id
+  name                           = "HTTP"
+  protocol                       = "Tcp"
+  frontend_port                  = ${p.ssl ? '443' : '80'}
+  backend_port                   = 80
+  frontend_ip_configuration_name = "PublicIPAddress"
+  probe_id                       = azurerm_lb_probe.main.id
+  backend_address_pool_ids       = [azurerm_lb_backend_address_pool.main.id]
+}
+
+${p.monitoring ? `resource "azurerm_monitor_action_group" "main" {
+  name                = "\${var.project_name}-actiongroup"
+  resource_group_name = azurerm_resource_group.main.name
+  short_name          = "p1action"
+}` : '# Monitoring disabled'}`,
+
+    variables: `variable "project_name" {
+  description = "Project name"
+  type        = string
+  default     = "${p.name}"
+}
+
+variable "location" {
+  description = "Azure region"
+  type        = string
+  default     = "${p.region === 'us-east-1' ? 'East US' : p.region}"
+}
+
+variable "environment" {
+  description = "Environment name"
+  type        = string
+  default     = "${p.env}"
+}
+
+variable "instance_sku" {
+  description = "VM SKU"
+  type        = string
+  default     = "Standard_B2s"
+}`,
+
+    outputs: `output "resource_group_name" {
+  description = "Name of the resource group"
+  value       = azurerm_resource_group.main.name
+}
+
+output "load_balancer_ip" {
+  description = "Public IP of the load balancer"
+  value       = azurerm_public_ip.main.ip_address
+}
+
+output "vmss_id" {
+  description = "ID of the VM scale set"
+  value       = azurerm_linux_virtual_machine_scale_set.main.id
+}`,
+
+    readme: `# ${p.name} — Terraform Azure
+
+## Overview
+${p.desc}
+
+## Prerequisites
+- Terraform >= 1.5
+- Azure CLI authenticated
+
+## Usage
+\`\`\`bash
+terraform init
+terraform plan
+terraform apply
+\`\`\`
+
+## Features
+- Resource Group + VNet + Subnet\n${p.ssl ? '- SSL termination on LB\n' : ''}${p.monitoring ? '- Azure Monitor action group\n' : ''}
+
+## Outputs
+- resource_group_name
+- load_balancer_ip
+- vmss_id`
+  };
+}
+
+function generateK8s(p) {
+  return {
+    main: `apiVersion: v1
+kind: Namespace
+metadata:
+  name: ${p.name}-${p.env}
+---
+apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ${v.name}
-  namespace: ${v.namespace}
-  labels:
-    app: ${v.name}
+  name: ${p.name}
+  namespace: ${p.name}-${p.env}
 spec:
-  replicas: ${v.replicas}
+  replicas: 3
   selector:
     matchLabels:
-      app: ${v.name}
+      app: ${p.name}
   template:
     metadata:
       labels:
-        app: ${v.name}
+        app: ${p.name}
     spec:
       containers:
-      - name: ${v.name}
-        image: ${v.image}
+      - name: app
+        image: nginx:latest
         ports:
-        - containerPort: ${v.port}
-        ${envVars ? 'env:\n' + envVars : ''}
+        - containerPort: 80
         resources:
           requests:
             memory: "128Mi"
@@ -457,941 +781,859 @@ spec:
           limits:
             memory: "256Mi"
             cpu: "200m"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 5
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: ${v.name}-svc
-  namespace: ${v.namespace}
+  name: ${p.name}-svc
+  namespace: ${p.name}-${p.env}
 spec:
   selector:
-    app: ${v.name}
+    app: ${p.name}
   ports:
   - port: 80
-    targetPort: ${v.port}
-  type: ClusterIP`;
-  }else if(v.kind==='Service'){
-    return `apiVersion: v1
-kind: Service
-metadata:
-  name: ${v.name}
-  namespace: ${v.namespace}
-spec:
-  selector:
-    app: ${v.name}
-  ports:
-  - port: 80
-    targetPort: ${v.port}
-    protocol: TCP
-  type: LoadBalancer`;
-  }else if(v.kind==='ConfigMap'){
-    return `apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: ${v.name}
-  namespace: ${v.namespace}
-data:
-  app.conf: |
-    server {
-      listen ${v.port};
-      server_name ${v.name};
-    }`;
-  }else if(v.kind==='Secret'){
-    return `apiVersion: v1
-kind: Secret
-metadata:
-  name: ${v.name}
-  namespace: ${v.namespace}
-type: Opaque
-data:
-  # Base64 encoded values
-  username: YWRtaW4=
-  password: cGFzc3dvcmQxMjM=`;
-  }else if(v.kind==='Ingress'){
-    return `apiVersion: networking.k8s.io/v1
+    targetPort: 80
+  type: ClusterIP
+---
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: ${v.name}
-  namespace: ${v.namespace}
-  annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
+  name: ${p.name}-ingress
+  namespace: ${p.name}-${p.env}
+  ${p.ssl ? 'annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"' : ''}
 spec:
+  ${p.ssl ? 'tls:
+  - hosts:
+    - ${p.name}.example.com
+    secretName: ${p.name}-tls' : ''}
   rules:
-  - host: ${v.name}.local
+  - host: ${p.name}.example.com
     http:
       paths:
       - path: /
         pathType: Prefix
         backend:
           service:
-            name: ${v.name}-svc
+            name: ${p.name}-svc
             port:
-              number: ${v.port}`;
-  }else if(v.kind==='StatefulSet'){
-    return `apiVersion: apps/v1
-kind: StatefulSet
+              number: 80
+---
+${p.monitoring ? `apiVersion: v1
+kind: ServiceMonitor
 metadata:
-  name: ${v.name}
-  namespace: ${v.namespace}
-spec:
-  serviceName: "${v.name}-headless"
-  replicas: ${v.replicas}
-  selector:
-    matchLabels:
-      app: ${v.name}
-  template:
-    metadata:
-      labels:
-        app: ${v.name}
-    spec:
-      containers:
-      - name: ${v.name}
-        image: ${v.image}
-        ports:
-        - containerPort: ${v.port}
-  volumeClaimTemplates:
-  - metadata:
-      name: data
-    spec:
-      accessModes: ["ReadWriteOnce"]
-      resources:
-        requests:
-          storage: 1Gi`;
-  }else if(v.kind==='DaemonSet'){
-    return `apiVersion: apps/v1
-kind: DaemonSet
-metadata:
-  name: ${v.name}
-  namespace: ${v.namespace}
+  name: ${p.name}-metrics
+  namespace: ${p.name}-${p.env}
 spec:
   selector:
     matchLabels:
-      app: ${v.name}
-  template:
-    metadata:
-      labels:
-        app: ${v.name}
-    spec:
-      containers:
-      - name: ${v.name}
-        image: ${v.image}
-        ports:
-        - containerPort: ${v.port}
-        resources:
-          limits:
-            memory: "200Mi"
-          requests:
-            cpu: "100m"
-            memory: "200Mi"`;
-  }else{
-    return `apiVersion: batch/v1
-kind: Job
-metadata:
-  name: ${v.name}
-  namespace: ${v.namespace}
-spec:
-  template:
-    spec:
-      restartPolicy: OnFailure
-      containers:
-      - name: ${v.name}
-        image: ${v.image}
-        command: ["sh", "-c", "echo Job completed"]`;
-  }
+      app: ${p.name}
+  endpoints:
+  - port: metrics
+    interval: 30s` : '# Monitoring disabled'}`,
+
+    variables: `# No variables file needed for raw K8s manifests.
+# Use kustomization or Helm for parameterization.`,
+
+    outputs: `# Apply with:
+# kubectl apply -f main.yaml`,
+
+    readme: `# ${p.name} — Kubernetes
+
+## Overview
+${p.desc}
+
+## Usage
+\`\`\`bash
+kubectl apply -f main.yaml
+\`\`\`
+
+## Components
+- Namespace: ${p.name}-${p.env}\n- Deployment: 3 replicas\n- Service: ClusterIP\n- Ingress: ${p.name}.example.com\n${p.ssl ? '- TLS via cert-manager\n' : ''}${p.monitoring ? '- ServiceMonitor for Prometheus\n' : ''}`
+  };
 }
 
-function genCICD(v){
-  const steps=v.steps.split('\n').filter(Boolean);
-  if(v.platform==='GitHub Actions'){
-    const stepYaml=steps.map(s=>`      - name: ${s.charAt(0).toUpperCase()+s.slice(1)}
-        run: |
-          echo "Running ${s}..."
-          # Add your ${s} commands here`).join('\n\n');
-    return `name: CI/CD Pipeline
+function generateDocker(p) {
+  return {
+    main: `version: "3.8"
+
+services:
+  app:
+    image: nginx:alpine
+    container_name: ${p.name}-app
+    ports:
+      - "80:80"
+    ${p.ssl ? 'ports:
+      - "443:443"
+    volumes:
+      - ./ssl:/etc/nginx/ssl:ro' : ''}
+    volumes:
+      - ./html:/usr/share/nginx/html:ro
+    restart: unless-stopped
+    networks:
+      - ${p.name}-net
+    ${p.monitoring ? 'labels:
+      - "prometheus.io/scrape=true"
+      - "prometheus.io/port=80"' : ''}
+
+  ${p.monitoring ? `prometheus:
+    image: prom/prometheus:latest
+    container_name: ${p.name}-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    networks:
+      - ${p.name}-net
+    restart: unless-stopped` : ''}
+
+  ${p.backup ? `backup:
+    image: offen/docker-volume-backup:latest
+    container_name: ${p.name}-backup
+    volumes:
+      - ./html:/backup/data:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      - BACKUP_CRON_EXPRESSION=0 2 * * *
+      - BACKUP_RETENTION_DAYS=30
+    networks:
+      - ${p.name}-net
+    restart: unless-stopped` : ''}
+
+networks:
+  ${p.name}-net:
+    driver: bridge`,
+
+    variables: `# No separate variables file.
+# Edit docker-compose.yml directly or use .env file.`,
+
+    outputs: `# Start the stack:
+# docker compose up -d`,
+
+    readme: `# ${p.name} — Docker Compose
+
+## Overview
+${p.desc}
+
+## Usage
+\`\`\`bash
+docker compose up -d
+docker compose logs -f
+\`\`\`
+
+## Services
+- app: nginx:alpine\n${p.monitoring ? '- prometheus: monitoring\n' : ''}${p.backup ? '- backup: volume backups\n' : ''}
+
+## Networks
+- ${p.name}-net (bridge)`
+  };
+}
+
+function generateAnsible(p) {
+  return {
+    main: `---
+- name: Deploy ${p.name} infrastructure
+  hosts: all
+  become: yes
+  vars:
+    app_name: "${p.name}"
+    env: "${p.env}"
+
+  tasks:
+    - name: Update package cache
+      apt:
+        update_cache: yes
+      when: ansible_os_family == "Debian"
+
+    - name: Install nginx
+      package:
+        name: nginx
+        state: present
+
+    - name: Start and enable nginx
+      service:
+        name: nginx
+        state: started
+        enabled: yes
+
+    - name: Deploy index page
+      copy:
+        dest: /var/www/html/index.html
+        content: |
+          <h1>{{ app_name }} — {{ env }}</h1>
+          <p>Deployed via Ansible</p>
+      notify: restart nginx
+
+    ${p.ssl ? `- name: Install certbot
+      package:
+        name: certbot
+        state: present
+
+    - name: Obtain SSL certificate
+      command: certbot --nginx -d {{ app_name }}.example.com --non-interactive --agree-tos -m admin@example.com
+      args:
+        creates: /etc/letsencrypt/live/{{ app_name }}.example.com/fullchain.pem` : ''}
+
+    ${p.monitoring ? `- name: Install node_exporter
+      get_url:
+        url: https://github.com/prometheus/node_exporter/releases/download/v1.6.1/node_exporter-1.6.1.linux-amd64.tar.gz
+        dest: /tmp/node_exporter.tar.gz
+
+    - name: Extract node_exporter
+      unarchive:
+        src: /tmp/node_exporter.tar.gz
+        dest: /usr/local/bin/
+        remote_src: yes
+        extra_opts: [--strip-components=1]
+
+    - name: Create node_exporter service
+      template:
+        src: node_exporter.service.j2
+        dest: /etc/systemd/system/node_exporter.service
+      notify: reload systemd` : ''}
+
+  handlers:
+    - name: restart nginx
+      service:
+        name: nginx
+        state: restarted
+
+    ${p.monitoring ? `- name: reload systemd
+      systemd:
+        daemon_reload: yes
+
+    - name: start node_exporter
+      service:
+        name: node_exporter
+        state: started
+        enabled: yes` : ''}`,
+
+    variables: `# group_vars/all.yml
+---
+app_name: "${p.name}"
+env: "${p.env}"`,
+
+    outputs: `# Run with:
+# ansible-playbook -i inventory site.yml`,
+
+    readme: `# ${p.name} — Ansible
+
+## Overview
+${p.desc}
+
+## Usage
+\`\`\`bash
+ansible-playbook -i inventory site.yml
+\`\`\`
+
+## Features
+- Nginx installation and configuration\n${p.ssl ? '- SSL via Let\'s Encrypt\n' : ''}${p.monitoring ? '- Prometheus node_exporter\n' : ''}`
+  };
+}
+
+function generateGitHubActions(p) {
+  return {
+    main: `name: ${p.name} CI/CD
 
 on:
   push:
-    branches: [ ${v.branch} ]
+    branches: [main, develop]
   pull_request:
-    branches: [ ${v.branch} ]
+    branches: [main]
+
+env:
+  PROJECT_NAME: ${p.name}
+  ENVIRONMENT: ${p.env}
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup ${v.lang}
-        uses: actions/setup-${v.lang.toLowerCase().replace('.','')}@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
-          ${v.lang==='Node.js'?'node-version':v.lang==='Python'?'python-version':v.lang==='Go'?'go-version':v.lang==='Java'?'java-version':v.lang==='.NET'?'dotnet-version':'version'}: 'latest'
+          node-version: '20'
+          cache: 'npm'
 
-${stepYaml}
+      - name: Install dependencies
+        run: npm ci
 
-      - name: Deploy to ${v.deploy_target}
-        if: github.ref == 'refs/heads/${v.branch}'
+      - name: Run tests
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-files
+          path: dist/
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    environment:
+      name: ${p.env}
+      url: https://${p.name}.example.com
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: build-files
+          path: dist/
+
+      ${p.env === 'prod' ? `- name: Deploy to Production
         run: |
-          echo "Deploying to ${v.deploy_target}..."
-          # Add deployment commands`;
-  }else if(v.platform==='GitLab CI'){
-    const stageList=steps.map(s=>`  - ${s}`).join('\n');
-    const jobYaml=steps.map(s=>`${s}:
-  stage: ${s}
-  script:
-    - echo "Running ${s}..."
-    # Add ${s} commands
-  only:
-    - ${v.branch}`).join('\n\n');
-    return `stages:
-${stageList}
+          echo "Deploying to production..."
+          # Add your deployment script here` : `- name: Deploy to ${p.env}
+        run: |
+          echo "Deploying to ${p.env}..."
+          # Add your deployment script here`}
 
-${jobYaml}
+      ${p.monitoring ? `- name: Notify Slack
+        uses: 8398a7/action-slack@v3
+        with:
+          status: \${{ job.status }}
+          channel: '#deployments'
+        env:
+          SLACK_WEBHOOK_URL: \${{ secrets.SLACK_WEBHOOK_URL }}` : ''}`,
 
-deploy:
-  stage: deploy
-  script:
-    - echo "Deploying to ${v.deploy_target}..."
-  only:
-    - ${v.branch}
-  environment:
-    name: production`;
-  }else if(v.platform==='Azure DevOps'){
-    const stageYaml=steps.map(s=>`  - stage: ${s}
-    jobs:
-    - job: ${s}_job
-      steps:
-      - script: |
-          echo "Running ${s}..."
-          # Add ${s} commands
-        displayName: '${s}'`).join('\n\n');
-    return `trigger:
+    variables: `# No variables file.
+# Configure secrets in GitHub: Settings > Secrets and variables > Actions`,
+
+    outputs: `# Trigger: push to main branch`,
+
+    readme: `# ${p.name} — GitHub Actions
+
+## Overview
+${p.desc}
+
+## Secrets Required
+${p.monitoring ? '- SLACK_WEBHOOK_URL\n' : ''}- Add deployment credentials as secrets
+
+## Workflows
+- Build on every push/PR\n- Deploy only on main branch merges`
+  };
+}
+
+function generateAzureDevOps(p) {
+  return {
+    main: `trigger:
   branches:
     include:
-    - ${v.branch}
+      - main
+      - develop
 
-pool:
-  vmImage: 'ubuntu-latest'
+variables:
+  projectName: '${p.name}'
+  environment: '${p.env}'
 
 stages:
-${stageYaml}
-  - stage: Deploy
-    jobs:
-    - job: Deploy
-      steps:
-      - script: |
-          echo "Deploying to ${v.deploy_target}..."
-        displayName: 'Deploy to ${v.deploy_target}'`;
-  }else if(v.platform==='Jenkins'){
-    const stepGroovy=steps.map(s=>`        stage('${s.charAt(0).toUpperCase()+s.slice(1)}') {
-            steps {
-                echo "Running ${s}..."
-                // Add ${s} commands
-            }
-        }`).join('\n');
-    return `pipeline {
-    agent any
-    triggers {
-        githubPush()
-    }
-    stages {
-${stepGroovy}
-        stage('Deploy') {
-            when {
-                branch '${v.branch}'
-            }
-            steps {
-                echo "Deploying to ${v.deploy_target}..."
-                // Add deployment commands
-            }
-        }
-    }
-    post {
-        always {
-            cleanWs()
-        }
-    }
-}`;
-  }else{
-    const stepYaml=steps.map(s=>`      - run:
-          name: ${s.charAt(0).toUpperCase()+s.slice(1)}
-          command: |
-            echo "Running ${s}..."
-            # Add ${s} commands`).join('\n\n');
-    return `version: 2.1
-
-jobs:
-  build:
-    docker:
-      - image: cimg/${v.lang.toLowerCase().replace('.','')}:latest
+- stage: Build
+  displayName: 'Build Stage'
+  jobs:
+  - job: BuildJob
+    displayName: 'Build and Test'
+    pool:
+      vmImage: 'ubuntu-latest'
     steps:
-      - checkout
-${stepYaml}
-      - deploy:
-          name: Deploy to ${v.deploy_target}
-          command: |
-            echo "Deploying..."
+    - task: NodeTool@0
+      inputs:
+        versionSpec: '20.x'
+      displayName: 'Install Node.js'
 
-workflows:
-  build_and_deploy:
-    jobs:
-      - build:
-          filters:
-            branches:
-              only: ${v.branch}`;
-  }
+    - script: npm ci
+      displayName: 'Install dependencies'
+
+    - script: npm test
+      displayName: 'Run tests'
+
+    - script: npm run build
+      displayName: 'Build application'
+
+    - task: PublishBuildArtifacts@1
+      inputs:
+        pathToPublish: '$(Build.SourcesDirectory)/dist'
+        artifactName: 'drop'
+      displayName: 'Publish artifacts'
+
+- stage: Deploy
+  displayName: 'Deploy Stage'
+  dependsOn: Build
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+  jobs:
+  - deployment: DeployJob
+    displayName: 'Deploy to ${p.env}'
+    pool:
+      vmImage: 'ubuntu-latest'
+    environment: '${p.env}'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: DownloadBuildArtifacts@1
+            inputs:
+              buildType: 'current'
+              downloadType: 'single'
+              artifactName: 'drop'
+              downloadPath: '$(System.ArtifactsDirectory)'
+
+          - script: |
+              echo "Deploying $(projectName) to $(environment)..."
+              # Add deployment commands here
+            displayName: 'Deploy application'`,
+
+    variables: `# variables.yml or pipeline variables
+projectName: ${p.name}
+environment: ${p.env}`,
+
+    outputs: `# Trigger: push to main`,
+
+    readme: `# ${p.name} — Azure DevOps
+
+## Overview
+${p.desc}
+
+## Setup
+1. Import this pipeline into Azure DevOps\n2. Configure service connections\n3. Set up ${p.env} environment with approvals
+
+## Stages
+- Build: compile and test\n- Deploy: deploy to ${p.env} environment`
+  };
 }
 
-function genSQL(v){
-  const cols=v.columns.split('\n').filter(Boolean).map(l=>{const[p,...rest]=l.split(':');return '  '+p.trim()+' '+rest.join(':').trim();}).join(',\n');
-  if(v.action==='CREATE TABLE'){
-    let extra='';
-    if(v.db==='PostgreSQL') extra='\n\nCREATE INDEX idx_'+v.table+'_email ON '+v.table+'(email);';
-    else if(v.db==='MySQL') extra='\n\nALTER TABLE '+v.table+' ADD INDEX idx_email (email);';
-    return `CREATE TABLE ${v.table} (
-${cols}
-);${extra}`;
-  }else if(v.action==='SELECT Query'){
-    return `SELECT *
-FROM ${v.table}
-${v.conditions ? 'WHERE ' + v.conditions : ''}
-ORDER BY id DESC
-LIMIT 100;`;
-  }else if(v.action==='INSERT Statement'){
-    const colNames=v.columns.split('\n').filter(Boolean).map(l=>l.split(':')[0].trim()).join(', ');
-    const placeholders=v.columns.split('\n').filter(Boolean).map((l,i)=>'$'+(i+1)).join(', ');
-    return `INSERT INTO ${v.table} (${colNames})
-VALUES (${placeholders})
-RETURNING id;`;
-  }else if(v.action==='UPDATE Statement'){
-    const setClause=v.columns.split('\n').filter(Boolean).map(l=>l.split(':')[0].trim()+' = ?').join(', ');
-    return `UPDATE ${v.table}
-SET ${setClause}
-${v.conditions ? 'WHERE ' + v.conditions : ''}
-RETURNING *;`;
-  }else if(v.action==='Stored Procedure'){
-    if(v.db==='PostgreSQL'){
-      return `CREATE OR REPLACE FUNCTION process_${v.table}()
-RETURNS TRIGGER AS $$
-BEGIN
-  -- Add your logic here
-  NEW.updated_at := NOW();
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER trg_${v.table}_update
-  BEFORE UPDATE ON ${v.table}
-  FOR EACH ROW
-  EXECUTE FUNCTION process_${v.table}();`;
-    }else{
-      return `CREATE PROCEDURE sp_Process${v.table.charAt(0).toUpperCase()+v.table.slice(1)}
-AS
-BEGIN
-  SET NOCOUNT ON;
-  -- Add your logic here
-  SELECT * FROM ${v.table} ${v.conditions ? 'WHERE ' + v.conditions : ''};
-END;`;
-    }
-  }else if(v.action==='Index'){
-    const idxCol=v.columns.split('\n')[0]?.split(':')[0].trim()||'id';
-    return `CREATE INDEX idx_${v.table}_${idxCol}
-ON ${v.table} (${idxCol});`;
-  }else{
-    return `CREATE VIEW vw_${v.table}_summary AS
-SELECT ${v.columns.split('\n').filter(Boolean).map(l=>l.split(':')[0].trim()).join(', ')}
-FROM ${v.table}
-${v.conditions ? 'WHERE ' + v.conditions : ''};`;
-  }
-}
-
-function genPowerShell(v){
-  const params=v.params.split('\n').filter(Boolean).map(p=>'[Parameter(Mandatory=$true)]\n    [string]$'+p.trim().charAt(0).toUpperCase()+p.trim().slice(1)).join(',\n    ');
-  const paramBlock=params?'[CmdletBinding()]\nparam(
-    '+params+'
-)\n\n':'';
-  let body='';
-  if(v.target==='Windows Server'){
-    body=`# Import required modules if needed
-# Import-Module ActiveDirectory
-
-Write-Host "Starting: ${v.task}" -ForegroundColor Green
-
-# Main logic
-try {
-    # Add your implementation here
-    Write-Output "Task completed successfully"
-} catch {
-    Write-Error "Error occurred: $_.Exception.Message"
-    exit 1
-}`;
-  }else if(v.target==='Azure'){
-    body=`# Ensure Az module is installed
-# Install-Module -Name Az -AllowClobber
-
-Connect-AzAccount
-
-Write-Host "Starting: ${v.task}" -ForegroundColor Green
-
-# Main logic
-try {
-    # Add your Azure-specific implementation
-    Write-Output "Azure task completed successfully"
-} catch {
-    Write-Error "Error occurred: $_.Exception.Message"
-    exit 1
-}`;
-  }else if(v.target==='Active Directory'){
-    body=`Import-Module ActiveDirectory
-
-Write-Host "Starting: ${v.task}" -ForegroundColor Green
-
-# Main logic
-try {
-    # Add your AD-specific implementation
-    # Example: Get-ADUser -Filter * | Export-Csv users.csv
-    Write-Output "AD task completed successfully"
-} catch {
-    Write-Error "Error occurred: $_.Exception.Message"
-    exit 1
-}`;
-  }else if(v.target==='Exchange'){
-    body=`# Connect to Exchange Online
-# Connect-ExchangeOnline
-
-Write-Host "Starting: ${v.task}" -ForegroundColor Green
-
-# Main logic
-try {
-    # Add your Exchange-specific implementation
-    Write-Output "Exchange task completed successfully"
-} catch {
-    Write-Error "Error occurred: $_.Exception.Message"
-    exit 1
-}`;
-  }else{
-    body=`Write-Host "Starting: ${v.task}" -ForegroundColor Green
-
-# Main logic
-try {
-    # Add your local machine implementation
-    Write-Output "Local task completed successfully"
-} catch {
-    Write-Error "Error occurred: $_.Exception.Message"
-    exit 1
-}`;
-  }
-  return `${paramBlock}${v.requires_admin==='yes'?'# Requires -RunAsAdministrator
-
-':''}${body}`;
-}
-
-function genNginx(v){
-  let serverBlock='';
-  if(v.use_case==='Reverse Proxy'){
-    serverBlock=`location / {
-    proxy_pass http://${v.upstream};
-    proxy_http_version 1.1;
-    proxy_set_header Upgrade $http_upgrade;
-    proxy_set_header Connection 'upgrade';
-    proxy_set_header Host $host;
-    proxy_set_header X-Real-IP $remote_addr;
-    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-    proxy_set_header X-Forwarded-Proto $scheme;
-    proxy_cache_bypass $http_upgrade;
-  }`;
-  }else if(v.use_case==='Load Balancer'){
-    serverBlock=`upstream backend {
-  ${v.upstream.split(',').map(u=>'  server '+u.trim()+';').join('\n')}
-  least_conn;
-}
-
-server {
-  location / {
-    proxy_pass http://backend;
-    proxy_set_header Host $host;
-    proxy_set_header X-Real-IP $remote_addr;
-  }
-}`;
-  }else if(v.use_case==='Static Site'){
-    serverBlock=`location / {
-    root /var/www/${v.domain};
-    index index.html index.htm;
-    try_files $uri $uri/ =404;
-  }
-
-  location ~* \.(jpg|jpeg|png|gif|ico|css|js)$ {
-    expires 30d;
-    add_header Cache-Control "public, immutable";
-  }`;
-  }else if(v.use_case==='SSL/TLS Termination'){
-    serverBlock=`listen 443 ssl http2;
-  ssl_certificate /etc/nginx/ssl/${v.domain}.crt;
-  ssl_certificate_key /etc/nginx/ssl/${v.domain}.key;
-  ssl_protocols TLSv1.2 TLSv1.3;
-  ssl_ciphers 'ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256';
-  ssl_prefer_server_ciphers off;
-
-  location / {
-    proxy_pass http://${v.upstream};
-    proxy_set_header Host $host;
-  }`;
-  }else if(v.use_case==='Rate Limiting'){
-    serverBlock=`limit_req_zone $binary_remote_addr zone=one:10m rate=10r/s;
-
-server {
-  location / {
-    limit_req zone=one burst=20 nodelay;
-    proxy_pass http://${v.upstream};
-  }
-}`;
-  }else{
-    serverBlock=`proxy_cache_path /var/cache/nginx levels=1:2 keys_zone=STATIC:10m inactive=24h max_size=1g;
-
-server {
-  location / {
-    proxy_pass http://${v.upstream};
-    proxy_cache STATIC;
-    proxy_cache_valid 200 30m;
-    proxy_cache_use_stale error timeout invalid_header updating;
-    proxy_cache_lock on;
-  }
-}`;
-  }
-  const extra=v.extra.split('\n').filter(Boolean).map(l=>'  '+l.trim()).join('\n');
-  return `server {
-  listen 80;
-  server_name ${v.domain} www.${v.domain};
-  ${v.ssl==='yes' ? 'return 301 https://$server_name$request_uri;' : ''}
-
-  ${serverBlock}
-  ${extra ? '\n  ' + extra : ''}
-
-  error_page 500 502 503 504 /50x.html;
-  location = /50x.html {
-    root /usr/share/nginx/html;
-  }
-}`;
-}
-
-function genMonitoring(v){
-  if(v.tool==='Prometheus'){
-    const alertRules=v.alerts.split('\n').filter(Boolean).map((a,i)=>`  - alert: Alert${i+1}
-    expr: ${a}
-    for: 5m
-    labels:
-      severity: warning
-    annotations:
-      summary: "Alert triggered: ${a}"`).join('\n');
-    const lbls=v.labels.split('\n').filter(Boolean).map(l=>{const[p,...rest]=l.split('=');return '      '+p.trim()+': "'+rest.join('=').trim()+'"';}).join('\n');
-    return `global:
-  scrape_interval: ${v.interval}
-  evaluation_interval: ${v.interval}
-
-scrape_configs:
-  - job_name: '${v.target.replace(/[:/]/g,'_')}'
-    static_configs:
-      - targets: ['${v.target}']
-${lbls ? '        labels:
-' + lbls : ''}
-
-rule_files:
-  - "alerts.yml"
-
-# alerts.yml
-groups:
-  - name: default
-    rules:
-${alertRules}`;
-  }else if(v.tool==='Grafana'){
-    return `apiVersion: 1
-
-datasources:
-  - name: Prometheus
-    type: prometheus
-    access: proxy
-    url: http://${v.target}
-    isDefault: true
-    editable: true
-
-# Dashboard JSON would be imported here
-# Use Grafana UI to export and version control dashboards`;
-  }else if(v.tool==='Datadog'){
-    return `init_config:
-
-instances:
-  - openmetrics_endpoint: http://${v.target}/metrics
-    namespace: "custom"
-    metrics:
-      - .*
-
-# monitors:
-#   - name: "High Error Rate"
-#     type: metric alert
-#     query: "avg(last_5m):sum:${v.target.replace(/[:/]/g,'_')}.errors{*} > 10"`;
-  }else if(v.tool==='New Relic'){
-    return `integrations:
-  - name: nri-prometheus
-    config:
-      standalone: false
-      cluster_name: production
-      match:
-        - target: http://${v.target}/metrics
-      transformations:
-        - description: "General metrics"
-
-# Alerts would be configured via New Relic UI or Terraform`;
-  }else if(v.tool==='Zabbix'){
-    return `# Zabbix agent configuration
-Server=127.0.0.1
-ServerActive=127.0.0.1
-Hostname=${v.target.replace(/[:/]/g,'_')}
-
-# User parameters
-UserParameter=custom.metric[*],echo $1
-
-# Include additional configs
-Include=/etc/zabbix/zabbix_agentd.d/*.conf`;
-  }else{
-    return `define host{
-  use                     generic-host
-  host_name               ${v.target.replace(/[:/]/g,'_')}
-  address                 ${v.target.split(':')[0]}
-  check_command           check-host-alive
-  max_check_attempts      3
-  check_period            24x7
-  notification_interval   30
-  notification_period     24x7
-}
-
-define service{
-  use                     generic-service
-  host_name               ${v.target.replace(/[:/]/g,'_')}
-  service_description     HTTP
-  check_command           check_http
-  check_interval          ${v.interval}
-}`;
-  }
-}
-
-function genGo(v){
-  let code='';
-  if(v.type==='HTTP Server'){
-    code=`package main
-
-import (
-  "fmt"
-  "log"
-  "net/http"
-  "os"
-  "os/signal"
-  "syscall"
-  "time"
-)
-
-func main() {
-  mux := http.NewServeMux()
-
-  // Health endpoint
-  mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
-    w.WriteHeader(http.StatusOK)
-    w.Write([]byte(\`{\"status\":\"ok\"}\`))
-  })
-
-  // Request logging middleware
-  loggedMux := loggingMiddleware(mux)
-
-  srv := &http.Server{
-    Addr:    ":${v.port}",
-    Handler: loggedMux,
-    ReadTimeout:  15 * time.Second,
-    WriteTimeout: 15 * time.Second,
-    IdleTimeout:  60 * time.Second,
-  }
-
-  // Graceful shutdown
-  done := make(chan bool, 1)
-  quit := make(chan os.Signal, 1)
-  signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
-
-  go func() {
-    <-quit
-    log.Println("Server is shutting down...")
-    // srv.Shutdown(context.Background())
-    done <- true
-  }()
-
-  log.Println("Server starting on port ${v.port}...")
-  go func() {
-    if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-      log.Fatalf("Listen: %s\n", err)
-    }
-  }()
-
-  <-done
-  log.Println("Server stopped")
-}
-
-func loggingMiddleware(next http.Handler) http.Handler {
-  return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-    start := time.Now()
-    next.ServeHTTP(w, r)
-    log.Printf("%s %s %s", r.Method, r.URL.Path, time.Since(start))
-  })
-}`;
-  }else if(v.type==='CLI Tool'){
-    code=`package main
-
-import (
-  "flag"
-  "fmt"
-  "os"
-)
-
-func main() {
-  var name string
-  flag.StringVar(&name, "name", "world", "name to greet")
-  flag.Parse()
-
-  fmt.Printf("Hello, %s!\n", name)
-  os.Exit(0)
-}`;
-  }else if(v.type==='Worker / Cron'){
-    code=`package main
-
-import (
-  "fmt"
-  "log"
-  "time"
-)
-
-func main() {
-  ticker := time.NewTicker(1 * time.Minute)
-  defer ticker.Stop()
-
-  log.Println("Worker started")
-
-  for {
-    select {
-    case t := <-ticker.C:
-      if err := doWork(); err != nil {
-        log.Printf("Work failed: %v", err)
-        continue
-      }
-      log.Printf("Work completed at %v", t)
-    }
-  }
-}
-
-func doWork() error {
-  fmt.Println("Processing task...")
-  // Add your worker logic here
-  return nil
-}`;
-  }else if(v.type==='gRPC Service'){
-    code=`package main
-
-import (
-  "context"
-  "log"
-  "net"
-  "google.golang.org/grpc"
-)
-
-// proto definition would be in .proto file
-type server struct {
-  // pb.UnimplementedYourServiceServer
-}
-
-func main() {
-  lis, err := net.Listen("tcp", ":${v.port}")
-  if err != nil {
-    log.Fatalf("failed to listen: %v", err)
-  }
-  s := grpc.NewServer()
-  // pb.RegisterYourServiceServer(s, &server{})
-  log.Printf("gRPC server listening on :${v.port}")
-  if err := s.Serve(lis); err != nil {
-    log.Fatalf("failed to serve: %v", err)
-  }
-}`;
-  }else if(v.type==='Middleware'){
-    code=`package middleware
-
-import (
-  "net/http"
-  "time"
-)
-
-// Chain chains multiple middlewares
-func Chain(h http.Handler, middleware ...func(http.Handler) http.Handler) http.Handler {
-  for i := len(middleware) - 1; i >= 0; i-- {
-    h = middleware[i](h)
-  }
-  return h
-}
-
-// Recoverer recovers from panics
-func Recoverer(next http.Handler) http.Handler {
-  return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-    defer func() {
-      if err := recover(); err != nil {
-        http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-      }
-    }()
-    next.ServeHTTP(w, r)
-  })
-}
-
-// Timeout adds request timeout
-func Timeout(duration time.Duration) func(http.Handler) http.Handler {
-  return func(next http.Handler) http.Handler {
-    return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-      // Implementation using context.WithTimeout
-      next.ServeHTTP(w, r)
-    })
-  }
-}`;
-  }else{
-    code=`package main
-
-import (
-  "database/sql"
-  "fmt"
-  "log"
-  _ "github.com/lib/pq"
-)
-
-func main() {
-  connStr := "host=localhost port=5432 user=postgres password=secret dbname=mydb sslmode=disable"
-  db, err := sql.Open("postgres", connStr)
-  if err != nil {
-    log.Fatal(err)
-  }
-  defer db.Close()
-
-  if err := db.Ping(); err != nil {
-    log.Fatal(err)
-  }
-
-  fmt.Println("Connected to database")
-  // Add your queries here
-}`;
-  }
-  const deps=v.deps.split('\n').filter(Boolean);
-  const goMod=`module ${v.name}
-
-go 1.21
-
-require (
-${deps.map(d=>'  '+d.trim()+' latest').join('\n')}
-)`;
-  return `// go.mod
-${goMod}
-
-// main.go
-${code}`;
-}
-
-// ===== PROMPT BUILDERS =====
-function buildPrompt(cat,vals){
-  const cfg=forms[cat];
-  let prompt='You are an expert '+cfg.title+' engineer. Your task is to generate a complete, production-ready '+cfg.title.toLowerCase()+' based on the following specifications.\n\n';
-  prompt+='## Requirements\n';
-  cfg.fields.forEach(f=>{
-    const v=vals[f.id]||'(not specified)';
-    prompt+='- '+f.label+': '+v.replace(/\n/g,'; ')+'\n';
-  });
-  prompt+='\n## Instructions\n';
-  prompt+='1. Generate clean, well-commented code following industry best practices.\n';
-  prompt+='2. Include error handling and security considerations where applicable.\n';
-  prompt+='3. Add inline comments explaining non-obvious logic.\n';
-  prompt+='4. Ensure the output is copy-paste ready for immediate use.\n';
-  prompt+='5. If configuration requires secrets or sensitive data, use placeholder values and add a SECURITY note.\n';
-  prompt+='\n## Output Format\n';
-  prompt+='Provide the complete artifact in a single code block. Do not include explanations outside the code unless necessary for security warnings.\n';
-  return prompt;
-}
-
-// ===== GENERATE =====
-function generate(){
-  const v=getVals();
-  let out='';
-  if(currentMode==='template'){
-    switch(currentCat){
-      case 'ansible': out=genAnsible(v); break;
-      case 'terraform': out=genTerraform(v); break;
-      case 'kubernetes': out=genKubernetes(v); break;
-      case 'cicd': out=genCICD(v); break;
-      case 'sql': out=genSQL(v); break;
-      case 'powershell': out=genPowerShell(v); break;
-      case 'nginx': out=genNginx(v); break;
-      case 'monitoring': out=genMonitoring(v); break;
-      case 'go': out=genGo(v); break;
-    }
-    document.getElementById('outputLabel').textContent='OUTPUT - '+forms[currentCat].tag;
-  }else{
-    out=buildPrompt(currentCat,v);
-    document.getElementById('outputLabel').textContent='PROMPT - LLM Agent';
-  }
-  const pre=document.getElementById('outputPre');
-  pre.textContent=out;
-  const area=document.getElementById('outputArea');
-  area.classList.add('visible');
-  area.classList.remove('fade-in');
-  void area.offsetWidth;
-  area.classList.add('fade-in');
-  area.scrollIntoView({behavior:'smooth',block:'nearest'});
-}
-
-// ===== COPY =====
-function copyOutput(){
-  const text=document.getElementById('outputPre').textContent;
-  navigator.clipboard.writeText(text).then(()=>{
-    const btn=document.getElementById('copyBtn');
-    btn.textContent='COPIED!';
-    btn.classList.add('copied');
-    setTimeout(()=>{btn.textContent='COPY';btn.classList.remove('copied');},2000);
-  });
-}
-
-// ===== INIT =====
-renderForm();
-</script>
-
-<script>
-// Matrix rain
-(function initMatrix() {
-  const canvas = document.getElementById('matrix-canvas');
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-  resize(); window.addEventListener('resize', resize);
-  const chars = '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
-  const fontSize = 14;
-  let columns = Math.floor(canvas.width / fontSize);
-  let drops = Array(columns).fill(1);
-  window.addEventListener('resize', () => { columns = Math.floor(canvas.width / fontSize); drops = Array(columns).fill(1); });
-  function draw() {
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = '#f97316';
-    ctx.font = fontSize + 'px monospace';
-    for (let i = 0; i < drops.length; i++) {
-      const text = chars[Math.floor(Math.random() * chars.length)];
-      ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-      if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
-      drops[i]++;
-    }
-  }
-  setInterval(draw, 50);
-})();
-
-// Active nav
-const currentPage = window.location.pathname.split('/').pop() || 'index.html';
-document.querySelectorAll('nav a').forEach(a => {
-  if (a.getAttribute('href') === currentPage) a.classList.add('active');
+function generatePulumi(p) {
+  return {
+    main: `import * as pulumi from "@pulumi/pulumi";
+import * as aws from "@pulumi/aws";
+
+const config = new pulumi.Config();
+const projectName = config.get("projectName") || "${p.name}";
+const environment = config.get("environment") || "${p.env}";
+
+const tags = {
+  Name: projectName,
+  Environment: environment,
+};
+
+${p.vpc ? `const vpc = new aws.ec2.Vpc("main", {
+  cidrBlock: "10.0.0.0/16",
+  enableDnsHostnames: true,
+  enableDnsSupport: true,
+  tags,
 });
+
+const subnet = new aws.ec2.Subnet("public", {
+  vpcId: vpc.id,
+  cidrBlock: "10.0.1.0/24",
+  availabilityZone: "us-east-1a",
+  tags,
+});` : '// Using default VPC'}
+
+const securityGroup = new aws.ec2.SecurityGroup("app", {
+  ${p.vpc ? 'vpcId: vpc.id,' : ''}
+  ingress: [
+    { protocol: "tcp", fromPort: 80, toPort: 80, cidrBlocks: ["0.0.0.0/0"] },
+    ${p.ssl ? '{ protocol: "tcp", fromPort: 443, toPort: 443, cidrBlocks: ["0.0.0.0/0"] },' : ''}
+  ],
+  egress: [
+    { protocol: "-1", fromPort: 0, toPort: 0, cidrBlocks: ["0.0.0.0/0"] },
+  ],
+  tags,
+});
+
+const ami = aws.ec2.getAmi({
+  mostRecent: true,
+  owners: ["amazon"],
+  filters: [{ name: "name", values: ["amzn2-ami-hvm-*-x86_64-gp2"] }],
+});
+
+const launchTemplate = new aws.ec2.LaunchTemplate("app", {
+  imageId: ami.then(a => a.id),
+  instanceType: "${p.instance}",
+  vpcSecurityGroupIds: [securityGroup.id],
+  userData: Buffer.from(\`
+    #!/bin/bash
+    yum update -y
+    yum install -y httpd
+    systemctl start httpd
+    echo "<h1>\${projectName} — \${environment}</h1>" > /var/www/html/index.html
+  \`).toString("base64"),
+  tags,
+});
+
+export const securityGroupId = securityGroup.id;
+export const launchTemplateId = launchTemplate.id;`,
+
+    variables: `// Pulumi.yaml
+name: ${p.name}
+runtime: nodejs
+description: ${p.desc}
+
+// Pulumi.\${p.env}.yaml
+config:
+  aws:region: ${p.region}
+  ${p.name}:projectName: ${p.name}
+  ${p.name}:environment: ${p.env}`,
+
+    outputs: `export const securityGroupId = securityGroup.id;
+export const launchTemplateId = launchTemplate.id;`,
+
+    readme: `# ${p.name} — Pulumi (TypeScript)
+
+## Overview
+${p.desc}
+
+## Usage
+\`\`\`bash
+npm install
+pulumi stack init ${p.env}
+pulumi up
+\`\`\`
+
+## Exports
+- securityGroupId
+- launchTemplateId`
+  };
+}
+
+function generateBicep(p) {
+  return {
+    main: `@description('Project name')
+param projectName string = '${p.name}'
+
+@description('Environment')
+param environment string = '${p.env}'
+
+@description('Location')
+param location string = '${p.region === 'us-east-1' ? 'eastus' : p.region}'
+
+@description('VM SKU')
+param vmSku string = 'Standard_B2s'
+
+resource vnet 'Microsoft.Network/virtualNetworks@2023-05-01' = {
+  name: '\${projectName}-vnet'
+  location: location
+  properties: {
+    addressSpace: {
+      addressPrefixes: ['10.0.0.0/16']
+    }
+  }
+}
+
+resource subnet 'Microsoft.Network/virtualNetworks/subnets@2023-05-01' = {
+  parent: vnet
+  name: 'default'
+  properties: {
+    addressPrefix: '10.0.1.0/24'
+  }
+}
+
+resource nsg 'Microsoft.Network/networkSecurityGroups@2023-05-01' = {
+  name: '\${projectName}-nsg'
+  location: location
+  properties: {
+    securityRules: [
+      {
+        name: 'HTTP'
+        properties: {
+          priority: 100
+          direction: 'Inbound'
+          access: 'Allow'
+          protocol: 'Tcp'
+          sourcePortRange: '*'
+          destinationPortRange: '80'
+          sourceAddressPrefix: '*'
+          destinationAddressPrefix: '*'
+        }
+      }
+      ${p.ssl ? `{
+        name: 'HTTPS'
+        properties: {
+          priority: 110
+          direction: 'Inbound'
+          access: 'Allow'
+          protocol: 'Tcp'
+          sourcePortRange: '*'
+          destinationPortRange: '443'
+          sourceAddressPrefix: '*'
+          destinationAddressPrefix: '*'
+        }
+      }` : ''}
+    ]
+  }
+}
+
+resource vm 'Microsoft.Compute/virtualMachines@2023-07-01' = {
+  name: '\${projectName}-vm'
+  location: location
+  properties: {
+    hardwareProfile: {
+      vmSize: vmSku
+    }
+    osProfile: {
+      computerName: '\${projectName}-vm'
+      adminUsername: 'adminuser'
+      adminPassword: 'SecureP@ssw0rd!'
+    }
+    storageProfile: {
+      imageReference: {
+        publisher: 'Canonical'
+        offer: '0001-com-ubuntu-server-jammy'
+        sku: '22_04-lts'
+        version: 'latest'
+      }
+      osDisk: {
+        createOption: 'FromImage'
+        managedDisk: {
+          storageAccountType: 'Standard_LRS'
+        }
+      }
+    }
+    networkProfile: {
+      networkInterfaces: [
+        {
+          id: nic.id
+        }
+      ]
+    }
+  }
+}
+
+resource nic 'Microsoft.Network/networkInterfaces@2023-05-01' = {
+  name: '\${projectName}-nic'
+  location: location
+  properties: {
+    ipConfigurations: [
+      {
+        name: 'ipconfig1'
+        properties: {
+          subnet: {
+            id: subnet.id
+          }
+          privateIPAllocationMethod: 'Dynamic'
+        }
+      }
+    ]
+    networkSecurityGroup: {
+      id: nsg.id
+    }
+  }
+}`,
+
+    variables: `// Parameters can be overridden at deployment time:
+// az deployment group create --parameters environment=prod`,
+
+    outputs: `output vmId string = vm.id
+output vnetId string = vnet.id`,
+
+    readme: `# ${p.name} — Azure Bicep
+
+## Overview
+${p.desc}
+
+## Usage
+\`\`\`bash
+az deployment group create \
+  --resource-group ${p.name}-rg \
+  --template-file main.bicep \
+  --parameters environment=${p.env}
+\`\`\`
+
+## Resources
+- Virtual Network + Subnet\n- Network Security Group\n- Virtual Machine`
+  };
+}
+
+function generateTerraformGCP(p) {
+  return {
+    main: `terraform {
+  required_providers {
+    google = { source = "hashicorp/google", version = "~> 5.0" }
+  }
+}
+
+provider "google" {
+  project = var.project_id
+  region  = var.region
+}
+
+resource "google_compute_network" "vpc" {
+  name                    = "\${var.project_name}-vpc"
+  auto_create_subnetworks = false
+}
+
+resource "google_compute_subnetwork" "subnet" {
+  name          = "\${var.project_name}-subnet"
+  ip_cidr_range = "10.0.0.0/24"
+  region        = var.region
+  network       = google_compute_network.vpc.id
+}
+
+resource "google_compute_firewall" "allow_http" {
+  name    = "\${var.project_name}-allow-http"
+  network = google_compute_network.vpc.name
+
+  allow {
+    protocol = "tcp"
+    ports    = ["80"${p.ssl ? ', "443"' : ''}]
+  }
+
+  source_ranges = ["0.0.0.0/0"]
+}
+
+resource "google_compute_instance_template" "app" {
+  name_prefix  = "\${var.project_name}-"
+  machine_type = var.machine_type
+
+  disk {
+    source_image = "debian-cloud/debian-11"
+    auto_delete  = true
+    boot         = true
+  }
+
+  network_interface {
+    network    = google_compute_network.vpc.id
+    subnetwork = google_compute_subnetwork.subnet.id
+    access_config {}
+  }
+
+  metadata_startup_script = <<-EOF
+    #!/bin/bash
+    apt-get update
+    apt-get install -y nginx
+    systemctl start nginx
+    echo "<h1>\${var.project_name} — \${var.environment}</h1>" > /var/www/html/index.html
+  EOF
+
+  tags = ["http-server"]
+}
+
+resource "google_compute_instance_group_manager" "app" {
+  name = "\${var.project_name}-igm"
+
+  version {
+    instance_template = google_compute_instance_template.app.id
+  }
+
+  target_size = 2
+
+  named_port {
+    name = "http"
+    port = 80
+  }
+}
+
+resource "google_compute_backend_service" "app" {
+  name        = "\${var.project_name}-backend"
+  port_name   = "http"
+  protocol    = "HTTP"
+  timeout_sec = 30
+
+  backend {
+    group = google_compute_instance_group_manager.app.instance_group
+  }
+}
+
+resource "google_compute_url_map" "app" {
+  name            = "\${var.project_name}-urlmap"
+  default_service = google_compute_backend_service.app.id
+}
+
+resource "google_compute_target_http_proxy" "app" {
+  name    = "\${var.project_name}-proxy"
+  url_map = google_compute_url_map.app.id
+}
+
+resource "google_compute_global_forwarding_rule" "app" {
+  name       = "\${var.project_name}-fw-rule"
+  target     = google_compute_target_http_proxy.app.id
+  port_range = "80"
+}
+
+${p.monitoring ? `resource "google_monitoring_dashboard" "main" {
+  dashboard_json = jsonencode({
+    displayName = "\${var.project_name}-dashboard"
+    gridLayout = { columns = "2" }
+  })
+}` : '# Monitoring disabled'}`,
+
+    variables: `variable "project_id" {
+  description = "GCP project ID"
+  type        = string
+}
+
+variable "project_name" {
+  description = "Project name"
+  type        = string
+  default     = "${p.name}"
+}
+
+variable "region" {
+  description = "GCP region"
+  type        = string
+  default     = "${p.region === 'us-east-1' ? 'us-central1' : p.region}"
+}
+
+variable "environment" {
+  description = "Environment"
+  type        = string
+  default     = "${p.env}"
+}
+
+variable "machine_type" {
+  description = "Machine type"
+  type        = string
+  default     = "e2-medium"
+}`,
+
+    outputs: `output "load_balancer_ip" {
+  description = "Global forwarding rule IP"
+  value       = google_compute_global_forwarding_rule.app.ip_address
+}
+
+output "instance_group" {
+  description = "Instance group manager"
+  value       = google_compute_instance_group_manager.app.instance_group
+}`,
+
+    readme: `# ${p.name} — Terraform GCP
+
+## Overview
+${p.desc}
+
+## Prerequisites
+- Terraform >= 1.5
+- gcloud CLI authenticated
+
+## Usage
+\`\`\`bash
+terraform init
+terraform plan
+terraform apply
+\`\`\`
+
+## Features
+- VPC + Subnet\n- Managed Instance Group\n- Global HTTP Load Balancer\n${p.monitoring ? '- Cloud Monitoring dashboard\n' : ''}`
+  };
+}
 </script>
 </body>
 </html>
