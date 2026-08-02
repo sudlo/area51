@@ -94,7 +94,7 @@
     <a href="search.html">Search</a>
   </nav>
   <div class="page-title">Build</div>
-  <div class="page-desc">Describe what you need. We'll ask the questions that matter.</div>
+  <div class="page-desc">Describe what you need. We will ask the questions that matter.</div>
 
   <div class="card">
     <div class="card-title"><span class="icon">&#9998;</span> What do you want to build?</div>
@@ -144,24 +144,24 @@
 </div>
 
 <script>
-/* ---------- Matrix Rain ---------- */
+/* ===== Matrix Rain ===== */
 const canvas=document.getElementById('matrix-canvas'),ctx=canvas.getContext('2d');
 let W,H,cols=[];const fs=14,chars='01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
-function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;cols=Array(Math.floor(W/fs)).fill(0).map(()=>Math.random()*H)}
+function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;cols=Array(Math.floor(W/fs)).fill(0).map(function(){return Math.random()*H;});}
 window.addEventListener('resize',resize);resize();
 function draw(){ctx.fillStyle='rgba(0,0,0,0.05)';ctx.fillRect(0,0,W,H);ctx.fillStyle='#f97316';ctx.font=fs+'px monospace';
-  for(let i=0;i<cols.length;i++){ctx.fillText(chars[Math.floor(Math.random()*chars.length)],i*fs,cols[i]);cols[i]+=fs;if(cols[i]>H&&Math.random()>.975)cols[i]=0}
+  for(let i=0;i<cols.length;i++){ctx.fillText(chars[Math.floor(Math.random()*chars.length)],i*fs,cols[i]);cols[i]+=fs;if(cols[i]>H&&Math.random()>.975)cols[i]=0;}
   requestAnimationFrame(draw);
 }draw();
 
-/* ---------- State ---------- */
-let currentStack='';
-let currentDetected={};
+/* ===== State ===== */
+var currentStack='';
+var currentDetected={};
 
-/* ---------- Keyword Parser ---------- */
+/* ===== Keyword Parser ===== */
 function detectIntent(text){
-  const t=text.toLowerCase();
-  const d={};
+  var t=text.toLowerCase();
+  var d={};
   d.terraform = /terraform|tf\b|iac/.test(t);
   d.ansible   = /ansible|playbook/.test(t);
   d.docker    = /docker|compose|container/.test(t);
@@ -208,115 +208,134 @@ function detectIntent(text){
   return d;
 }
 
-/* ---------- Question Builder ---------- */
+/* ===== Question Builder ===== */
 function buildQuestions(detected){
-  const qs=[];
-  const t=document.getElementById('prompt').value.toLowerCase();
+  var qs=[];
+  var t=document.getElementById('prompt').value.toLowerCase();
+
   if(!detected.aws&&!detected.azure&&!detected.gcp&&detected.terraform){
-    qs.push({id:'cloud',label:'Cloud Provider',type:'select',options:['AWS','Azure','GCP'],default:'AWS'});
+    qs.push({id:'cloud',label:'Cloud Provider',type:'select',options:['AWS','Azure','GCP'],defaultVal:'AWS'});
   }
   if(!detected.region){
-    qs.push({id:'region',label:'Region / Location',type:'text',placeholder:'us-east-1',default:'us-east-1'});
+    qs.push({id:'region',label:'Region / Location',type:'text',placeholder:'us-east-1',defaultVal:'us-east-1'});
   }
   if(!detected.ec2&&!detected.serverless&&!detected.eks&&(detected.aws||detected.azure||detected.gcp||detected.terraform)){
-    qs.push({id:'compute',label:'Compute Type',type:'select',options:['EC2/VM Instances','Serverless (Lambda/Functions)','Kubernetes (EKS/GKE/AKS)'],default:'EC2/VM Instances'});
+    qs.push({id:'compute',label:'Compute Type',type:'select',options:['EC2/VM Instances','Serverless (Lambda/Functions)','Kubernetes (EKS/GKE/AKS)'],defaultVal:'EC2/VM Instances'});
   }
   if(!detected.vpc&&(detected.aws||detected.azure||detected.gcp||detected.terraform)){
-    qs.push({id:'vpc',label:'Create VPC / Network?',type:'checkbox',default:true});
+    qs.push({id:'vpc',label:'Create VPC / Network?',type:'checkbox',defaultVal:true});
   }
   if(!detected.ssl){
-    qs.push({id:'ssl',label:'Enable SSL / HTTPS?',type:'checkbox',default:true});
+    qs.push({id:'ssl',label:'Enable SSL / HTTPS?',type:'checkbox',defaultVal:true});
   }
   if(!detected.monitoring){
-    qs.push({id:'monitoring',label:'Enable Monitoring?',type:'checkbox',default:true});
+    qs.push({id:'monitoring',label:'Enable Monitoring?',type:'checkbox',defaultVal:true});
   }
   if(!detected.db&&(detected.aws||detected.azure||detected.gcp||detected.terraform)){
-    qs.push({id:'db',label:'Database',type:'select',options:['None','PostgreSQL (RDS/Cloud SQL)','MySQL','DynamoDB / CosmosDB / Firestore'],default:'PostgreSQL (RDS/Cloud SQL)'});
+    qs.push({id:'db',label:'Database',type:'select',options:['None','PostgreSQL (RDS/Cloud SQL)','MySQL','DynamoDB / CosmosDB / Firestore'],defaultVal:'PostgreSQL (RDS/Cloud SQL)'});
   }
   if(!detected.lb&&(detected.aws||detected.azure||detected.gcp||detected.terraform)){
-    qs.push({id:'lb',label:'Load Balancer?',type:'checkbox',default:true});
+    qs.push({id:'lb',label:'Load Balancer?',type:'checkbox',defaultVal:true});
   }
   if(!detected.autoscale&&(detected.aws||detected.azure||detected.gcp||detected.terraform)){
-    qs.push({id:'autoscale',label:'Auto Scaling?',type:'checkbox',default:true});
+    qs.push({id:'autoscale',label:'Auto Scaling?',type:'checkbox',defaultVal:true});
   }
   if(!detected.backup){
-    qs.push({id:'backup',label:'Enable Backups?',type:'checkbox',default:false});
+    qs.push({id:'backup',label:'Enable Backups?',type:'checkbox',defaultVal:false});
   }
   if((detected.kubernetes||detected.eks)&&!/replica|replicat/.test(t)){
-    qs.push({id:'replicas',label:'Replica Count',type:'text',placeholder:'3',default:'3'});
+    qs.push({id:'replicas',label:'Replica Count',type:'text',placeholder:'3',defaultVal:'3'});
   }
   if(!/project.?name|app.?name/.test(t)){
-    qs.push({id:'project',label:'Project Name',type:'text',placeholder:'my-app',default:'area51'});
+    qs.push({id:'project',label:'Project Name',type:'text',placeholder:'my-app',defaultVal:'area51'});
   }
   return qs;
 }
 
-/* ---------- Render Questions ---------- */
+/* ===== Render Questions ===== */
 function renderQuestions(qs){
-  const box=document.getElementById('questions-box');
+  var box=document.getElementById('questions-box');
   box.innerHTML='';
-  const row=document.createElement('div');row.className='question-row';
-  qs.forEach(q=>{
-    const wrap=document.createElement('div');
+  var row=document.createElement('div');row.className='question-row';
+  for(var i=0;i<qs.length;i++){
+    var q=qs[i];
+    var wrap=document.createElement('div');
     if(q.type==='select'){
-      wrap.innerHTML='<label>'+q.label+'</label><select id="q-'+q.id+'">'+q.options.map(o=>'<option value="'+o+'"'+(o===q.default?' selected':'')+'>'+o+'</option>').join('')+'</select>';
+      var opts='';
+      for(var j=0;j<q.options.length;j++){
+        opts+='<option value="'+q.options[j]+'"'+(q.options[j]===q.defaultVal?' selected':'')+'>'+q.options[j]+'</option>';
+      }
+      wrap.innerHTML='<label>'+q.label+'</label><select id="q-'+q.id+'">'+opts+'</select>';
     }else if(q.type==='checkbox'){
-      wrap.innerHTML='<div class="q-checkbox"><input type="checkbox" id="q-'+q.id+'"'+(q.default?' checked':'')+'><label for="q-'+q.id+'">'+q.label+'</label></div>';
+      wrap.innerHTML='<div class="q-checkbox"><input type="checkbox" id="q-'+q.id+'"'+(q.defaultVal?' checked':'')+'><label for="q-'+q.id+'">'+q.label+'</label></div>';
     }else{
-      wrap.innerHTML='<label>'+q.label+'</label><input type="text" id="q-'+q.id+'" placeholder="'+q.placeholder+'" value="'+(q.default||'')+'">';
+      wrap.innerHTML='<label>'+q.label+'</label><input type="text" id="q-'+q.id+'" placeholder="'+q.placeholder+'" value="'+(q.defaultVal||'')+'">';
     }
     row.appendChild(wrap);
-  });
+  }
   box.appendChild(row);
 }
 
-/* ---------- Analyze Button ---------- */
+/* ===== Analyze Button ===== */
 function analyze(){
-  const prompt=document.getElementById('prompt').value.trim();
-  const status=document.getElementById('status');
-  if(!prompt){status.innerText='Type something first.';status.className='status error';return;}
-  status.innerText='Analyzing...';status.className='status info';
-  const d=detectIntent(prompt);
-  const qs=buildQuestions(d);
-  const tagBox=document.getElementById('detected-tags');
-  const tags=[];
-  if(currentStack) tags.push('Stack: '+currentStack.replace(/-/g,' ').toUpperCase());
-  if(d.aws) tags.push('AWS');if(d.azure) tags.push('Azure');if(d.gcp) tags.push('GCP');
-  if(d.vpc) tags.push('VPC');if(d.ssl) tags.push('SSL');if(d.monitoring) tags.push('Monitoring');
-  if(d.db) tags.push('Database');if(d.lb) tags.push('Load Balancer');if(d.autoscale) tags.push('Auto Scaling');
-  tagBox.innerHTML=tags.map(t=>'<span class="detected-tag">'+t+'</span>').join('');
-  renderQuestions(qs);
-  document.getElementById('questions-card').style.display='block';
-  status.innerText='Detected '+tags.length+' intent(s). Answer below, then hit BUILD.';
-  status.className='status success';
-  document.getElementById('questions-card').scrollIntoView({behavior:'smooth'});
+  try{
+    var prompt=document.getElementById('prompt').value.trim();
+    var status=document.getElementById('status');
+    if(!prompt){status.innerText='Type something first.';status.className='status error';return;}
+    status.innerText='Analyzing...';status.className='status info';
+    var d=detectIntent(prompt);
+    var qs=buildQuestions(d);
+    var tagBox=document.getElementById('detected-tags');
+    var tags=[];
+    if(currentStack) tags.push('Stack: '+currentStack.replace(/-/g,' ').toUpperCase());
+    if(d.aws) tags.push('AWS');if(d.azure) tags.push('Azure');if(d.gcp) tags.push('GCP');
+    if(d.vpc) tags.push('VPC');if(d.ssl) tags.push('SSL');if(d.monitoring) tags.push('Monitoring');
+    if(d.db) tags.push('Database');if(d.lb) tags.push('Load Balancer');if(d.autoscale) tags.push('Auto Scaling');
+    var tagHtml='';
+    for(var k=0;k<tags.length;k++) tagHtml+='<span class="detected-tag">'+tags[k]+'</span>';
+    tagBox.innerHTML=tagHtml;
+    renderQuestions(qs);
+    document.getElementById('questions-card').style.display='block';
+    status.innerText='Detected '+tags.length+' intent(s). Answer below, then hit BUILD.';
+    status.className='status success';
+    document.getElementById('questions-card').scrollIntoView({behavior:'smooth'});
+  }catch(e){
+    document.getElementById('status').innerText='ERROR: '+e.message;
+    document.getElementById('status').className='status error';
+    console.error(e);
+  }
 }
 
-/* ---------- Tab Switch ---------- */
+/* ===== Tab Switch ===== */
 function switchTab(name){
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+  var tabs=document.querySelectorAll('.tab');
+  for(var i=0;i<tabs.length;i++) tabs[i].classList.remove('active');
+  var contents=document.querySelectorAll('.tab-content');
+  for(var i=0;i<contents.length;i++) contents[i].classList.remove('active');
   document.querySelector('.tab[data-tab="'+name+'"]').classList.add('active');
   document.getElementById('tab-'+name).classList.add('active');
 }
 
-/* ---------- Copy ---------- */
+/* ===== Copy ===== */
 function copyCode(id){
-  const el=document.getElementById(id);
-  navigator.clipboard.writeText(el.innerText).then(()=>{
-    const btn=document.querySelector('#tab-'+id.replace('code-','')+' .copy-btn');
-    const old=btn.innerText;btn.innerText='Copied!';
-    setTimeout(()=>btn.innerText=old,1200);
+  var el=document.getElementById(id);
+  navigator.clipboard.writeText(el.innerText).then(function(){
+    var tabName=id.replace('code-','');
+    var btn=document.querySelector('#tab-'+tabName+' .copy-btn');
+    var old=btn.innerText;btn.innerText='Copied!';
+    setTimeout(function(){btn.innerText=old;},1200);
   });
 }
 
-/* ---------- Collect Answers ---------- */
+/* ===== Collect Answers ===== */
 function getAnswers(){
-  const ans={};
-  document.querySelectorAll('#questions-box input, #questions-box select').forEach(el=>{
-    const key=el.id.replace('q-','');
+  var ans={};
+  var inputs=document.querySelectorAll('#questions-box input, #questions-box select');
+  for(var i=0;i<inputs.length;i++){
+    var el=inputs[i];
+    var key=el.id.replace('q-','');
     ans[key]=el.type==='checkbox'?el.checked:el.value;
-  });
+  }
   if(ans.cloud==='AWS') currentStack='terraform-aws';
   if(ans.cloud==='Azure') currentStack='terraform-azure';
   if(ans.cloud==='GCP') currentStack='terraform-gcp';
@@ -325,1449 +344,1648 @@ function getAnswers(){
   return ans;
 }
 
-/* ---------- Generate ---------- */
+/* ===== Generate ===== */
 function generate(){
-  const status=document.getElementById('status');
-  status.innerText='Building artifacts...';status.className='status info';
-  const ans=getAnswers();
-  const prompt=document.getElementById('prompt').value;
-  const params={
-    name:ans.project||'area51',region:ans.region||'us-east-1',env:'prod',instance:'t3.medium',
-    desc:prompt,monitoring:!!ans.monitoring,backup:!!ans.backup,ssl:!!ans.ssl,vpc:!!ans.vpc,
-    db:ans.db||'None',lb:!!ans.lb,autoscale:!!ans.autoscale,compute:ans.compute||'EC2/VM Instances',replicas:ans.replicas||'3'
-  };
-  const result=runGenerator(currentStack,params);
-  document.getElementById('code-main').innerText=result.main;
-  document.getElementById('code-variables').innerText=result.variables;
-  document.getElementById('code-outputs').innerText=result.outputs;
-  document.getElementById('code-readme').innerText=result.readme;
-  document.getElementById('output-area').classList.add('active');
-  status.innerText='SUCCESS: '+currentStack.toUpperCase()+' artifacts generated.';
-  status.className='status success';
-  document.getElementById('output-area').scrollIntoView({behavior:'smooth'});
+  try{
+    var status=document.getElementById('status');
+    status.innerText='Building artifacts...';status.className='status info';
+    var ans=getAnswers();
+    var prompt=document.getElementById('prompt').value;
+    var params={
+      name:ans.project||'area51',region:ans.region||'us-east-1',env:'prod',instance:'t3.medium',
+      desc:prompt,monitoring:!!ans.monitoring,backup:!!ans.backup,ssl:!!ans.ssl,vpc:!!ans.vpc,
+      db:ans.db||'None',lb:!!ans.lb,autoscale:!!ans.autoscale,compute:ans.compute||'EC2/VM Instances',replicas:ans.replicas||'3'
+    };
+    var result=runGenerator(currentStack,params);
+    document.getElementById('code-main').innerText=result.main;
+    document.getElementById('code-variables').innerText=result.variables;
+    document.getElementById('code-outputs').innerText=result.outputs;
+    document.getElementById('code-readme').innerText=result.readme;
+    document.getElementById('output-area').classList.add('active');
+    status.innerText='SUCCESS: '+currentStack.toUpperCase()+' artifacts generated.';
+    status.className='status success';
+    document.getElementById('output-area').scrollIntoView({behavior:'smooth'});
+  }catch(e){
+    document.getElementById('status').innerText='ERROR: '+e.message;
+    document.getElementById('status').className='status error';
+    console.error(e);
+  }
 }
 
-/* ---------- Generators ---------- */
+/* ===== Generators ===== */
 function runGenerator(stack,p){
-  const map={
-    'terraform-aws':genTerraformAWS,'terraform-azure':genTerraformAzure,'terraform-gcp':genTerraformGCP,
-    'k8s':genK8s,'docker':genDocker,'ansible':genAnsible,
-    'github-actions':genGHA,'azure-devops':genADO,'pulumi':genPulumi,'bicep':genBicep,
-    'terraform-aws-serverless':genTerraformAWSServerless
-  };
-  return (map[stack]||genTerraformAWS)(p);
+  if(stack==='terraform-aws') return genTerraformAWS(p);
+  if(stack==='terraform-aws-serverless') return genTerraformAWSServerless(p);
+  if(stack==='terraform-azure') return genTerraformAzure(p);
+  if(stack==='terraform-gcp') return genTerraformGCP(p);
+  if(stack==='k8s') return genK8s(p);
+  if(stack==='docker') return genDocker(p);
+  if(stack==='ansible') return genAnsible(p);
+  if(stack==='github-actions') return genGHA(p);
+  if(stack==='azure-devops') return genADO(p);
+  if(stack==='pulumi') return genPulumi(p);
+  if(stack==='bicep') return genBicep(p);
+  return genTerraformAWS(p);
 }
 
 function genTerraformAWS(p){
-  const vpcBlock=p.vpc?`resource "aws_vpc" "main" {
-  cidr_block           = "10.0.0.0/16"
-  enable_dns_hostnames = true
-  tags = { Name = "${p.name}-vpc", Environment = "${p.env}" }
-}
+  var vpcBlock = p.vpc ? [
+    'resource "aws_vpc" "main" {',
+    '  cidr_block           = "10.0.0.0/16"',
+    '  enable_dns_hostnames = true',
+    '  tags = { Name = "'+p.name+'-vpc", Environment = "'+p.env+'" }',
+    '}',
+    '',
+    'resource "aws_subnet" "public" {',
+    '  count             = 2',
+    '  vpc_id            = aws_vpc.main.id',
+    '  cidr_block        = cidrsubnet(aws_vpc.main.cidr_block, 8, count.index)',
+    '  availability_zone = data.aws_availability_zones.available.names[count.index]',
+    '  tags = { Name = "'+p.name+'-public-${count.index}" }',
+    '}',
+    '',
+    'data "aws_availability_zones" "available" { state = "available" }'
+  ].join('\n') : '# Using default VPC';
 
-resource "aws_subnet" "public" {
-  count             = 2
-  vpc_id            = aws_vpc.main.id
-  cidr_block        = cidrsubnet(aws_vpc.main.cidr_block, 8, count.index)
-  availability_zone = data.aws_availability_zones.available.names[count.index]
-  tags = { Name = "${p.name}-public-${'${count.index}'}" }
-}
+  var dbBlock = p.db !== 'None' ? [
+    'resource "aws_db_subnet_group" "main" {',
+    '  name       = "'+p.name+'-db-subnet"',
+    '  subnet_ids = ' + (p.vpc ? '[aws_subnet.public[0].id, aws_subnet.public[1].id]' : 'data.aws_subnets.default.ids'),
+    '  tags = { Name = "'+p.name+'-db-subnet" }',
+    '}',
+    '',
+    'resource "aws_db_instance" "main" {',
+    '  identifier           = "'+p.name+'-db"',
+    '  engine               = "' + (p.db.indexOf('Postgre') !== -1 ? 'postgres' : 'mysql') + '"',
+    '  instance_class       = "db.t3.micro"',
+    '  allocated_storage    = 20',
+    '  db_subnet_group_name = aws_db_subnet_group.main.name',
+    '  username             = "dbadmin"',
+    '  password             = random_password.db.result',
+    '  skip_final_snapshot  = true',
+    '  publicly_accessible  = false',
+    '}',
+    '',
+    'resource "random_password" "db" {',
+    '  length  = 16',
+    '  special = true',
+    '}'
+  ].join('\n') : '';
 
-data "aws_availability_zones" "available" { state = "available" }`:'# Using default VPC';
+  var asgBlock = p.autoscale ? [
+    'resource "aws_autoscaling_group" "app" {',
+    '  name                = "'+p.name+'-asg"',
+    '  vpc_zone_identifier = ' + (p.vpc ? '[aws_subnet.public[0].id, aws_subnet.public[1].id]' : 'data.aws_subnets.default.ids'),
+    '  target_group_arns   = ' + (p.lb ? '[aws_lb_target_group.app.arn]' : '[]'),
+    '  health_check_type   = "EC2"',
+    '  min_size            = 2',
+    '  max_size            = 6',
+    '  desired_capacity    = 2',
+    '  launch_template { id = aws_launch_template.app.id; version = "$Latest" }',
+    '  tag { key = "Name"; value = "'+p.name+'-instance"; propagate_at_launch = true }',
+    '}'
+  ].join('\n') : [
+    'resource "aws_instance" "app" {',
+    '  count         = 2',
+    '  ami           = data.aws_ami.amazon_linux.id',
+    '  instance_type = "'+p.instance+'"',
+    '  vpc_security_group_ids = [aws_security_group.app.id]',
+    (p.vpc ? '  subnet_id = aws_subnet.public[count.index % 2].id' : ''),
+    '  user_data = base64encode(<<-EOF',
+    '    #!/bin/bash',
+    '    yum update -y',
+    '    yum install -y httpd',
+    '    systemctl start httpd',
+    '    systemctl enable httpd',
+    '    echo "<h1>'+p.name+' — '+p.env+'</h1>" > /var/www/html/index.html',
+    '  EOF',
+    '  )',
+    '  tags = { Name = "'+p.name+'-instance-${count.index}" }',
+    '}'
+  ].join('\n');
 
-  const dbBlock=p.db!=='None'?`
-resource "aws_db_subnet_group" "main" {
-  name       = "${p.name}-db-subnet"
-  subnet_ids = ${p.vpc?'[aws_subnet.public[0].id, aws_subnet.public[1].id]':'data.aws_subnets.default.ids'}
-  tags = { Name = "${p.name}-db-subnet" }
-}
+  var lbBlock = p.lb ? [
+    'resource "aws_lb" "app" {',
+    '  name               = "'+p.name+'-alb"',
+    '  internal           = false',
+    '  load_balancer_type = "application"',
+    '  security_groups    = [aws_security_group.app.id]',
+    '  subnets            = ' + (p.vpc ? '[aws_subnet.public[0].id, aws_subnet.public[1].id]' : 'data.aws_subnets.default.ids'),
+    '}',
+    '',
+    'resource "aws_lb_target_group" "app" {',
+    '  name     = "'+p.name+'-tg"',
+    '  port     = 80',
+    '  protocol = "HTTP"',
+    '  vpc_id   = ' + (p.vpc ? 'aws_vpc.main.id' : 'data.aws_vpc.default.id'),
+    '  health_check { path = "/"; port = "traffic-port" }',
+    '}',
+    '',
+    'resource "aws_lb_listener" "app" {',
+    '  load_balancer_arn = aws_lb.app.arn',
+    '  port              = ' + (p.ssl ? '443' : '80'),
+    '  protocol          = ' + (p.ssl ? '"HTTPS"' : '"HTTP"'),
+    (p.ssl ? '  ssl_policy = "ELBSecurityPolicy-TLS13-1-2-2021-06"\n  certificate_arn = aws_acm_certificate.app.arn' : ''),
+    '  default_action { type = "forward"; target_group_arn = aws_lb_target_group.app.arn }',
+    '}'
+  ].join('\n') : '';
 
-resource "aws_db_instance" "main" {
-  identifier           = "${p.name}-db"
-  engine               = "${p.db.includes('Postgre')?'postgres':'mysql'}"
-  instance_class       = "db.t3.micro"
-  allocated_storage    = 20
-  db_subnet_group_name = aws_db_subnet_group.main.name
-  username             = "dbadmin"
-  password             = random_password.db.result
-  skip_final_snapshot  = true
-  publicly_accessible  = false
-}
+  var monBlock = p.monitoring ? [
+    'resource "aws_cloudwatch_log_group" "app" {',
+    '  name              = "/aws/'+p.name+'/app"',
+    '  retention_in_days = 7',
+    '}',
+    '',
+    'resource "aws_cloudwatch_dashboard" "main" {',
+    '  dashboard_name = "'+p.name+'-dashboard"',
+    '  dashboard_body = jsonencode({',
+    '    widgets = [{',
+    '      type   = "metric"',
+    '      x = 0; y = 0; width = 12; height = 6',
+    '      properties = {',
+    '        metrics = [["AWS/EC2", "CPUUtilization", "AutoScalingGroupName", "'+p.name+'-asg"]],',
+    '        period = 300, stat = "Average", region = "'+p.region+'", title = "CPU Utilization"',
+    '      }',
+    '    }]',
+    '  })',
+    '}'
+  ].join('\n') : '';
 
-resource "random_password" "db" {
-  length  = 16
-  special = true
-}`:'';
+  var backupBlock = (p.backup && p.db !== 'None') ? [
+    'resource "aws_db_snapshot" "backup" {',
+    '  db_instance_identifier = aws_db_instance.main.identifier',
+    '  db_snapshot_identifier   = "'+p.name+'-snapshot-${formatdate(\\"YYYY-MM-DD\\", timestamp())}"',
+    '}'
+  ].join('\n') : '';
 
-  const asgBlock=p.autoscale?`
-resource "aws_autoscaling_group" "app" {
-  name                = "${p.name}-asg"
-  vpc_zone_identifier = ${p.vpc?'[aws_subnet.public[0].id, aws_subnet.public[1].id]':'data.aws_subnets.default.ids'}
-  target_group_arns   = ${p.lb?'[aws_lb_target_group.app.arn]':'[]'}
-  health_check_type   = "EC2"
-  min_size            = 2
-  max_size            = 6
-  desired_capacity    = 2
-  launch_template { id = aws_launch_template.app.id; version = "$Latest" }
-  tag { key = "Name"; value = "${p.name}-instance"; propagate_at_launch = true }
-}`:`resource "aws_instance" "app" {
-  count         = 2
-  ami           = data.aws_ami.amazon_linux.id
-  instance_type = "${p.instance}"
-  vpc_security_group_ids = [aws_security_group.app.id]
-  ${p.vpc?'subnet_id = aws_subnet.public[count.index % 2].id':''}
-  user_data = base64encode(<<-EOF
-    #!/bin/bash
-    yum update -y
-    yum install -y httpd
-    systemctl start httpd
-    systemctl enable httpd
-    echo "<h1>${p.name} — ${p.env}</h1>" > /var/www/html/index.html
-  EOF
-  )
-  tags = { Name = "${p.name}-instance-${'${count.index}'}" }
-}`;
+  var main = [
+    'terraform {',
+    '  required_providers {',
+    '    aws = { source = "hashicorp/aws", version = "~> 5.0" }',
+    '  }',
+    '}',
+    '',
+    'provider "aws" {',
+    '  region = var.region',
+    '}',
+    '',
+    vpcBlock,
+    '',
+    'resource "aws_security_group" "app" {',
+    '  name_prefix = "'+p.name+'-"',
+    (p.vpc ? '  vpc_id = aws_vpc.main.id' : ''),
+    '  ingress {',
+    '    from_port   = 80',
+    '    to_port     = 80',
+    '    protocol    = "tcp"',
+    '    cidr_blocks = ["0.0.0.0/0"]',
+    '  }',
+    (p.ssl ? '  ingress {\n    from_port   = 443\n    to_port     = 443\n    protocol    = "tcp"\n    cidr_blocks = ["0.0.0.0/0"]\n  }' : ''),
+    '  egress {',
+    '    from_port   = 0',
+    '    to_port     = 0',
+    '    protocol    = "-1"',
+    '    cidr_blocks = ["0.0.0.0/0"]',
+    '  }',
+    '  tags = { Name = "'+p.name+'-sg" }',
+    '}',
+    '',
+    'data "aws_ami" "amazon_linux" {',
+    '  most_recent = true',
+    '  owners      = ["amazon"]',
+    '  filter { name = "name"; values = ["amzn2-ami-hvm-*-x86_64-gp2"] }',
+    '}',
+    '',
+    'resource "aws_launch_template" "app" {',
+    '  name_prefix   = "'+p.name+'-"',
+    '  image_id      = data.aws_ami.amazon_linux.id',
+    '  instance_type = var.instance_type',
+    '  vpc_security_group_ids = [aws_security_group.app.id]',
+    '  user_data = base64encode(<<-EOF',
+    '    #!/bin/bash',
+    '    yum update -y',
+    '    yum install -y httpd',
+    '    systemctl start httpd',
+    '    systemctl enable httpd',
+    '    echo "<h1>'+p.name+' — '+p.env+'</h1>" > /var/www/html/index.html',
+    '  EOF',
+    '  )',
+    '  tag_specifications {',
+    '    resource_type = "instance"',
+    '    tags = { Name = "'+p.name+'-instance" }',
+    '  }',
+    '}',
+    '',
+    asgBlock,
+    lbBlock,
+    dbBlock,
+    monBlock,
+    backupBlock
+  ].join('\n');
 
-  const lbBlock=p.lb?`
-resource "aws_lb" "app" {
-  name               = "${p.name}-alb"
-  internal           = false
-  load_balancer_type = "application"
-  security_groups    = [aws_security_group.app.id]
-  subnets            = ${p.vpc?'[aws_subnet.public[0].id, aws_subnet.public[1].id]':'data.aws_subnets.default.ids'}
-}
+  var variables = [
+    'variable "region" {',
+    '  description = "AWS region"',
+    '  type        = string',
+    '  default     = "'+p.region+'"',
+    '}',
+    '',
+    'variable "project_name" {',
+    '  description = "Project name"',
+    '  type        = string',
+    '  default     = "'+p.name+'"',
+    '}',
+    '',
+    'variable "environment" {',
+    '  description = "Environment"',
+    '  type        = string',
+    '  default     = "'+p.env+'"',
+    '}',
+    '',
+    'variable "instance_type" {',
+    '  description = "EC2 instance type"',
+    '  type        = string',
+    '  default     = "'+p.instance+'"',
+    '}'
+  ].join('\n');
 
-resource "aws_lb_target_group" "app" {
-  name     = "${p.name}-tg"
-  port     = 80
-  protocol = "HTTP"
-  vpc_id   = ${p.vpc?'aws_vpc.main.id':'data.aws_vpc.default.id'}
-  health_check { path = "/"; port = "traffic-port" }
-}
+  var outputsArr = ['output "security_group_id" {\n  description = "Security group ID"\n  value       = aws_security_group.app.id\n}'];
+  if(p.lb) outputsArr.push('output "load_balancer_dns" {\n  description = "ALB DNS name"\n  value       = aws_lb.app.dns_name\n}');
+  if(p.autoscale) outputsArr.push('output "autoscaling_group_name" {\n  description = "ASG name"\n  value       = aws_autoscaling_group.app.name\n}');
+  if(p.db !== 'None') outputsArr.push('output "db_endpoint" {\n  description = "Database endpoint"\n  value       = aws_db_instance.main.endpoint\n  sensitive   = true\n}');
 
-resource "aws_lb_listener" "app" {
-  load_balancer_arn = aws_lb.app.arn
-  port              = ${p.ssl?'443':'80'}
-  protocol          = ${p.ssl?'"HTTPS"':'"HTTP"'}
-  ${p.ssl?'ssl_policy = "ELBSecurityPolicy-TLS13-1-2-2021-06"\n  certificate_arn = aws_acm_certificate.app.arn':''}
-  default_action { type = "forward"; target_group_arn = aws_lb_target_group.app.arn }
-}`:'';
+  var readme = [
+    '# '+p.name+' — Terraform AWS',
+    '',
+    '## Overview',
+    p.desc,
+    '',
+    '## Prerequisites',
+    '- Terraform >= 1.5',
+    '- AWS CLI configured',
+    '',
+    '## Usage',
+    '```bash',
+    'terraform init',
+    'terraform plan',
+    'terraform apply',
+    '```',
+    '',
+    '## Features',
+    (p.vpc ? '- Custom VPC with public subnets' : '- Default VPC'),
+    (p.lb ? '- Application Load Balancer' : ''),
+    (p.autoscale ? '- Auto Scaling Group (2-6 instances)' : ''),
+    (p.ssl ? '- SSL/TLS termination on ALB' : ''),
+    (p.db !== 'None' ? '- ' + p.db + ' database' : ''),
+    (p.monitoring ? '- CloudWatch dashboard' : ''),
+    (p.backup ? '- Automated DB snapshots' : ''),
+    '',
+    '## Outputs',
+    '- security_group_id',
+    (p.lb ? '- load_balancer_dns' : ''),
+    (p.autoscale ? '- autoscaling_group_name' : ''),
+    (p.db !== 'None' ? '- db_endpoint' : '')
+  ].filter(function(s){return s!=='';}).join('\n');
 
-  const monBlock=p.monitoring?`
-resource "aws_cloudwatch_log_group" "app" {
-  name              = "/aws/${p.name}/app"
-  retention_in_days = 7
-}
-
-resource "aws_cloudwatch_dashboard" "main" {
-  dashboard_name = "${p.name}-dashboard"
-  dashboard_body = jsonencode({
-    widgets = [{
-      type   = "metric"
-      x = 0; y = 0; width = 12; height = 6
-      properties = {
-        metrics = [["AWS/EC2", "CPUUtilization", "AutoScalingGroupName", "${p.name}-asg"]],
-        period = 300, stat = "Average", region = "${p.region}", title = "CPU Utilization"
-      }
-    }]
-  })
-}`:'';
-
-  return {
-    main:`terraform {
-  required_providers {
-    aws = { source = "hashicorp/aws", version = "~> 5.0" }
-  }
-}
-
-provider "aws" {
-  region = var.region
-}
-
-${vpcBlock}
-
-resource "aws_security_group" "app" {
-  name_prefix = "${p.name}-"
-  ${p.vpc?'vpc_id = aws_vpc.main.id':''}
-  ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-  ${p.ssl?`ingress {
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }`:''}
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-  tags = { Name = "${p.name}-sg" }
-}
-
-data "aws_ami" "amazon_linux" {
-  most_recent = true
-  owners      = ["amazon"]
-  filter { name = "name"; values = ["amzn2-ami-hvm-*-x86_64-gp2"] }
-}
-
-resource "aws_launch_template" "app" {
-  name_prefix   = "${p.name}-"
-  image_id      = data.aws_ami.amazon_linux.id
-  instance_type = var.instance_type
-  vpc_security_group_ids = [aws_security_group.app.id]
-  user_data = base64encode(<<-EOF
-    #!/bin/bash
-    yum update -y
-    yum install -y httpd
-    systemctl start httpd
-    systemctl enable httpd
-    echo "<h1>${p.name} — ${p.env}</h1>" > /var/www/html/index.html
-  EOF
-  )
-  tag_specifications {
-    resource_type = "instance"
-    tags = { Name = "${p.name}-instance" }
-  }
-}
-
-${asgBlock}
-${lbBlock}
-${dbBlock}
-${monBlock}
-${p.backup&&p.db!=='None'?`resource "aws_db_snapshot" "backup" {
-  db_instance_identifier = aws_db_instance.main.identifier
-  db_snapshot_identifier   = "${p.name}-snapshot-${'${formatdate(\\"YYYY-MM-DD\\", timestamp())}'}"
-}`:''}`,
-    variables:`variable "region" {
-  description = "AWS region"
-  type        = string
-  default     = "${p.region}"
-}
-
-variable "project_name" {
-  description = "Project name"
-  type        = string
-  default     = "${p.name}"
-}
-
-variable "environment" {
-  description = "Environment"
-  type        = string
-  default     = "${p.env}"
-}
-
-variable "instance_type" {
-  description = "EC2 instance type"
-  type        = string
-  default     = "${p.instance}"
-}`,
-    outputs:`output "security_group_id" {
-  description = "Security group ID"
-  value       = aws_security_group.app.id
-}
-${p.lb?`output "load_balancer_dns" {
-  description = "ALB DNS name"
-  value       = aws_lb.app.dns_name
-}`:''}
-${p.autoscale?`output "autoscaling_group_name" {
-  description = "ASG name"
-  value       = aws_autoscaling_group.app.name
-}`:''}
-${p.db!=='None'?`output "db_endpoint" {
-  description = "Database endpoint"
-  value       = aws_db_instance.main.endpoint
-  sensitive   = true
-}`:''}`,
-    readme:`# ${p.name} — Terraform AWS
-
-## Overview
-${p.desc}
-
-## Prerequisites
-- Terraform >= 1.5
-- AWS CLI configured
-
-## Usage
-\`\`\`bash
-terraform init
-terraform plan
-terraform apply
-\`\`\`
-
-## Features
-${p.vpc?'- Custom VPC with public subnets\n':'- Default VPC\n'}${p.lb?'- Application Load Balancer\n':''}${p.autoscale?'- Auto Scaling Group (2-6 instances)\n':''}${p.ssl?'- SSL/TLS termination on ALB\n':''}${p.db!=='None'?'- '+p.db+' database\n':''}${p.monitoring?'- CloudWatch dashboard\n':''}${p.backup?'- Automated DB snapshots\n':''}
-
-## Outputs
-- security_group_id${p.lb?'\n- load_balancer_dns':''}${p.autoscale?'\n- autoscaling_group_name':''}${p.db!=='None'?'\n- db_endpoint':''}`
-  };
+  return {main:main, variables:variables, outputs:outputsArr.join('\n\n'), readme:readme};
 }
 
 function genTerraformAWSServerless(p){
-  return {
-    main:`terraform {
-  required_providers {
-    aws = { source = "hashicorp/aws", version = "~> 5.0" }
-  }
-}
+  var dbBlock = p.db === 'DynamoDB / CosmosDB / Firestore' ? [
+    'resource "aws_dynamodb_table" "app" {',
+    '  name         = "'+p.name+'-table"',
+    '  billing_mode = "PAY_PER_REQUEST"',
+    '  hash_key     = "id"',
+    '  attribute {',
+    '    name = "id"',
+    '    type = "S"',
+    '  }',
+    '}'
+  ].join('\n') : '';
 
-provider "aws" {
-  region = var.region
-}
+  var monBlock = p.monitoring ? [
+    'resource "aws_cloudwatch_log_group" "lambda" {',
+    '  name              = "/aws/lambda/${aws_lambda_function.app.function_name}"',
+    '  retention_in_days = 7',
+    '}'
+  ].join('\n') : '';
 
-resource "aws_lambda_function" "app" {
-  function_name = "${p.name}-function"
-  role          = aws_iam_role.lambda.arn
-  handler       = "index.handler"
-  runtime       = "nodejs20.x"
-  filename      = "function.zip"
-  source_code_hash = filebase64sha256("function.zip")
-  environment {
-    variables = {
-      ENV = "${p.env}"
-    }
-  }
-}
+  var main = [
+    'terraform {',
+    '  required_providers {',
+    '    aws = { source = "hashicorp/aws", version = "~> 5.0" }',
+    '  }',
+    '}',
+    '',
+    'provider "aws" {',
+    '  region = var.region',
+    '}',
+    '',
+    'resource "aws_lambda_function" "app" {',
+    '  function_name = "'+p.name+'-function"',
+    '  role          = aws_iam_role.lambda.arn',
+    '  handler       = "index.handler"',
+    '  runtime       = "nodejs20.x"',
+    '  filename      = "function.zip"',
+    '  source_code_hash = filebase64sha256("function.zip")',
+    '  environment {',
+    '    variables = {',
+    '      ENV = "'+p.env+'"',
+    '    }',
+    '  }',
+    '}',
+    '',
+    'resource "aws_iam_role" "lambda" {',
+    '  name = "'+p.name+'-lambda-role"',
+    '  assume_role_policy = jsonencode({',
+    '    Version = "2012-10-17"',
+    '    Statement = [{',
+    '      Action = "sts:AssumeRole"',
+    '      Effect = "Allow"',
+    '      Principal = { Service = "lambda.amazonaws.com" }',
+    '    }]',
+    '  })',
+    '}',
+    '',
+    'resource "aws_iam_role_policy_attachment" "lambda_basic" {',
+    '  role       = aws_iam_role.lambda.name',
+    '  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"',
+    '}',
+    '',
+    'resource "aws_api_gateway_rest_api" "app" {',
+    '  name = "'+p.name+'-api"',
+    '}',
+    '',
+    'resource "aws_api_gateway_resource" "app" {',
+    '  rest_api_id = aws_api_gateway_rest_api.app.id',
+    '  parent_id   = aws_api_gateway_rest_api.app.root_resource_id',
+    '  path_part   = "{proxy+}"',
+    '}',
+    '',
+    'resource "aws_api_gateway_method" "app" {',
+    '  rest_api_id   = aws_api_gateway_rest_api.app.id',
+    '  resource_id   = aws_api_gateway_resource.app.id',
+    '  http_method   = "ANY"',
+    '  authorization = "NONE"',
+    '}',
+    '',
+    'resource "aws_api_gateway_integration" "lambda" {',
+    '  rest_api_id = aws_api_gateway_rest_api.app.id',
+    '  resource_id = aws_api_gateway_resource.app.id',
+    '  http_method = aws_api_gateway_method.app.http_method',
+    '  integration_http_method = "POST"',
+    '  type        = "AWS_PROXY"',
+    '  uri         = aws_lambda_function.app.invoke_arn',
+    '}',
+    '',
+    'resource "aws_lambda_permission" "api" {',
+    '  statement_id  = "AllowAPIGatewayInvoke"',
+    '  action        = "lambda:InvokeFunction"',
+    '  function_name = aws_lambda_function.app.function_name',
+    '  principal     = "apigateway.amazonaws.com"',
+    '  source_arn    = "${aws_api_gateway_rest_api.app.execution_arn}/*/*"',
+    '}',
+    '',
+    'resource "aws_api_gateway_deployment" "app" {',
+    '  depends_on = [aws_api_gateway_integration.lambda]',
+    '  rest_api_id = aws_api_gateway_rest_api.app.id',
+    '  stage_name  = "'+p.env+'"',
+    '}',
+    '',
+    dbBlock,
+    monBlock
+  ].join('\n');
 
-resource "aws_iam_role" "lambda" {
-  name = "${p.name}-lambda-role"
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [{
-      Action = "sts:AssumeRole"
-      Effect = "Allow"
-      Principal = { Service = "lambda.amazonaws.com" }
-    }]
-  })
-}
+  var variables = [
+    'variable "region" {',
+    '  description = "AWS region"',
+    '  type        = string',
+    '  default     = "'+p.region+'"',
+    '}',
+    '',
+    'variable "project_name" {',
+    '  description = "Project name"',
+    '  type        = string',
+    '  default     = "'+p.name+'"',
+    '}',
+    '',
+    'variable "environment" {',
+    '  description = "Environment"',
+    '  type        = string',
+    '  default     = "'+p.env+'"',
+    '}'
+  ].join('\n');
 
-resource "aws_iam_role_policy_attachment" "lambda_basic" {
-  role       = aws_iam_role.lambda.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-}
+  var outputs = [
+    'output "api_endpoint" {',
+    '  description = "API Gateway endpoint"',
+    '  value       = aws_api_gateway_deployment.app.invoke_url',
+    '}',
+    '',
+    'output "lambda_arn" {',
+    '  description = "Lambda function ARN"',
+    '  value       = aws_lambda_function.app.arn',
+    '}'
+  ].join('\n');
 
-resource "aws_api_gateway_rest_api" "app" {
-  name = "${p.name}-api"
-}
+  var readme = [
+    '# '+p.name+' — AWS Serverless (Lambda + API Gateway)',
+    '',
+    '## Overview',
+    p.desc,
+    '',
+    '## Usage',
+    '```bash',
+    'zip function.zip index.js',
+    'terraform init',
+    'terraform apply',
+    '```',
+    '',
+    '## Architecture',
+    '- Lambda function (Node.js 20)',
+    '- API Gateway REST API',
+    '- IAM role with basic execution policy',
+    (p.db === 'DynamoDB / CosmosDB / Firestore' ? '- DynamoDB table' : ''),
+    (p.monitoring ? '- CloudWatch Logs' : '')
+  ].filter(function(s){return s!=='';}).join('\n');
 
-resource "aws_api_gateway_resource" "app" {
-  rest_api_id = aws_api_gateway_rest_api.app.id
-  parent_id   = aws_api_gateway_rest_api.app.root_resource_id
-  path_part   = "{proxy+}"
-}
-
-resource "aws_api_gateway_method" "app" {
-  rest_api_id   = aws_api_gateway_rest_api.app.id
-  resource_id   = aws_api_gateway_resource.app.id
-  http_method   = "ANY"
-  authorization = "NONE"
-}
-
-resource "aws_api_gateway_integration" "lambda" {
-  rest_api_id = aws_api_gateway_rest_api.app.id
-  resource_id = aws_api_gateway_resource.app.id
-  http_method = aws_api_gateway_method.app.http_method
-  integration_http_method = "POST"
-  type        = "AWS_PROXY"
-  uri         = aws_lambda_function.app.invoke_arn
-}
-
-resource "aws_lambda_permission" "api" {
-  statement_id  = "AllowAPIGatewayInvoke"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.app.function_name
-  principal     = "apigateway.amazonaws.com"
-  source_arn    = "${'${aws_api_gateway_rest_api.app.execution_arn}'}/*/*"
-}
-
-resource "aws_api_gateway_deployment" "app" {
-  depends_on = [aws_api_gateway_integration.lambda]
-  rest_api_id = aws_api_gateway_rest_api.app.id
-  stage_name  = "${p.env}"
-}
-
-${p.db==='DynamoDB / CosmosDB / Firestore'?`resource "aws_dynamodb_table" "app" {
-  name         = "${p.name}-table"
-  billing_mode = "PAY_PER_REQUEST"
-  hash_key     = "id"
-  attribute {
-    name = "id"
-    type = "S"
-  }
-}`:''}
-${p.monitoring?`resource "aws_cloudwatch_log_group" "lambda" {
-  name              = "/aws/lambda/${'${aws_lambda_function.app.function_name}'}"
-  retention_in_days = 7
-}`:''}`,
-    variables:`variable "region" {
-  description = "AWS region"
-  type        = string
-  default     = "${p.region}"
-}
-
-variable "project_name" {
-  description = "Project name"
-  type        = string
-  default     = "${p.name}"
-}
-
-variable "environment" {
-  description = "Environment"
-  type        = string
-  default     = "${p.env}"
-}`,
-    outputs:`output "api_endpoint" {
-  description = "API Gateway endpoint"
-  value       = aws_api_gateway_deployment.app.invoke_url
-}
-
-output "lambda_arn" {
-  description = "Lambda function ARN"
-  value       = aws_lambda_function.app.arn
-}`,
-    readme:`# ${p.name} — AWS Serverless (Lambda + API Gateway)
-
-## Overview
-${p.desc}
-
-## Usage
-\`\`\`bash
-zip function.zip index.js
-terraform init
-terraform apply
-\`\`\`
-
-## Architecture
-- Lambda function (Node.js 20)\n- API Gateway REST API\n- IAM role with basic execution policy\n${p.db==='DynamoDB / CosmosDB / Firestore'?'- DynamoDB table\n':''}${p.monitoring?'- CloudWatch Logs\n':''}`
-  };
+  return {main:main, variables:variables, outputs:outputs, readme:readme};
 }
 
 function genTerraformAzure(p){
-  return {
-    main:`terraform {
-  required_providers {
-    azurerm = { source = "hashicorp/azurerm", version = "~> 3.0" }
-  }
-}
+  var lbBlock = p.lb ? [
+    'resource "azurerm_lb" "main" {',
+    '  name                = "'+p.name+'-lb"',
+    '  location            = azurerm_resource_group.main.location',
+    '  resource_group_name = azurerm_resource_group.main.name',
+    '  sku                 = "Standard"',
+    '  frontend_ip_configuration {',
+    '    name                 = "PublicIPAddress"',
+    '    public_ip_address_id = azurerm_public_ip.main.id',
+    '  }',
+    '}',
+    '',
+    'resource "azurerm_public_ip" "main" {',
+    '  name                = "'+p.name+'-pip"',
+    '  resource_group_name = azurerm_resource_group.main.name',
+    '  location            = azurerm_resource_group.main.location',
+    '  allocation_method   = "Static"',
+    '  sku                 = "Standard"',
+    '}',
+    '',
+    'resource "azurerm_lb_backend_address_pool" "main" {',
+    '  loadbalancer_id = azurerm_lb.main.id',
+    '  name            = "BackEndAddressPool"',
+    '}',
+    '',
+    'resource "azurerm_lb_probe" "main" {',
+    '  loadbalancer_id = azurerm_lb.main.id',
+    '  name            = "http-probe"',
+    '  port            = 80',
+    '}',
+    '',
+    'resource "azurerm_lb_rule" "main" {',
+    '  loadbalancer_id                = azurerm_lb.main.id',
+    '  name                           = "HTTP"',
+    '  protocol                       = "Tcp"',
+    '  frontend_port                  = ' + (p.ssl ? '443' : '80'),
+    '  backend_port                   = 80',
+    '  frontend_ip_configuration_name = "PublicIPAddress"',
+    '  probe_id                       = azurerm_lb_probe.main.id',
+    '  backend_address_pool_ids       = [azurerm_lb_backend_address_pool.main.id]',
+    '}'
+  ].join('\n') : '';
 
-provider "azurerm" {
-  features {}
-}
+  var dbBlock = p.db !== 'None' ? [
+    'resource "azurerm_postgresql_flexible_server" "main" {',
+    '  name                   = "'+p.name+'-db"',
+    '  resource_group_name    = azurerm_resource_group.main.name',
+    '  location               = azurerm_resource_group.main.location',
+    '  version                = "13"',
+    '  administrator_login    = "dbadmin"',
+    '  administrator_password = "SecureP@ssw0rd123!"',
+    '  storage_mb             = 32768',
+    '  sku_name               = "B_Standard_B1ms"',
+    '}'
+  ].join('\n') : '';
 
-resource "azurerm_resource_group" "main" {
-  name     = "${p.name}-${p.env}-rg"
-  location = var.location
-}
+  var monBlock = p.monitoring ? [
+    'resource "azurerm_monitor_action_group" "main" {',
+    '  name                = "'+p.name+'-actiongroup"',
+    '  resource_group_name = azurerm_resource_group.main.name',
+    '  short_name          = "p1action"',
+    '}'
+  ].join('\n') : '';
 
-resource "azurerm_virtual_network" "main" {
-  name                = "${p.name}-vnet"
-  address_space       = ["10.0.0.0/16"]
-  location            = azurerm_resource_group.main.location
-  resource_group_name = azurerm_resource_group.main.name
-}
+  var main = [
+    'terraform {',
+    '  required_providers {',
+    '    azurerm = { source = "hashicorp/azurerm", version = "~> 3.0" }',
+    '  }',
+    '}',
+    '',
+    'provider "azurerm" {',
+    '  features {}',
+    '}',
+    '',
+    'resource "azurerm_resource_group" "main" {',
+    '  name     = "'+p.name+'-'+p.env+'-rg"',
+    '  location = var.location',
+    '}',
+    '',
+    'resource "azurerm_virtual_network" "main" {',
+    '  name                = "'+p.name+'-vnet"',
+    '  address_space       = ["10.0.0.0/16"]',
+    '  location            = azurerm_resource_group.main.location',
+    '  resource_group_name = azurerm_resource_group.main.name',
+    '}',
+    '',
+    'resource "azurerm_subnet" "main" {',
+    '  name                 = "'+p.name+'-subnet"',
+    '  resource_group_name  = azurerm_resource_group.main.name',
+    '  virtual_network_name = azurerm_virtual_network.main.name',
+    '  address_prefixes     = ["10.0.1.0/24"]',
+    '}',
+    '',
+    'resource "azurerm_network_security_group" "main" {',
+    '  name                = "'+p.name+'-nsg"',
+    '  location            = azurerm_resource_group.main.location',
+    '  resource_group_name = azurerm_resource_group.main.name',
+    '',
+    '  security_rule {',
+    '    name                       = "HTTP"',
+    '    priority                   = 100',
+    '    direction                  = "Inbound"',
+    '    access                     = "Allow"',
+    '    protocol                   = "Tcp"',
+    '    source_port_range          = "*"',
+    '    destination_port_range     = "80"',
+    '    source_address_prefix      = "*"',
+    '    destination_address_prefix = "*"',
+    '  }',
+    (p.ssl ? '  security_rule {\n    name                       = "HTTPS"\n    priority                   = 110\n    direction                  = "Inbound"\n    access                     = "Allow"\n    protocol                   = "Tcp"\n    source_port_range          = "*"\n    destination_port_range     = "443"\n    source_address_prefix      = "*"\n    destination_address_prefix = "*"\n  }' : ''),
+    '}',
+    '',
+    'resource "azurerm_linux_virtual_machine_scale_set" "main" {',
+    '  name                = "'+p.name+'-vmss"',
+    '  resource_group_name = azurerm_resource_group.main.name',
+    '  location            = azurerm_resource_group.main.location',
+    '  sku                 = "Standard_B2s"',
+    '  instances           = 2',
+    '  admin_username      = "adminuser"',
+    '',
+    '  admin_ssh_key {',
+    '    username   = "adminuser"',
+    '    public_key = file("~/.ssh/id_rsa.pub")',
+    '  }',
+    '',
+    '  source_image_reference {',
+    '    publisher = "Canonical"',
+    '    offer     = "0001-com-ubuntu-server-jammy"',
+    '    sku       = "22_04-lts"',
+    '    version   = "latest"',
+    '  }',
+    '',
+    '  os_disk {',
+    '    storage_account_type = "Standard_LRS"',
+    '    caching              = "ReadWrite"',
+    '  }',
+    '',
+    '  network_interface {',
+    '    name    = "nic"',
+    '    primary = true',
+    '    ip_configuration {',
+    '      name      = "internal"',
+    '      primary   = true',
+    '      subnet_id = azurerm_subnet.main.id',
+    (p.lb ? '      load_balancer_backend_address_pool_ids = [azurerm_lb_backend_address_pool.main.id]' : ''),
+    '    }',
+    '  }',
+    '',
+    '  custom_data = base64encode(<<-EOF',
+    '    #!/bin/bash',
+    '    apt-get update',
+    '    apt-get install -y nginx',
+    '    systemctl start nginx',
+    '    echo "<h1>'+p.name+' — '+p.env+'</h1>" > /var/www/html/index.html',
+    '  EOF',
+    '  )',
+    '}',
+    '',
+    lbBlock,
+    dbBlock,
+    monBlock
+  ].join('\n');
 
-resource "azurerm_subnet" "main" {
-  name                 = "${p.name}-subnet"
-  resource_group_name  = azurerm_resource_group.main.name
-  virtual_network_name = azurerm_virtual_network.main.name
-  address_prefixes     = ["10.0.1.0/24"]
-}
+  var variables = [
+    'variable "project_name" {',
+    '  description = "Project name"',
+    '  type        = string',
+    '  default     = "'+p.name+'"',
+    '}',
+    '',
+    'variable "location" {',
+    '  description = "Azure region"',
+    '  type        = string',
+    '  default     = "' + (p.region==='us-east-1'?'East US':p.region) + '"',
+    '}',
+    '',
+    'variable "environment" {',
+    '  description = "Environment"',
+    '  type        = string',
+    '  default     = "'+p.env+'"',
+    '}'
+  ].join('\n');
 
-resource "azurerm_network_security_group" "main" {
-  name                = "${p.name}-nsg"
-  location            = azurerm_resource_group.main.location
-  resource_group_name = azurerm_resource_group.main.name
+  var outputsArr = ['output "resource_group_name" {\n  value = azurerm_resource_group.main.name\n}'];
+  if(p.lb) outputsArr.push('output "load_balancer_ip" {\n  value = azurerm_public_ip.main.ip_address\n}');
+  if(p.db !== 'None') outputsArr.push('output "db_fqdn" {\n  value = azurerm_postgresql_flexible_server.main.fqdn\n}');
 
-  security_rule {
-    name                       = "HTTP"
-    priority                   = 100
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "80"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
-  }
-  ${p.ssl?`security_rule {
-    name                       = "HTTPS"
-    priority                   = 110
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "443"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
-  }`:''}
-}
+  var readme = [
+    '# '+p.name+' — Terraform Azure',
+    '',
+    '## Overview',
+    p.desc,
+    '',
+    '## Usage',
+    '```bash',
+    'terraform init',
+    'terraform plan',
+    'terraform apply',
+    '```',
+    '',
+    '## Features',
+    '- Resource Group + VNet + Subnet',
+    (p.lb ? '- Load Balancer + Public IP' : ''),
+    (p.ssl ? '- SSL termination' : ''),
+    (p.db !== 'None' ? '- PostgreSQL Flexible Server' : ''),
+    (p.monitoring ? '- Azure Monitor Action Group' : '')
+  ].filter(function(s){return s!=='';}).join('\n');
 
-resource "azurerm_linux_virtual_machine_scale_set" "main" {
-  name                = "${p.name}-vmss"
-  resource_group_name = azurerm_resource_group.main.name
-  location            = azurerm_resource_group.main.location
-  sku                 = "Standard_B2s"
-  instances           = 2
-  admin_username      = "adminuser"
-
-  admin_ssh_key {
-    username   = "adminuser"
-    public_key = file("~/.ssh/id_rsa.pub")
-  }
-
-  source_image_reference {
-    publisher = "Canonical"
-    offer     = "0001-com-ubuntu-server-jammy"
-    sku       = "22_04-lts"
-    version   = "latest"
-  }
-
-  os_disk {
-    storage_account_type = "Standard_LRS"
-    caching              = "ReadWrite"
-  }
-
-  network_interface {
-    name    = "nic"
-    primary = true
-    ip_configuration {
-      name      = "internal"
-      primary   = true
-      subnet_id = azurerm_subnet.main.id
-      ${p.lb?`load_balancer_backend_address_pool_ids = [azurerm_lb_backend_address_pool.main.id]`:''}
-    }
-  }
-
-  custom_data = base64encode(<<-EOF
-    #!/bin/bash
-    apt-get update
-    apt-get install -y nginx
-    systemctl start nginx
-    echo "<h1>${p.name} — ${p.env}</h1>" > /var/www/html/index.html
-  EOF
-  )
-}
-
-${p.lb?`resource "azurerm_lb" "main" {
-  name                = "${p.name}-lb"
-  location            = azurerm_resource_group.main.location
-  resource_group_name = azurerm_resource_group.main.name
-  sku                 = "Standard"
-  frontend_ip_configuration {
-    name                 = "PublicIPAddress"
-    public_ip_address_id = azurerm_public_ip.main.id
-  }
-}
-
-resource "azurerm_public_ip" "main" {
-  name                = "${p.name}-pip"
-  resource_group_name = azurerm_resource_group.main.name
-  location            = azurerm_resource_group.main.location
-  allocation_method   = "Static"
-  sku                 = "Standard"
-}
-
-resource "azurerm_lb_backend_address_pool" "main" {
-  loadbalancer_id = azurerm_lb.main.id
-  name            = "BackEndAddressPool"
-}
-
-resource "azurerm_lb_probe" "main" {
-  loadbalancer_id = azurerm_lb.main.id
-  name            = "http-probe"
-  port            = 80
-}
-
-resource "azurerm_lb_rule" "main" {
-  loadbalancer_id                = azurerm_lb.main.id
-  name                           = "HTTP"
-  protocol                       = "Tcp"
-  frontend_port                  = ${p.ssl?'443':'80'}
-  backend_port                   = 80
-  frontend_ip_configuration_name = "PublicIPAddress"
-  probe_id                       = azurerm_lb_probe.main.id
-  backend_address_pool_ids       = [azurerm_lb_backend_address_pool.main.id]
-}`:''}
-
-${p.db!=='None'?`resource "azurerm_postgresql_flexible_server" "main" {
-  name                   = "${p.name}-db"
-  resource_group_name    = azurerm_resource_group.main.name
-  location               = azurerm_resource_group.main.location
-  version                = "13"
-  administrator_login    = "dbadmin"
-  administrator_password = "SecureP@ssw0rd123!"
-  storage_mb             = 32768
-  sku_name               = "B_Standard_B1ms"
-}`:''}
-
-${p.monitoring?`resource "azurerm_monitor_action_group" "main" {
-  name                = "${p.name}-actiongroup"
-  resource_group_name = azurerm_resource_group.main.name
-  short_name          = "p1action"
-}`:''}`,
-    variables:`variable "project_name" {
-  description = "Project name"
-  type        = string
-  default     = "${p.name}"
-}
-
-variable "location" {
-  description = "Azure region"
-  type        = string
-  default     = "${p.region==='us-east-1'?'East US':p.region}"
-}
-
-variable "environment" {
-  description = "Environment"
-  type        = string
-  default     = "${p.env}"
-}`,
-    outputs:`output "resource_group_name" {
-  value = azurerm_resource_group.main.name
-}
-${p.lb?`output "load_balancer_ip" {
-  value = azurerm_public_ip.main.ip_address
-}`:''}
-${p.db!=='None'?`output "db_fqdn" {
-  value = azurerm_postgresql_flexible_server.main.fqdn
-}`:''}`,
-    readme:`# ${p.name} — Terraform Azure
-
-## Overview
-${p.desc}
-
-## Usage
-\`\`\`bash
-terraform init
-terraform plan
-terraform apply
-\`\`\`
-
-## Features
-- Resource Group + VNet + Subnet\n${p.lb?'- Load Balancer + Public IP\n':''}${p.ssl?'- SSL termination\n':''}${p.db!=='None'?'- PostgreSQL Flexible Server\n':''}${p.monitoring?'- Azure Monitor Action Group\n':''}`
-  };
+  return {main:main, variables:variables, outputs:outputsArr.join('\n\n'), readme:readme};
 }
 
 function genTerraformGCP(p){
-  return {
-    main:`terraform {
-  required_providers {
-    google = { source = "hashicorp/google", version = "~> 5.0" }
-  }
-}
+  var lbBlock = p.lb ? [
+    'resource "google_compute_backend_service" "app" {',
+    '  name        = "'+p.name+'-backend"',
+    '  port_name   = "http"',
+    '  protocol    = "HTTP"',
+    '  timeout_sec = 30',
+    '  backend { group = google_compute_instance_group_manager.app.instance_group }',
+    '}',
+    '',
+    'resource "google_compute_url_map" "app" {',
+    '  name            = "'+p.name+'-urlmap"',
+    '  default_service = google_compute_backend_service.app.id',
+    '}',
+    '',
+    'resource "google_compute_target_http_proxy" "app" {',
+    '  name    = "'+p.name+'-proxy"',
+    '  url_map = google_compute_url_map.app.id',
+    '}',
+    '',
+    'resource "google_compute_global_forwarding_rule" "app" {',
+    '  name       = "'+p.name+'-fw-rule"',
+    '  target     = google_compute_target_http_proxy.app.id',
+    '  port_range = "80"',
+    '}'
+  ].join('\n') : '';
 
-provider "google" {
-  project = var.project_id
-  region  = var.region
-}
+  var dbBlock = p.db !== 'None' ? [
+    'resource "google_sql_database_instance" "main" {',
+    '  name             = "'+p.name+'-db"',
+    '  database_version = "' + (p.db.indexOf('Postgre') !== -1 ? 'POSTGRES_13' : 'MYSQL_8_0') + '"',
+    '  region           = var.region',
+    '  settings {',
+    '    tier = "db-f1-micro"',
+    '    ip_configuration {',
+    '      ipv4_enabled = true',
+    '      authorized_networks { name = "all"; value = "0.0.0.0/0" }',
+    '    }',
+    '  }',
+    '}'
+  ].join('\n') : '';
 
-resource "google_compute_network" "vpc" {
-  name                    = "${p.name}-vpc"
-  auto_create_subnetworks = false
-}
+  var monBlock = p.monitoring ? [
+    'resource "google_monitoring_dashboard" "main" {',
+    '  dashboard_json = jsonencode({',
+    '    displayName = "'+p.name+'-dashboard"',
+    '    gridLayout  = { columns = "2" }',
+    '  })',
+    '}'
+  ].join('\n') : '';
 
-resource "google_compute_subnetwork" "subnet" {
-  name          = "${p.name}-subnet"
-  ip_cidr_range = "10.0.0.0/24"
-  region        = var.region
-  network       = google_compute_network.vpc.id
-}
+  var main = [
+    'terraform {',
+    '  required_providers {',
+    '    google = { source = "hashicorp/google", version = "~> 5.0" }',
+    '  }',
+    '}',
+    '',
+    'provider "google" {',
+    '  project = var.project_id',
+    '  region  = var.region',
+    '}',
+    '',
+    'resource "google_compute_network" "vpc" {',
+    '  name                    = "'+p.name+'-vpc"',
+    '  auto_create_subnetworks = false',
+    '}',
+    '',
+    'resource "google_compute_subnetwork" "subnet" {',
+    '  name          = "'+p.name+'-subnet"',
+    '  ip_cidr_range = "10.0.0.0/24"',
+    '  region        = var.region',
+    '  network       = google_compute_network.vpc.id',
+    '}',
+    '',
+    'resource "google_compute_firewall" "allow_http" {',
+    '  name    = "'+p.name+'-allow-http"',
+    '  network = google_compute_network.vpc.name',
+    '  allow {',
+    '    protocol = "tcp"',
+    '    ports    = ["80"' + (p.ssl ? ', "443"' : '') + ']',
+    '  }',
+    '  source_ranges = ["0.0.0.0/0"]',
+    '}',
+    '',
+    'resource "google_compute_instance_template" "app" {',
+    '  name_prefix  = "'+p.name+'-"',
+    '  machine_type = "e2-medium"',
+    '  disk {',
+    '    source_image = "debian-cloud/debian-11"',
+    '    auto_delete  = true',
+    '    boot         = true',
+    '  }',
+    '  network_interface {',
+    '    network    = google_compute_network.vpc.id',
+    '    subnetwork = google_compute_subnetwork.subnet.id',
+    '    access_config {}',
+    '  }',
+    '  metadata_startup_script = <<-EOF',
+    '    #!/bin/bash',
+    '    apt-get update',
+    '    apt-get install -y nginx',
+    '    systemctl start nginx',
+    '    echo "<h1>'+p.name+' — '+p.env+'</h1>" > /var/www/html/index.html',
+    '  EOF',
+    '  tags = ["http-server"]',
+    '}',
+    '',
+    'resource "google_compute_instance_group_manager" "app" {',
+    '  name = "'+p.name+'-igm"',
+    '  version {',
+    '    instance_template = google_compute_instance_template.app.id',
+    '  }',
+    '  target_size = 2',
+    '  named_port { name = "http"; port = 80 }',
+    '}',
+    '',
+    lbBlock,
+    dbBlock,
+    monBlock
+  ].join('\n');
 
-resource "google_compute_firewall" "allow_http" {
-  name    = "${p.name}-allow-http"
-  network = google_compute_network.vpc.name
-  allow {
-    protocol = "tcp"
-    ports    = ["80"${p.ssl?', "443"':''}]
-  }
-  source_ranges = ["0.0.0.0/0"]
-}
+  var variables = [
+    'variable "project_id" {',
+    '  description = "GCP project ID"',
+    '  type        = string',
+    '}',
+    '',
+    'variable "project_name" {',
+    '  description = "Project name"',
+    '  type        = string',
+    '  default     = "'+p.name+'"',
+    '}',
+    '',
+    'variable "region" {',
+    '  description = "GCP region"',
+    '  type        = string',
+    '  default     = "' + (p.region==='us-east-1'?'us-central1':p.region) + '"',
+    '}',
+    '',
+    'variable "environment" {',
+    '  description = "Environment"',
+    '  type        = string',
+    '  default     = "'+p.env+'"',
+    '}'
+  ].join('\n');
 
-resource "google_compute_instance_template" "app" {
-  name_prefix  = "${p.name}-"
-  machine_type = "e2-medium"
-  disk {
-    source_image = "debian-cloud/debian-11"
-    auto_delete  = true
-    boot         = true
-  }
-  network_interface {
-    network    = google_compute_network.vpc.id
-    subnetwork = google_compute_subnetwork.subnet.id
-    access_config {}
-  }
-  metadata_startup_script = <<-EOF
-    #!/bin/bash
-    apt-get update
-    apt-get install -y nginx
-    systemctl start nginx
-    echo "<h1>${p.name} — ${p.env}</h1>" > /var/www/html/index.html
-  EOF
-  tags = ["http-server"]
-}
+  var outputsArr = ['output "instance_group" {\n  value = google_compute_instance_group_manager.app.instance_group\n}'];
+  if(p.lb) outputsArr.push('output "load_balancer_ip" {\n  value = google_compute_global_forwarding_rule.app.ip_address\n}');
+  if(p.db !== 'None') outputsArr.push('output "db_connection_name" {\n  value = google_sql_database_instance.main.connection_name\n}');
 
-resource "google_compute_instance_group_manager" "app" {
-  name = "${p.name}-igm"
-  version {
-    instance_template = google_compute_instance_template.app.id
-  }
-  target_size = 2
-  named_port { name = "http"; port = 80 }
-}
+  var readme = [
+    '# '+p.name+' — Terraform GCP',
+    '',
+    '## Overview',
+    p.desc,
+    '',
+    '## Prerequisites',
+    '- Terraform >= 1.5',
+    '- gcloud CLI authenticated',
+    '',
+    '## Usage',
+    '```bash',
+    'terraform init',
+    'terraform plan',
+    'terraform apply',
+    '```',
+    '',
+    '## Features',
+    '- VPC + Subnet',
+    '- Managed Instance Group',
+    (p.lb ? '- Global HTTP Load Balancer' : ''),
+    (p.db !== 'None' ? '- Cloud SQL' : ''),
+    (p.monitoring ? '- Cloud Monitoring' : '')
+  ].filter(function(s){return s!=='';}).join('\n');
 
-${p.lb?`resource "google_compute_backend_service" "app" {
-  name        = "${p.name}-backend"
-  port_name   = "http"
-  protocol    = "HTTP"
-  timeout_sec = 30
-  backend { group = google_compute_instance_group_manager.app.instance_group }
-}
-
-resource "google_compute_url_map" "app" {
-  name            = "${p.name}-urlmap"
-  default_service = google_compute_backend_service.app.id
-}
-
-resource "google_compute_target_http_proxy" "app" {
-  name    = "${p.name}-proxy"
-  url_map = google_compute_url_map.app.id
-}
-
-resource "google_compute_global_forwarding_rule" "app" {
-  name       = "${p.name}-fw-rule"
-  target     = google_compute_target_http_proxy.app.id
-  port_range = "80"
-}`:''}
-
-${p.db!=='None'?`resource "google_sql_database_instance" "main" {
-  name             = "${p.name}-db"
-  database_version = "${p.db.includes('Postgre')?'POSTGRES_13':'MYSQL_8_0'}"
-  region           = var.region
-  settings {
-    tier = "db-f1-micro"
-    ip_configuration {
-      ipv4_enabled = true
-      authorized_networks { name = "all"; value = "0.0.0.0/0" }
-    }
-  }
-}`:''}
-
-${p.monitoring?`resource "google_monitoring_dashboard" "main" {
-  dashboard_json = jsonencode({
-    displayName = "${p.name}-dashboard"
-    gridLayout  = { columns = "2" }
-  })
-}`:''}`,
-    variables:`variable "project_id" {
-  description = "GCP project ID"
-  type        = string
-}
-
-variable "project_name" {
-  description = "Project name"
-  type        = string
-  default     = "${p.name}"
-}
-
-variable "region" {
-  description = "GCP region"
-  type        = string
-  default     = "${p.region==='us-east-1'?'us-central1':p.region}"
-}
-
-variable "environment" {
-  description = "Environment"
-  type        = string
-  default     = "${p.env}"
-}`,
-    outputs:`output "instance_group" {
-  value = google_compute_instance_group_manager.app.instance_group
-}
-${p.lb?`output "load_balancer_ip" {
-  value = google_compute_global_forwarding_rule.app.ip_address
-}`:''}
-${p.db!=='None'?`output "db_connection_name" {
-  value = google_sql_database_instance.main.connection_name
-}`:''}`,
-    readme:`# ${p.name} — Terraform GCP
-
-## Overview
-${p.desc}
-
-## Usage
-\`\`\`bash
-terraform init
-terraform plan
-terraform apply
-\`\`\`
-
-## Features
-- VPC + Subnet\n- Managed Instance Group\n${p.lb?'- Global HTTP Load Balancer\n':''}${p.db!=='None'?'- Cloud SQL\n':''}${p.monitoring?'- Cloud Monitoring\n':''}`
-  };
+  return {main:main, variables:variables, outputs:outputsArr.join('\n\n'), readme:readme};
 }
 
 function genK8s(p){
-  return {
-    main:`apiVersion: v1
-kind: Namespace
-metadata:
-  name: ${p.name}-${p.env}
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: ${p.name}
-  namespace: ${p.name}-${p.env}
-spec:
-  replicas: ${p.replicas}
-  selector:
-    matchLabels:
-      app: ${p.name}
-  template:
-    metadata:
-      labels:
-        app: ${p.name}
-    spec:
-      containers:
-      - name: app
-        image: nginx:latest
-        ports:
-        - containerPort: 80
-        resources:
-          requests:
-            memory: "128Mi"
-            cpu: "100m"
-          limits:
-            memory: "256Mi"
-            cpu: "200m"
-        livenessProbe:
-          httpGet:
-            path: /
-            port: 80
-          initialDelaySeconds: 30
-          periodSeconds: 10
-        readinessProbe:
-          httpGet:
-            path: /
-            port: 80
-          initialDelaySeconds: 5
-          periodSeconds: 5
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: ${p.name}-svc
-  namespace: ${p.name}-${p.env}
-spec:
-  selector:
-    app: ${p.name}
-  ports:
-  - port: 80
-    targetPort: 80
-  type: ClusterIP
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: ${p.name}-ingress
-  namespace: ${p.name}-${p.env}
-  ${p.ssl?'annotations:\n    cert-manager.io/cluster-issuer: "letsencrypt-prod"':''}
-spec:
-  ${p.ssl?'tls:\n  - hosts:\n    - ${p.name}.example.com\n    secretName: ${p.name}-tls':''}
-  rules:
-  - host: ${p.name}.example.com
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: ${p.name}-svc
-            port:
-              number: 80
----
-${p.monitoring?`apiVersion: v1
-kind: ServiceMonitor
-metadata:
-  name: ${p.name}-metrics
-  namespace: ${p.name}-${p.env}
-spec:
-  selector:
-    matchLabels:
-      app: ${p.name}
-  endpoints:
-  - port: metrics
-    interval: 30s`:''}
-${p.db!=='None'?`---
-apiVersion: v1
-kind: Secret
-metadata:
-  name: ${p.name}-db-secret
-  namespace: ${p.name}-${p.env}
-stringData:
-  connection-string: "postgresql://dbadmin:password@db:5432/${p.name}"`:''}`,
-    variables:`# No variables file needed for raw manifests.\n# Use Kustomize or Helm for parameterization.`,
-    outputs:`# Apply with:\n# kubectl apply -f main.yaml`,
-    readme:`# ${p.name} — Kubernetes
+  var monBlock = p.monitoring ? [
+    '---',
+    'apiVersion: v1',
+    'kind: ServiceMonitor',
+    'metadata:',
+    '  name: '+p.name+'-metrics',
+    '  namespace: '+p.name+'-'+p.env,
+    'spec:',
+    '  selector:',
+    '    matchLabels:',
+    '      app: '+p.name,
+    '  endpoints:',
+    '  - port: metrics',
+    '    interval: 30s'
+  ].join('\n') : '';
 
-## Overview
-${p.desc}
+  var dbBlock = p.db !== 'None' ? [
+    '---',
+    'apiVersion: v1',
+    'kind: Secret',
+    'metadata:',
+    '  name: '+p.name+'-db-secret',
+    '  namespace: '+p.name+'-'+p.env,
+    'stringData:',
+    '  connection-string: "postgresql://dbadmin:password@db:5432/'+p.name+'"'
+  ].join('\n') : '';
 
-## Usage
-\`\`\`bash
-kubectl apply -f main.yaml
-\`\`\`
+  var main = [
+    'apiVersion: v1',
+    'kind: Namespace',
+    'metadata:',
+    '  name: '+p.name+'-'+p.env,
+    '---',
+    'apiVersion: apps/v1',
+    'kind: Deployment',
+    'metadata:',
+    '  name: '+p.name,
+    '  namespace: '+p.name+'-'+p.env,
+    'spec:',
+    '  replicas: '+p.replicas,
+    '  selector:',
+    '    matchLabels:',
+    '      app: '+p.name,
+    '  template:',
+    '    metadata:',
+    '      labels:',
+    '        app: '+p.name,
+    '    spec:',
+    '      containers:',
+    '      - name: app',
+    '        image: nginx:latest',
+    '        ports:',
+    '        - containerPort: 80',
+    '        resources:',
+    '          requests:',
+    '            memory: "128Mi"',
+    '            cpu: "100m"',
+    '          limits:',
+    '            memory: "256Mi"',
+    '            cpu: "200m"',
+    '        livenessProbe:',
+    '          httpGet:',
+    '            path: /',
+    '            port: 80',
+    '          initialDelaySeconds: 30',
+    '          periodSeconds: 10',
+    '        readinessProbe:',
+    '          httpGet:',
+    '            path: /',
+    '            port: 80',
+    '          initialDelaySeconds: 5',
+    '          periodSeconds: 5',
+    '---',
+    'apiVersion: v1',
+    'kind: Service',
+    'metadata:',
+    '  name: '+p.name+'-svc',
+    '  namespace: '+p.name+'-'+p.env,
+    'spec:',
+    '  selector:',
+    '    app: '+p.name,
+    '  ports:',
+    '  - port: 80',
+    '    targetPort: 80',
+    '  type: ClusterIP',
+    '---',
+    'apiVersion: networking.k8s.io/v1',
+    'kind: Ingress',
+    'metadata:',
+    '  name: '+p.name+'-ingress',
+    '  namespace: '+p.name+'-'+p.env,
+    (p.ssl ? '  annotations:\n    cert-manager.io/cluster-issuer: "letsencrypt-prod"' : ''),
+    'spec:',
+    (p.ssl ? '  tls:\n  - hosts:\n    - '+p.name+'.example.com\n    secretName: '+p.name+'-tls' : ''),
+    '  rules:',
+    '  - host: '+p.name+'.example.com',
+    '    http:',
+    '      paths:',
+    '      - path: /',
+    '        pathType: Prefix',
+    '        backend:',
+    '          service:',
+    '            name: '+p.name+'-svc',
+    '            port:',
+    '              number: 80',
+    monBlock,
+    dbBlock
+  ].filter(function(s){return s!=='';}).join('\n');
 
-## Components
-- Namespace: ${p.name}-${p.env}\n- Deployment: ${p.replicas} replicas\n- Service: ClusterIP\n- Ingress: ${p.name}.example.com\n${p.ssl?'- TLS via cert-manager\n':''}${p.monitoring?'- ServiceMonitor for Prometheus\n':''}${p.db!=='None'?'- Database secret\n':''}`
-  };
+  var readme = [
+    '# '+p.name+' — Kubernetes',
+    '',
+    '## Overview',
+    p.desc,
+    '',
+    '## Usage',
+    '```bash',
+    'kubectl apply -f main.yaml',
+    '```',
+    '',
+    '## Components',
+    '- Namespace: '+p.name+'-'+p.env,
+    '- Deployment: '+p.replicas+' replicas',
+    '- Service: ClusterIP',
+    '- Ingress: '+p.name+'.example.com',
+    (p.ssl ? '- TLS via cert-manager' : ''),
+    (p.monitoring ? '- ServiceMonitor for Prometheus' : ''),
+    (p.db !== 'None' ? '- Database secret' : '')
+  ].filter(function(s){return s!=='';}).join('\n');
+
+  return {main:main, variables:'# No variables file needed for raw manifests.\n# Use Kustomize or Helm for parameterization.', outputs:'# Apply with:\n# kubectl apply -f main.yaml', readme:readme};
 }
 
 function genDocker(p){
-  return {
-    main:`version: "3.8"
+  var monBlock = p.monitoring ? [
+    '  prometheus:',
+    '    image: prom/prometheus:latest',
+    '    container_name: '+p.name+'-prometheus',
+    '    ports:',
+    '      - "9090:9090"',
+    '    volumes:',
+    '      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro',
+    '    networks:',
+    '      - '+p.name+'-net',
+    '    restart: unless-stopped'
+  ].join('\n') : '';
 
-services:
-  app:
-    image: nginx:alpine
-    container_name: ${p.name}-app
-    ports:
-      - "80:80"
-    ${p.ssl?'volumes:\n      - ./ssl:/etc/nginx/ssl:ro\n      - ./html:/usr/share/nginx/html:ro':'volumes:\n      - ./html:/usr/share/nginx/html:ro'}
-    restart: unless-stopped
-    networks:
-      - ${p.name}-net
-    ${p.monitoring?'labels:\n      - "prometheus.io/scrape=true"\n      - "prometheus.io/port=80"':''}
+  var backupBlock = p.backup ? [
+    '  backup:',
+    '    image: offen/docker-volume-backup:latest',
+    '    container_name: '+p.name+'-backup',
+    '    volumes:',
+    '      - ./html:/backup/data:ro',
+    '      - /var/run/docker.sock:/var/run/docker.sock:ro',
+    '    environment:',
+    '      - BACKUP_CRON_EXPRESSION=0 2 * * *',
+    '      - BACKUP_RETENTION_DAYS=30',
+    '    networks:',
+    '      - '+p.name+'-net',
+    '    restart: unless-stopped'
+  ].join('\n') : '';
 
-  ${p.monitoring?`prometheus:
-    image: prom/prometheus:latest
-    container_name: ${p.name}-prometheus
-    ports:
-      - "9090:9090"
-    volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
-    networks:
-      - ${p.name}-net
-    restart: unless-stopped`:''}
+  var dbBlock = p.db !== 'None' ? [
+    '  db:',
+    '    image: ' + (p.db.indexOf('Postgre') !== -1 ? 'postgres:15-alpine' : 'mysql:8'),
+    '    container_name: '+p.name+'-db',
+    '    environment:',
+    '      - POSTGRES_USER=dbadmin',
+    '      - POSTGRES_PASSWORD=password',
+    '      - POSTGRES_DB='+p.name,
+    '    volumes:',
+    '      - db-data:/var/lib/postgresql/data',
+    '    networks:',
+    '      - '+p.name+'-net',
+    '    restart: unless-stopped'
+  ].join('\n') : '';
 
-  ${p.backup?`backup:
-    image: offen/docker-volume-backup:latest
-    container_name: ${p.name}-backup
-    volumes:
-      - ./html:/backup/data:ro
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-    environment:
-      - BACKUP_CRON_EXPRESSION=0 2 * * *
-      - BACKUP_RETENTION_DAYS=30
-    networks:
-      - ${p.name}-net
-    restart: unless-stopped`:''}
+  var main = [
+    'version: "3.8"',
+    '',
+    'services:',
+    '  app:',
+    '    image: nginx:alpine',
+    '    container_name: '+p.name+'-app',
+    '    ports:',
+    '      - "80:80"',
+    (p.ssl ? '      - "443:443"\n    volumes:\n      - ./ssl:/etc/nginx/ssl:ro\n      - ./html:/usr/share/nginx/html:ro' : '    volumes:\n      - ./html:/usr/share/nginx/html:ro'),
+    '    restart: unless-stopped',
+    '    networks:',
+    '      - '+p.name+'-net',
+    (p.monitoring ? '    labels:\n      - "prometheus.io/scrape=true"\n      - "prometheus.io/port=80"' : ''),
+    '',
+    monBlock,
+    backupBlock,
+    dbBlock,
+    '',
+    'networks:',
+    '  '+p.name+'-net:',
+    '    driver: bridge',
+    (p.db !== 'None' ? '\nvolumes:\n  db-data:' : '')
+  ].filter(function(s){return s!=='';}).join('\n');
 
-  ${p.db!=='None'?`db:
-    image: ${p.db.includes('Postgre')?'postgres:15-alpine':'mysql:8'}
-    container_name: ${p.name}-db
-    environment:
-      - POSTGRES_USER=dbadmin
-      - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=${p.name}
-    volumes:
-      - db-data:/var/lib/postgresql/data
-    networks:
-      - ${p.name}-net
-    restart: unless-stopped`:''}
+  var readme = [
+    '# '+p.name+' — Docker Compose',
+    '',
+    '## Overview',
+    p.desc,
+    '',
+    '## Usage',
+    '```bash',
+    'docker compose up -d',
+    'docker compose logs -f',
+    '```',
+    '',
+    '## Services',
+    '- app: nginx:alpine',
+    (p.monitoring ? '- prometheus: monitoring' : ''),
+    (p.backup ? '- backup: volume backups' : ''),
+    (p.db !== 'None' ? '- db: '+p.db : ''),
+    '',
+    '## Networks',
+    '- '+p.name+'-net (bridge)'
+  ].filter(function(s){return s!=='';}).join('\n');
 
-networks:
-  ${p.name}-net:
-    driver: bridge
-
-${p.db!=='None'?'volumes:\n  db-data:':''}`,
-    variables:`# No separate variables file.\n# Edit docker-compose.yml directly or use .env file.`,
-    outputs:`# Start the stack:\n# docker compose up -d`,
-    readme:`# ${p.name} — Docker Compose
-
-## Overview
-${p.desc}
-
-## Usage
-\`\`\`bash
-docker compose up -d
-docker compose logs -f
-\`\`\`
-
-## Services
-- app: nginx:alpine\n${p.monitoring?'- prometheus: monitoring\n':''}${p.backup?'- backup: volume backups\n':''}${p.db!=='None'?'- db: '+p.db+'\n':''}\n## Networks\n- ${p.name}-net (bridge)`
-  };
+  return {main:main, variables:'# No separate variables file.\n# Edit docker-compose.yml directly or use .env file.', outputs:'# Start the stack:\n# docker compose up -d', readme:readme};
 }
 
 function genAnsible(p){
-  return {
-    main:`---
-- name: Deploy ${p.name} infrastructure
-  hosts: all
-  become: yes
-  vars:
-    app_name: "${p.name}"
-    env: "${p.env}"
-  tasks:
-    - name: Update package cache
-      apt:
-        update_cache: yes
-      when: ansible_os_family == "Debian"
+  var sslBlock = p.ssl ? [
+    '    - name: Install certbot',
+    '      package:',
+    '        name: certbot',
+    '        state: present',
+    '',
+    '    - name: Obtain SSL certificate',
+    '      command: certbot --nginx -d {{ app_name }}.example.com --non-interactive --agree-tos -m admin@example.com',
+    '      args:',
+    '        creates: /etc/letsencrypt/live/{{ app_name }}.example.com/fullchain.pem'
+  ].join('\n') : '';
 
-    - name: Install nginx
-      package:
-        name: nginx
-        state: present
+  var monBlock = p.monitoring ? [
+    '    - name: Install node_exporter',
+    '      get_url:',
+    '        url: https://github.com/prometheus/node_exporter/releases/download/v1.6.1/node_exporter-1.6.1.linux-amd64.tar.gz',
+    '        dest: /tmp/node_exporter.tar.gz',
+    '',
+    '    - name: Extract node_exporter',
+    '      unarchive:',
+    '        src: /tmp/node_exporter.tar.gz',
+    '        dest: /usr/local/bin/',
+    '        remote_src: yes',
+    '        extra_opts: [--strip-components=1]',
+    '',
+    '    - name: Create node_exporter service',
+    '      template:',
+    '        src: node_exporter.service.j2',
+    '        dest: /etc/systemd/system/node_exporter.service',
+    '      notify: reload systemd'
+  ].join('\n') : '';
 
-    - name: Start and enable nginx
-      service:
-        name: nginx
-        state: started
-        enabled: yes
+  var dbBlock = p.db !== 'None' ? [
+    '    - name: Install PostgreSQL',
+    '      package:',
+    '        name: postgresql',
+    '        state: present',
+    '',
+    '    - name: Start PostgreSQL',
+    '      service:',
+    '        name: postgresql',
+    '        state: started',
+    '        enabled: yes'
+  ].join('\n') : '';
 
-    - name: Deploy index page
-      copy:
-        dest: /var/www/html/index.html
-        content: |
-          <h1>{{ app_name }} — {{ env }}</h1>
-          <p>Deployed via Ansible</p>
-      notify: restart nginx
+  var monHandlers = p.monitoring ? [
+    '    - name: reload systemd',
+    '      systemd:',
+    '        daemon_reload: yes',
+    '',
+    '    - name: start node_exporter',
+    '      service:',
+    '        name: node_exporter',
+    '        state: started',
+    '        enabled: yes'
+  ].join('\n') : '';
 
-    ${p.ssl?`- name: Install certbot
-      package:
-        name: certbot
-        state: present
+  var main = [
+    '---',
+    '- name: Deploy '+p.name+' infrastructure',
+    '  hosts: all',
+    '  become: yes',
+    '  vars:',
+    '    app_name: "'+p.name+'"',
+    '    env: "'+p.env+'"',
+    '  tasks:',
+    '    - name: Update package cache',
+    '      apt:',
+    '        update_cache: yes',
+    '      when: ansible_os_family == "Debian"',
+    '',
+    '    - name: Install nginx',
+    '      package:',
+    '        name: nginx',
+    '        state: present',
+    '',
+    '    - name: Start and enable nginx',
+    '      service:',
+    '        name: nginx',
+    '        state: started',
+    '        enabled: yes',
+    '',
+    '    - name: Deploy index page',
+    '      copy:',
+    '        dest: /var/www/html/index.html',
+    '        content: |',
+    '          <h1>{{ app_name }} — {{ env }}</h1>',
+    '          <p>Deployed via Ansible</p>',
+    '      notify: restart nginx',
+    '',
+    sslBlock,
+    monBlock,
+    dbBlock,
+    '',
+    '  handlers:',
+    '    - name: restart nginx',
+    '      service:',
+    '        name: nginx',
+    '        state: restarted',
+    monHandlers
+  ].filter(function(s){return s!=='';}).join('\n');
 
-    - name: Obtain SSL certificate
-      command: certbot --nginx -d {{ app_name }}.example.com --non-interactive --agree-tos -m admin@example.com
-      args:
-        creates: /etc/letsencrypt/live/{{ app_name }}.example.com/fullchain.pem`:''}
+  var readme = [
+    '# '+p.name+' — Ansible',
+    '',
+    '## Overview',
+    p.desc,
+    '',
+    '## Usage',
+    '```bash',
+    'ansible-playbook -i inventory site.yml',
+    '```',
+    '',
+    '## Features',
+    '- Nginx installation and configuration',
+    (p.ssl ? '- SSL via Let\\'s Encrypt' : ''),
+    (p.monitoring ? '- Prometheus node_exporter' : ''),
+    (p.db !== 'None' ? '- PostgreSQL installation' : '')
+  ].filter(function(s){return s!=='';}).join('\n');
 
-    ${p.monitoring?`- name: Install node_exporter
-      get_url:
-        url: https://github.com/prometheus/node_exporter/releases/download/v1.6.1/node_exporter-1.6.1.linux-amd64.tar.gz
-        dest: /tmp/node_exporter.tar.gz
-
-    - name: Extract node_exporter
-      unarchive:
-        src: /tmp/node_exporter.tar.gz
-        dest: /usr/local/bin/
-        remote_src: yes
-        extra_opts: [--strip-components=1]
-
-    - name: Create node_exporter service
-      template:
-        src: node_exporter.service.j2
-        dest: /etc/systemd/system/node_exporter.service
-      notify: reload systemd`:''}
-
-    ${p.db!=='None'?`- name: Install PostgreSQL
-      package:
-        name: postgresql
-        state: present
-
-    - name: Start PostgreSQL
-      service:
-        name: postgresql
-        state: started
-        enabled: yes`:''}
-
-  handlers:
-    - name: restart nginx
-      service:
-        name: nginx
-        state: restarted
-
-    ${p.monitoring?`- name: reload systemd
-      systemd:
-        daemon_reload: yes
-
-    - name: start node_exporter
-      service:
-        name: node_exporter
-        state: started
-        enabled: yes`:''}`,
-    variables:`# group_vars/all.yml\n---\napp_name: "${p.name}"\nenv: "${p.env}"`,
-    outputs:`# Run with:\n# ansible-playbook -i inventory site.yml`,
-    readme:`# ${p.name} — Ansible
-
-## Overview
-${p.desc}
-
-## Usage
-\`\`\`bash
-ansible-playbook -i inventory site.yml
-\`\`\`
-
-## Features
-- Nginx installation and configuration\n${p.ssl?'- SSL via Let\\'s Encrypt\n':''}${p.monitoring?'- Prometheus node_exporter\n':''}${p.db!=='None'?'- PostgreSQL installation\n':''}`
-  };
+  return {main:main, variables:'# group_vars/all.yml\n---\napp_name: "'+p.name+'"\nenv: "'+p.env+'"', outputs:'# Run with:\n# ansible-playbook -i inventory site.yml', readme:readme};
 }
 
 function genGHA(p){
-  return {
-    main:`name: ${p.name} CI/CD
+  var monBlock = p.monitoring ? [
+    '      - name: Notify Slack',
+    '        uses: 8398a7/action-slack@v3',
+    '        with:',
+    '          status: ${{ job.status }}',
+    '          channel: \'#deployments\'',
+    '        env:',
+    '          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}'
+  ].join('\n') : '';
 
-on:
-  push:
-    branches: [main, develop]
-  pull_request:
-    branches: [main]
+  var main = [
+    'name: '+p.name+' CI/CD',
+    '',
+    'on:',
+    '  push:',
+    '    branches: [main, develop]',
+    '  pull_request:',
+    '    branches: [main]',
+    '',
+    'env:',
+    '  PROJECT_NAME: '+p.name,
+    '  ENVIRONMENT: '+p.env,
+    '',
+    'jobs:',
+    '  build:',
+    '    runs-on: ubuntu-latest',
+    '    steps:',
+    '      - name: Checkout',
+    '        uses: actions/checkout@v4',
+    '',
+    '      - name: Setup Node',
+    '        uses: actions/setup-node@v4',
+    '        with:',
+    '          node-version: \'20\'',
+    '          cache: \'npm\'',
+    '',
+    '      - name: Install dependencies',
+    '        run: npm ci',
+    '',
+    '      - name: Run tests',
+    '        run: npm test',
+    '',
+    '      - name: Build',
+    '        run: npm run build',
+    '',
+    '      - name: Upload artifact',
+    '        uses: actions/upload-artifact@v4',
+    '        with:',
+    '          name: build-files',
+    '          path: dist/',
+    '',
+    '  deploy:',
+    '    needs: build',
+    '    runs-on: ubuntu-latest',
+    '    if: github.ref == \'refs/heads/main\'',
+    '    environment:',
+    '      name: '+p.env,
+    '      url: https://'+p.name+'.example.com',
+    '    steps:',
+    '      - name: Download artifact',
+    '        uses: actions/download-artifact@v4',
+    '        with:',
+    '          name: build-files',
+    '          path: dist/',
+    '',
+    '      - name: Deploy to '+p.env,
+    '        run: |',
+    '          echo "Deploying to '+p.env+'..."',
+    '          # Add your deployment script here',
+    monBlock
+  ].filter(function(s){return s!=='';}).join('\n');
 
-env:
-  PROJECT_NAME: ${p.name}
-  ENVIRONMENT: ${p.env}
+  var readme = [
+    '# '+p.name+' — GitHub Actions',
+    '',
+    '## Overview',
+    p.desc,
+    '',
+    '## Secrets Required',
+    (p.monitoring ? '- SLACK_WEBHOOK_URL' : ''),
+    '- Add deployment credentials as secrets',
+    '',
+    '## Workflows',
+    '- Build on every push/PR',
+    '- Deploy only on main branch merges'
+  ].filter(function(s){return s!=='';}).join('\n');
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Run tests
-        run: npm test
-
-      - name: Build
-        run: npm run build
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-files
-          path: dist/
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-    environment:
-      name: ${p.env}
-      url: https://${p.name}.example.com
-    steps:
-      - name: Download artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: build-files
-          path: dist/
-
-      - name: Deploy to ${p.env}
-        run: |
-          echo "Deploying to ${p.env}..."
-          # Add your deployment script here
-
-      ${p.monitoring?`- name: Notify Slack
-        uses: 8398a7/action-slack@v3
-        with:
-          status: \${{ job.status }}
-          channel: '#deployments'
-        env:
-          SLACK_WEBHOOK_URL: \${{ secrets.SLACK_WEBHOOK_URL }}`:''}`,
-    variables:`# No variables file.\n# Configure secrets in GitHub: Settings > Secrets and variables > Actions`,
-    outputs:`# Trigger: push to main branch`,
-    readme:`# ${p.name} — GitHub Actions
-
-## Overview
-${p.desc}
-
-## Secrets Required
-${p.monitoring?'- SLACK_WEBHOOK_URL\n':''}- Add deployment credentials as secrets
-
-## Workflows
-- Build on every push/PR\n- Deploy only on main branch merges`
-  };
+  return {main:main, variables:'# No variables file.\n# Configure secrets in GitHub: Settings > Secrets and variables > Actions', outputs:'# Trigger: push to main branch', readme:readme};
 }
 
 function genADO(p){
-  return {
-    main:`trigger:
-  branches:
-    include:
-      - main
-      - develop
+  var main = [
+    'trigger:',
+    '  branches:',
+    '    include:',
+    '      - main',
+    '      - develop',
+    '',
+    'variables:',
+    '  projectName: \''+p.name+'\'',
+    '  environment: \''+p.env+'\'',
+    '',
+    'stages:',
+    '- stage: Build',
+    '  displayName: \'Build Stage\'',
+    '  jobs:',
+    '  - job: BuildJob',
+    '    displayName: \'Build and Test\'',
+    '    pool:',
+    '      vmImage: \'ubuntu-latest\'',
+    '    steps:',
+    '    - task: NodeTool@0',
+    '      inputs:',
+    '        versionSpec: \'20.x\'',
+    '      displayName: \'Install Node.js\'',
+    '',
+    '    - script: npm ci',
+    '      displayName: \'Install dependencies\'',
+    '',
+    '    - script: npm test',
+    '      displayName: \'Run tests\'',
+    '',
+    '    - script: npm run build',
+    '      displayName: \'Build application\'',
+    '',
+    '    - task: PublishBuildArtifacts@1',
+    '      inputs:',
+    '        pathToPublish: \'$(Build.SourcesDirectory)/dist\'',
+    '        artifactName: \'drop\'',
+    '      displayName: \'Publish artifacts\'',
+    '',
+    '- stage: Deploy',
+    '  displayName: \'Deploy Stage\'',
+    '  dependsOn: Build',
+    '  condition: and(succeeded(), eq(variables[\'Build.SourceBranch\'], \'refs/heads/main\'))',
+    '  jobs:',
+    '  - deployment: DeployJob',
+    '    displayName: \'Deploy to '+p.env+'\'',
+    '    pool:',
+    '      vmImage: \'ubuntu-latest\'',
+    '    environment: \''+p.env+'\'',
+    '    strategy:',
+    '      runOnce:',
+    '        deploy:',
+    '          steps:',
+    '          - task: DownloadBuildArtifacts@1',
+    '            inputs:',
+    '              buildType: \'current\'',
+    '              downloadType: \'single\'',
+    '              artifactName: \'drop\'',
+    '              downloadPath: \'$(System.ArtifactsDirectory)\'',
+    '',
+    '          - script: |',
+    '              echo "Deploying $(projectName) to $(environment)..."',
+    '              # Add deployment commands here',
+    '            displayName: \'Deploy application\''
+  ].join('\n');
 
-variables:
-  projectName: '${p.name}'
-  environment: '${p.env}'
+  var readme = [
+    '# '+p.name+' — Azure DevOps',
+    '',
+    '## Overview',
+    p.desc,
+    '',
+    '## Setup',
+    '1. Import this pipeline into Azure DevOps',
+    '2. Configure service connections',
+    '3. Set up '+p.env+' environment with approvals',
+    '',
+    '## Stages',
+    '- Build: compile and test',
+    '- Deploy: deploy to '+p.env+' environment'
+  ].join('\n');
 
-stages:
-- stage: Build
-  displayName: 'Build Stage'
-  jobs:
-  - job: BuildJob
-    displayName: 'Build and Test'
-    pool:
-      vmImage: 'ubuntu-latest'
-    steps:
-    - task: NodeTool@0
-      inputs:
-        versionSpec: '20.x'
-      displayName: 'Install Node.js'
-
-    - script: npm ci
-      displayName: 'Install dependencies'
-
-    - script: npm test
-      displayName: 'Run tests'
-
-    - script: npm run build
-      displayName: 'Build application'
-
-    - task: PublishBuildArtifacts@1
-      inputs:
-        pathToPublish: '$(Build.SourcesDirectory)/dist'
-        artifactName: 'drop'
-      displayName: 'Publish artifacts'
-
-- stage: Deploy
-  displayName: 'Deploy Stage'
-  dependsOn: Build
-  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
-  jobs:
-  - deployment: DeployJob
-    displayName: 'Deploy to ${p.env}'
-    pool:
-      vmImage: 'ubuntu-latest'
-    environment: '${p.env}'
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - task: DownloadBuildArtifacts@1
-            inputs:
-              buildType: 'current'
-              downloadType: 'single'
-              artifactName: 'drop'
-              downloadPath: '$(System.ArtifactsDirectory)'
-
-          - script: |
-              echo "Deploying $(projectName) to $(environment)..."
-              # Add deployment commands here
-            displayName: 'Deploy application'`,
-    variables:`# variables.yml or pipeline variables\nprojectName: ${p.name}\nenvironment: ${p.env}`,
-    outputs:`# Trigger: push to main`,
-    readme:`# ${p.name} — Azure DevOps
-
-## Overview
-${p.desc}
-
-## Setup
-1. Import this pipeline into Azure DevOps\n2. Configure service connections\n3. Set up ${p.env} environment with approvals
-
-## Stages
-- Build: compile and test\n- Deploy: deploy to ${p.env} environment`
-  };
+  return {main:main, variables:'# variables.yml or pipeline variables\nprojectName: '+p.name+'\nenvironment: '+p.env, outputs:'# Trigger: push to main', readme:readme};
 }
 
 function genPulumi(p){
-  return {
-    main:`import * as pulumi from "@pulumi/pulumi";
-import * as aws from "@pulumi/aws";
+  var vpcBlock = p.vpc ? [
+    'const vpc = new aws.ec2.Vpc("main", {',
+    '  cidrBlock: "10.0.0.0/16",',
+    '  enableDnsHostnames: true,',
+    '  enableDnsSupport: true,',
+    '  tags,',
+    '});',
+    '',
+    'const subnet = new aws.ec2.Subnet("public", {',
+    '  vpcId: vpc.id,',
+    '  cidrBlock: "10.0.1.0/24",',
+    '  availabilityZone: "us-east-1a",',
+    '  tags,',
+    '});'
+  ].join('\n') : '// Using default VPC';
 
-const config = new pulumi.Config();
-const projectName = config.get("projectName") || "${p.name}";
-const environment = config.get("environment") || "${p.env}";
+  var main = [
+    'import * as pulumi from "@pulumi/pulumi";',
+    'import * as aws from "@pulumi/aws";',
+    '',
+    'const config = new pulumi.Config();',
+    'const projectName = config.get("projectName") || "'+p.name+'";',
+    'const environment = config.get("environment") || "'+p.env+'";',
+    '',
+    'const tags = {',
+    '  Name: projectName,',
+    '  Environment: environment,',
+    '};',
+    '',
+    vpcBlock,
+    '',
+    'const securityGroup = new aws.ec2.SecurityGroup("app", {',
+    (p.vpc ? '  vpcId: vpc.id,' : ''),
+    '  ingress: [',
+    '    { protocol: "tcp", fromPort: 80, toPort: 80, cidrBlocks: ["0.0.0.0/0"] },',
+    (p.ssl ? '    { protocol: "tcp", fromPort: 443, toPort: 443, cidrBlocks: ["0.0.0.0/0"] },' : ''),
+    '  ],',
+    '  egress: [',
+    '    { protocol: "-1", fromPort: 0, toPort: 0, cidrBlocks: ["0.0.0.0/0"] },',
+    '  ],',
+    '  tags,',
+    '});',
+    '',
+    'const ami = aws.ec2.getAmi({',
+    '  mostRecent: true,',
+    '  owners: ["amazon"],',
+    '  filters: [{ name: "name", values: ["amzn2-ami-hvm-*-x86_64-gp2"] }],',
+    '});',
+    '',
+    'const launchTemplate = new aws.ec2.LaunchTemplate("app", {',
+    '  imageId: ami.then(a => a.id),',
+    '  instanceType: "'+p.instance+'",',
+    '  vpcSecurityGroupIds: [securityGroup.id],',
+    '  userData: Buffer.from(`',
+    '    #!/bin/bash',
+    '    yum update -y',
+    '    yum install -y httpd',
+    '    systemctl start httpd',
+    '    echo "<h1>${projectName} — ${environment}</h1>" > /var/www/html/index.html',
+    '  `).toString("base64"),',
+    '  tags,',
+    '});',
+    '',
+    'export const securityGroupId = securityGroup.id;',
+    'export const launchTemplateId = launchTemplate.id;'
+  ].filter(function(s){return s!=='';}).join('\n');
 
-const tags = {
-  Name: projectName,
-  Environment: environment,
-};
+  var variables = [
+    '// Pulumi.yaml',
+    'name: '+p.name,
+    'runtime: nodejs',
+    'description: '+p.desc,
+    '',
+    '// Pulumi.'+p.env+'.yaml',
+    'config:',
+    '  aws:region: '+p.region,
+    '  '+p.name+':projectName: '+p.name,
+    '  '+p.name+':environment: '+p.env
+  ].join('\n');
 
-${p.vpc?`const vpc = new aws.ec2.Vpc("main", {
-  cidrBlock: "10.0.0.0/16",
-  enableDnsHostnames: true,
-  enableDnsSupport: true,
-  tags,
-});
+  var readme = [
+    '# '+p.name+' — Pulumi (TypeScript)',
+    '',
+    '## Overview',
+    p.desc,
+    '',
+    '## Usage',
+    '```bash',
+    'npm install',
+    'pulumi stack init '+p.env,
+    'pulumi up',
+    '```',
+    '',
+    '## Exports',
+    '- securityGroupId',
+    '- launchTemplateId'
+  ].join('\n');
 
-const subnet = new aws.ec2.Subnet("public", {
-  vpcId: vpc.id,
-  cidrBlock: "10.0.1.0/24",
-  availabilityZone: "us-east-1a",
-  tags,
-});`:'// Using default VPC'}
-
-const securityGroup = new aws.ec2.SecurityGroup("app", {
-  ${p.vpc?'vpcId: vpc.id,':''}
-  ingress: [
-    { protocol: "tcp", fromPort: 80, toPort: 80, cidrBlocks: ["0.0.0.0/0"] },
-    ${p.ssl?'{ protocol: "tcp", fromPort: 443, toPort: 443, cidrBlocks: ["0.0.0.0/0"] },':''}
-  ],
-  egress: [
-    { protocol: "-1", fromPort: 0, toPort: 0, cidrBlocks: ["0.0.0.0/0"] },
-  ],
-  tags,
-});
-
-const ami = aws.ec2.getAmi({
-  mostRecent: true,
-  owners: ["amazon"],
-  filters: [{ name: "name", values: ["amzn2-ami-hvm-*-x86_64-gp2"] }],
-});
-
-const launchTemplate = new aws.ec2.LaunchTemplate("app", {
-  imageId: ami.then(a => a.id),
-  instanceType: "${p.instance}",
-  vpcSecurityGroupIds: [securityGroup.id],
-  userData: Buffer.from(\`
-    #!/bin/bash
-    yum update -y
-    yum install -y httpd
-    systemctl start httpd
-    echo "<h1>\${projectName} — \${environment}</h1>" > /var/www/html/index.html
-  \`).toString("base64"),
-  tags,
-});
-
-export const securityGroupId = securityGroup.id;
-export const launchTemplateId = launchTemplate.id;`,
-    variables:`// Pulumi.yaml\nname: ${p.name}\nruntime: nodejs\ndescription: ${p.desc}\n\n// Pulumi.${p.env}.yaml\nconfig:\n  aws:region: ${p.region}\n  ${p.name}:projectName: ${p.name}\n  ${p.name}:environment: ${p.env}`,
-    outputs:`export const securityGroupId = securityGroup.id;\nexport const launchTemplateId = launchTemplate.id;`,
-    readme:`# ${p.name} — Pulumi (TypeScript)\n\n## Overview\n${p.desc}\n\n## Usage\n\`\`\`bash\nnpm install\npulumi stack init ${p.env}\npulumi up\n\`\`\`\n\n## Exports\n- securityGroupId\n- launchTemplateId`
-  };
+  return {main:main, variables:variables, outputs:'export const securityGroupId = securityGroup.id;\nexport const launchTemplateId = launchTemplate.id;', readme:readme};
 }
 
 function genBicep(p){
-  return {
-    main:`@description('Project name')
-param projectName string = '${p.name}'
+  var sslRule = p.ssl ? [
+    '      {',
+    '        name: \'HTTPS\'',
+    '        properties: {',
+    '          priority: 110',
+    '          direction: \'Inbound\'',
+    '          access: \'Allow\'',
+    '          protocol: \'Tcp\'',
+    '          sourcePortRange: \'*\'',
+    '          destinationPortRange: \'443\'',
+    '          sourceAddressPrefix: \'*\'',
+    '          destinationAddressPrefix: \'*\'',
+    '        }',
+    '      }'
+  ].join('\n') : '';
 
-@description('Environment')
-param environment string = '${p.env}'
+  var main = [
+    '@description(\'Project name\')',
+    'param projectName string = \''+p.name+'\'',
+    '',
+    '@description(\'Environment\')',
+    'param environment string = \''+p.env+'\'',
+    '',
+    '@description(\'Location\')',
+    'param location string = \''+(p.region==='us-east-1'?'eastus':p.region)+'\'',
+    '',
+    '@description(\'VM SKU\')',
+    'param vmSku string = \'Standard_B2s\'',
+    '',
+    'resource vnet \'Microsoft.Network/virtualNetworks@2023-05-01\' = {',
+    '  name: \''+p.name+'-vnet\'',
+    '  location: location',
+    '  properties: {',
+    '    addressSpace: {',
+    '      addressPrefixes: [\'10.0.0.0/16\']',
+    '    }',
+    '  }',
+    '}',
+    '',
+    'resource subnet \'Microsoft.Network/virtualNetworks/subnets@2023-05-01\' = {',
+    '  parent: vnet',
+    '  name: \'default\'',
+    '  properties: {',
+    '    addressPrefix: \'10.0.1.0/24\'',
+    '  }',
+    '}',
+    '',
+    'resource nsg \'Microsoft.Network/networkSecurityGroups@2023-05-01\' = {',
+    '  name: \''+p.name+'-nsg\'',
+    '  location: location',
+    '  properties: {',
+    '    securityRules: [',
+    '      {',
+    '        name: \'HTTP\'',
+    '        properties: {',
+    '          priority: 100',
+    '          direction: \'Inbound\'',
+    '          access: \'Allow\'',
+    '          protocol: \'Tcp\'',
+    '          sourcePortRange: \'*\'',
+    '          destinationPortRange: \'80\'',
+    '          sourceAddressPrefix: \'*\'',
+    '          destinationAddressPrefix: \'*\'',
+    '        }',
+    '      }',
+    sslRule,
+    '    ]',
+    '  }',
+    '}',
+    '',
+    'resource vm \'Microsoft.Compute/virtualMachines@2023-07-01\' = {',
+    '  name: \''+p.name+'-vm\'',
+    '  location: location',
+    '  properties: {',
+    '    hardwareProfile: {',
+    '      vmSize: vmSku',
+    '    }',
+    '    osProfile: {',
+    '      computerName: \''+p.name+'-vm\'',
+    '      adminUsername: \'adminuser\'',
+    '      adminPassword: \'SecureP@ssw0rd!\'',
+    '    }',
+    '    storageProfile: {',
+    '      imageReference: {',
+    '        publisher: \'Canonical\'',
+    '        offer: \'0001-com-ubuntu-server-jammy\'',
+    '        sku: \'22_04-lts\'',
+    '        version: \'latest\'',
+    '      }',
+    '      osDisk: {',
+    '        createOption: \'FromImage\'',
+    '        managedDisk: {',
+    '          storageAccountType: \'Standard_LRS\'',
+    '        }',
+    '      }',
+    '    }',
+    '    networkProfile: {',
+    '      networkInterfaces: [',
+    '        {',
+    '          id: nic.id',
+    '        }',
+    '      ]',
+    '    }',
+    '  }',
+    '}',
+    '',
+    'resource nic \'Microsoft.Network/networkInterfaces@2023-05-01\' = {',
+    '  name: \''+p.name+'-nic\'',
+    '  location: location',
+    '  properties: {',
+    '    ipConfigurations: [',
+    '      {',
+    '        name: \'ipconfig1\'',
+    '        properties: {',
+    '          subnet: {',
+    '            id: subnet.id',
+    '          }',
+    '          privateIPAllocationMethod: \'Dynamic\'',
+    '        }',
+    '      }',
+    '    ]',
+    '    networkSecurityGroup: {',
+    '      id: nsg.id',
+    '    }',
+    '  }',
+    '}'
+  ].filter(function(s){return s!=='';}).join('\n');
 
-@description('Location')
-param location string = '${p.region==='us-east-1'?'eastus':p.region}'
+  var readme = [
+    '# '+p.name+' — Azure Bicep',
+    '',
+    '## Overview',
+    p.desc,
+    '',
+    '## Usage',
+    '```bash',
+    'az deployment group create \\',
+    '  --resource-group '+p.name+'-rg \\',
+    '  --template-file main.bicep \\',
+    '  --parameters environment='+p.env,
+    '```',
+    '',
+    '## Resources',
+    '- Virtual Network + Subnet',
+    '- Network Security Group',
+    '- Virtual Machine'
+  ].join('\n');
 
-@description('VM SKU')
-param vmSku string = 'Standard_B2s'
-
-resource vnet 'Microsoft.Network/virtualNetworks@2023-05-01' = {
-  name: '${p.name}-vnet'
-  location: location
-  properties: {
-    addressSpace: {
-      addressPrefixes: ['10.0.0.0/16']
-    }
-  }
-}
-
-resource subnet 'Microsoft.Network/virtualNetworks/subnets@2023-05-01' = {
-  parent: vnet
-  name: 'default'
-  properties: {
-    addressPrefix: '10.0.1.0/24'
-  }
-}
-
-resource nsg 'Microsoft.Network/networkSecurityGroups@2023-05-01' = {
-  name: '${p.name}-nsg'
-  location: location
-  properties: {
-    securityRules: [
-      {
-        name: 'HTTP'
-        properties: {
-          priority: 100
-          direction: 'Inbound'
-          access: 'Allow'
-          protocol: 'Tcp'
-          sourcePortRange: '*'
-          destinationPortRange: '80'
-          sourceAddressPrefix: '*'
-          destinationAddressPrefix: '*'
-        }
-      }
-      ${p.ssl?`{
-        name: 'HTTPS'
-        properties: {
-          priority: 110
-          direction: 'Inbound'
-          access: 'Allow'
-          protocol: 'Tcp'
-          sourcePortRange: '*'
-          destinationPortRange: '443'
-          sourceAddressPrefix: '*'
-          destinationAddressPrefix: '*'
-        }
-      }`:''}
-    ]
-  }
-}
-
-resource vm 'Microsoft.Compute/virtualMachines@2023-07-01' = {
-  name: '${p.name}-vm'
-  location: location
-  properties: {
-    hardwareProfile: {
-      vmSize: vmSku
-    }
-    osProfile: {
-      computerName: '${p.name}-vm'
-      adminUsername: 'adminuser'
-      adminPassword: 'SecureP@ssw0rd!'
-    }
-    storageProfile: {
-      imageReference: {
-        publisher: 'Canonical'
-        offer: '0001-com-ubuntu-server-jammy'
-        sku: '22_04-lts'
-        version: 'latest'
-      }
-      osDisk: {
-        createOption: 'FromImage'
-        managedDisk: {
-          storageAccountType: 'Standard_LRS'
-        }
-      }
-    }
-    networkProfile: {
-      networkInterfaces: [
-        {
-          id: nic.id
-        }
-      ]
-    }
-  }
-}
-
-resource nic 'Microsoft.Network/networkInterfaces@2023-05-01' = {
-  name: '${p.name}-nic'
-  location: location
-  properties: {
-    ipConfigurations: [
-      {
-        name: 'ipconfig1'
-        properties: {
-          subnet: {
-            id: subnet.id
-          }
-          privateIPAllocationMethod: 'Dynamic'
-        }
-      }
-    ]
-    networkSecurityGroup: {
-      id: nsg.id
-    }
-  }
-}`,
-    variables:`// Parameters can be overridden at deployment time:\n// az deployment group create --parameters environment=prod`,
-    outputs:`output vmId string = vm.id\noutput vnetId string = vnet.id`,
-    readme:`# ${p.name} — Azure Bicep\n\n## Overview\n${p.desc}\n\n## Usage\n\`\`\`bash\naz deployment group create \\\n  --resource-group ${p.name}-rg \\\n  --template-file main.bicep \\\n  --parameters environment=${p.env}\n\`\`\`\n\n## Resources\n- Virtual Network + Subnet\n- Network Security Group\n- Virtual Machine`
-  };
+  return {main:main, variables:'// Parameters can be overridden at deployment time:\n// az deployment group create --parameters environment=prod', outputs:'output vmId string = vm.id\noutput vnetId string = vnet.id', readme:readme};
 }
 </script>
 </body>
