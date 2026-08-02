@@ -104,7 +104,6 @@
   .tab-panel { display: none; }
   .tab-panel.active { display: block; animation: fadeIn 0.3s ease; }
 </style>
-</head>
 <body>
 <canvas id="matrix-canvas"></canvas>
 <div class="container">
@@ -118,13 +117,80 @@
     <a href="arch.html">Architecture</a>
     <a href="search.html">Search</a>
     <a href="blog.html">Blog & Tech</a>
+    <a href="build.html">Build</a>
     <a href="about.html">About</a>
   </nav>
+
+  <!-- Natural Language Architecture Builder -->
   <div style="margin-bottom:30px;">
-    <div class="page-title">Architecture Builder</div>
-    <div class="page-desc">Tell me what you want to build. I will generate the diagram, the Terraform, and the ADR.</div>
+    <div class="page-title">Natural Language Architect</div>
+    <div class="page-desc">Describe your system in plain English. I will generate the diagram, the Terraform, and the ADR.</div>
   </div>
-  <div class="card" id="wizard">
+
+  <div class="card" style="margin-bottom:20px;">
+    <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
+      <input type="text" id="nlInput" placeholder="e.g. User connects to API Gateway which routes to Lambda functions writing to DynamoDB and S3..." 
+        style="flex:1;min-width:280px;padding:14px 18px;background:#050505;border:1px solid var(--border);border-radius:4px;color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.85rem;outline:none;"
+        onkeydown="if(event.key==='Enter')parseNaturalLanguage()">
+      <button class="btn" onclick="parseNaturalLanguage()">GENERATE</button>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;">
+      <span style="color:var(--text-muted);font-size:0.72rem;letter-spacing:1px;">QUICK START:</span>
+      <span class="link-tag" style="cursor:pointer;font-size:0.7rem;padding:4px 10px;" onclick="setNL('3-tier web app with load balancer, auto-scaling web servers, and PostgreSQL database')">3-Tier Web</span>
+      <span class="link-tag" style="cursor:pointer;font-size:0.7rem;padding:4px 10px;" onclick="setNL('microservices on Kubernetes with API gateway, service mesh, and message queue')">Microservices K8s</span>
+      <span class="link-tag" style="cursor:pointer;font-size:0.7rem;padding:4px 10px;" onclick="setNL('serverless event-driven with API Gateway, Lambda, DynamoDB, and S3 triggers')">Serverless</span>
+      <span class="link-tag" style="cursor:pointer;font-size:0.7rem;padding:4px 10px;" onclick="setNL('data lake with Kinesis ingestion, S3 raw storage, Glue ETL, and Athena queries')">Data Lake</span>
+      <span class="link-tag" style="cursor:pointer;font-size:0.7rem;padding:4px 10px;" onclick="setNL('multi-region active-active with Route 53, ALB, Aurora Global DB, and DynamoDB Global Tables')">Multi-Region</span>
+    </div>
+    <div id="nlError" style="color:var(--orange);font-size:0.8rem;margin-bottom:10px;display:none;"></div>
+  </div>
+
+  <!-- Visual Diagram -->
+  <div class="card" id="diagramCard" style="display:none;margin-bottom:20px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
+      <h3 style="font-family:'Orbitron',sans-serif;color:var(--gold);font-size:0.95rem;text-transform:uppercase;letter-spacing:1.5px;">Visual Diagram</h3>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-outline" onclick="downloadMermaidPNG()">Export PNG</button>
+        <button class="btn btn-outline" onclick="copyMermaid()">Copy Mermaid</button>
+        <button class="btn btn-outline" onclick="downloadMermaidFile()">Download .mmd</button>
+      </div>
+    </div>
+    <div id="mermaidContainer" style="background:#050505;border:1px solid var(--border);border-radius:6px;padding:20px;overflow-x:auto;">
+      <div class="mermaid" id="mermaidTarget"></div>
+    </div>
+    <div class="tab-bar" style="margin-top:16px;">
+      <button class="tab-btn active" onclick="switchNLTab('mermaid')">Mermaid</button>
+      <button class="tab-btn" onclick="switchNLTab('terraform')">Terraform</button>
+      <button class="tab-btn" onclick="switchNLTab('adr')">ADR</button>
+      <button class="tab-btn" onclick="switchNLTab('c4')">C4 Context</button>
+    </div>
+    <div class="tab-panel active" id="nl-tab-mermaid">
+      <div class="output-area" id="nlMermaidOut" style="margin-top:12px;"></div>
+    </div>
+    <div class="tab-panel" id="nl-tab-terraform">
+      <div class="action-row" style="margin-top:12px;">
+        <button class="btn" onclick="copyOutput('nlTerraformOut')">Copy Terraform</button>
+        <button class="btn btn-outline" onclick="downloadFile('main.tf', 'nlTerraformOut')">Download main.tf</button>
+      </div>
+      <div class="output-area" id="nlTerraformOut" style="margin-top:8px;"></div>
+    </div>
+    <div class="tab-panel" id="nl-tab-adr">
+      <div class="action-row" style="margin-top:12px;">
+        <button class="btn" onclick="copyOutput('nlAdrOut')">Copy ADR</button>
+        <button class="btn btn-outline" onclick="downloadFile('adr.md', 'nlAdrOut')">Download .md</button>
+      </div>
+      <div class="output-area" id="nlAdrOut" style="margin-top:8px;"></div>
+    </div>
+    <div class="tab-panel" id="nl-tab-c4">
+      <div class="action-row" style="margin-top:12px;">
+        <button class="btn" onclick="copyOutput('nlC4Out')">Copy C4</button>
+        <button class="btn btn-outline" onclick="downloadFile('c4.puml', 'nlC4Out')">Download .puml</button>
+      </div>
+      <div class="output-area" id="nlC4Out" style="margin-top:8px;"></div>
+    </div>
+  </div>
+
+<div class="card" id="wizard">
     <div class="step-indicator">
       <div class="step-dot active" id="dot-0"></div>
       <div class="step-dot" id="dot-1"></div>
@@ -2015,6 +2081,262 @@ function downloadFile(filename, elementId) {
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
 }
+
+
+// ===== NATURAL LANGUAGE ARCHITECT =====
+function setNL(text) {
+  document.getElementById('nlInput').value = text;
+  parseNaturalLanguage();
+}
+
+function parseNaturalLanguage() {
+  const input = document.getElementById('nlInput').value.trim();
+  const err = document.getElementById('nlError');
+  if (!input) { err.style.display = 'block'; err.textContent = 'Enter a description first.'; return; }
+  err.style.display = 'none';
+
+  const result = nlpToArchitecture(input);
+
+  document.getElementById('nlMermaidOut').textContent = result.mermaid;
+  document.getElementById('nlTerraformOut').textContent = result.terraform;
+  document.getElementById('nlAdrOut').textContent = result.adr;
+  document.getElementById('nlC4Out').textContent = result.c4;
+
+  document.getElementById('diagramCard').style.display = 'block';
+  document.getElementById('diagramCard').scrollIntoView({behavior:'smooth', block:'nearest'});
+
+  // Render Mermaid visual
+  const target = document.getElementById('mermaidTarget');
+  target.innerHTML = result.mermaid;
+  target.removeAttribute('data-processed');
+  mermaid.init(undefined, target);
+}
+
+function nlpToArchitecture(text) {
+  const t = text.toLowerCase();
+  let nodes = [], edges = [];
+  let provider = 'aws';
+
+  if (t.includes('azure')) provider = 'azure';
+  else if (t.includes('gcp') || t.includes('google cloud')) provider = 'gcp';
+  else if (t.includes('aws') || t.includes('amazon')) provider = 'aws';
+
+  // Extract components
+  const components = [];
+  const patterns = [
+    {k: 'user', r: /user|client|customer|browser/},
+    {k: 'dns', r: /dns|route 53|cloud dns|domain/},
+    {k: 'cdn', r: /cdn|cloudfront|cloud cdn|fastly/},
+    {k: 'lb', r: /load balancer|alb|nlb|elb|gateway|api gateway/},
+    {k: 'web', r: /web server|web tier|frontend|react|vue|angular|nginx|apache/},
+    {k: 'app', r: /app server|app tier|backend|api|service|microservice|lambda|function|container/},
+    {k: 'db', r: /database|db|postgres|mysql|dynamodb|cosmos|firestore|sql|aurora|rds/},
+    {k: 'cache', r: /cache|redis|memcached|elasticache/},
+    {k: 'queue', r: /queue|sqs|pubsub|service bus|rabbitmq|kafka|kinesis|event/},
+    {k: 'store', r: /s3|blob|gcs|storage|object storage|data lake/},
+    {k: 'worker', r: /worker|background|batch|cron|step function/},
+    {k: 'monitor', r: /monitor|cloudwatch|grafana|prometheus|observability/},
+    {k: 'auth', r: /auth|identity|cognito|oauth|iam|rbac/},
+    {k: 'waf', r: /waf|firewall|ddos|security/},
+  ];
+
+  patterns.forEach(p => {
+    if (p.r.test(t)) components.push(p.k);
+  });
+
+  if (components.length === 0) components.push('user', 'lb', 'app', 'db');
+
+  // Build Mermaid
+  const idMap = {};
+  components.forEach((c, i) => { idMap[c] = c + i; });
+
+  let mermaid = 'graph TB
+';
+  const labels = {
+    user: 'User', dns: 'DNS', cdn: 'CDN', lb: 'Load Balancer', web: 'Web Tier',
+    app: 'App Tier', db: 'Database', cache: 'Cache', queue: 'Message Queue',
+    store: 'Object Storage', worker: 'Worker', monitor: 'Monitoring', auth: 'Auth Service', waf: 'WAF'
+  };
+  const shapes = {
+    user: '([User])', dns: '[DNS]', cdn: '[CDN]', lb: '[Load Balancer]', web: '[Web Tier]',
+    app: '[App Tier]', db: '[(Database)]', cache: '[(Cache)]', queue: '[Message Queue]',
+    store: '[(Object Storage)]', worker: '[Worker]', monitor: '[Monitoring]', auth: '[Auth]', waf: '[WAF]'
+  };
+
+  components.forEach(c => {
+    mermaid += `    ${idMap[c]}${shapes[c] || '[' + (labels[c] || c) + ']'}
+`;
+  });
+
+  // Connect in sequence
+  for (let i = 0; i < components.length - 1; i++) {
+    const a = components[i], b = components[i+1];
+    if (a === 'monitor' || b === 'monitor') {
+      mermaid += `    ${idMap['monitor'] || 'monitor0'} -.-> ${idMap[b] || idMap[a]}
+`;
+    } else {
+      mermaid += `    ${idMap[a]} --> ${idMap[b]}
+`;
+    }
+  }
+
+  // Cross connections
+  if (components.includes('app') && components.includes('cache')) {
+    mermaid += `    ${idMap['app']} --> ${idMap['cache']}
+`;
+  }
+  if (components.includes('app') && components.includes('store')) {
+    mermaid += `    ${idMap['app']} --> ${idMap['store']}
+`;
+  }
+  if (components.includes('queue') && components.includes('worker')) {
+    mermaid += `    ${idMap['queue']} --> ${idMap['worker']}
+`;
+  }
+  if (components.includes('app') && components.includes('auth')) {
+    mermaid += `    ${idMap['app']} --> ${idMap['auth']}
+`;
+  }
+  if (components.includes('lb') && components.includes('waf')) {
+    mermaid += `    ${idMap['lb']} -.-> ${idMap['waf']}
+`;
+  }
+
+  // Terraform skeleton
+  const tfProvider = provider === 'aws' ? 'aws' : provider === 'azure' ? 'azurerm' : 'google';
+  const tfRegion = provider === 'aws' ? 'us-east-1' : provider === 'azure' ? 'East US' : 'us-central1';
+  let terraform = `terraform {
+  required_providers {
+    ${tfProvider} = { source = "hashicorp/${tfProvider}" version = "~> 5.0" }
+  }
+}
+provider "${tfProvider}" {
+  ${provider === 'gcp' ? 'project = var.project
+  ' : ''}region = "${tfRegion}"
+}
+
+# Generated from: "${text.substring(0, 60)}${text.length > 60 ? '...' : ''}"
+# Components detected: ${components.join(', ')}
+
+${components.includes('lb') ? `resource "${tfProvider}_lb" "main" {
+  name = "app-lb"
+  # Configure load balancer
+}` : ''}
+${components.includes('app') ? `resource "${tfProvider}_compute_instance" "app" {
+  count = 2
+  # Application servers
+}` : ''}
+${components.includes('db') ? `resource "${tfProvider}_db_instance" "main" {
+  # Database configuration
+}` : ''}
+${components.includes('cache') ? `resource "${tfProvider}_cache_cluster" "redis" {
+  # Cache configuration
+}` : ''}
+${components.includes('store') ? `resource "${tfProvider}_storage_bucket" "data" {
+  # Object storage
+}` : ''}
+`;
+
+  // ADR
+  const adr = `# ADR-001: Architecture Decision
+
+## Status
+Accepted
+
+## Context
+${text}
+
+## Decision
+We will implement an architecture using ${provider.toUpperCase()} with the following components:
+- ${components.map(c => labels[c] || c).join('
+- ')}
+
+## Consequences
+**Positive:**
+- Scalable and maintainable
+- Provider-native services
+- Strong documentation
+
+**Negative:**
+- Operational complexity
+- Vendor lock-in potential
+- Ongoing cost optimization required
+
+## Date
+${new Date().toISOString().split('T')[0]}
+`;
+
+  // C4
+  const c4 = `@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+LAYOUT_WITH_LEGEND()
+Title System Context
+Person(user, "User", "End user")
+System(app, "Application", "${text.substring(0, 40)}")
+${components.includes('db') ? 'SystemDb(db, "Database", "Primary data store")
+Rel(app, db, "Reads/Writes")' : ''}
+${components.includes('store') ? 'System_Ext(store, "Object Storage", "File storage")
+Rel(app, store, "Stores files")' : ''}
+Rel(user, app, "Uses", "HTTPS")
+SHOW_LEGEND()
+@enduml`;
+
+  return { mermaid, terraform, adr, c4 };
+}
+
+function switchNLTab(name) {
+  document.querySelectorAll('#diagramCard .tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('#diagramCard .tab-panel').forEach(p => p.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('nl-tab-' + name).classList.add('active');
+}
+
+function copyMermaid() {
+  const text = document.getElementById('nlMermaidOut').textContent;
+  navigator.clipboard.writeText(text).then(() => alert('Mermaid copied!'));
+}
+
+function downloadMermaidFile() {
+  const text = document.getElementById('nlMermaidOut').textContent;
+  const blob = new Blob([text], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'diagram.mmd';
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a); URL.revokeObjectURL(url);
+}
+
+function downloadMermaidPNG() {
+  const svg = document.querySelector('#mermaidTarget svg');
+  if (!svg) { alert('No diagram rendered yet. Generate first.'); return; }
+
+  const serializer = new XMLSerializer();
+  const svgStr = serializer.serializeToString(svg);
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  const img = new Image();
+
+  const svgBlob = new Blob([svgStr], { type: 'image/svg+xml;charset=utf-8' });
+  const url = URL.createObjectURL(svgBlob);
+
+  img.onload = function() {
+    canvas.width = img.width * 2;
+    canvas.height = img.height * 2;
+    ctx.fillStyle = '#050505';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    URL.revokeObjectURL(url);
+
+    const pngUrl = canvas.toDataURL('image/png');
+    const a = document.createElement('a');
+    a.href = pngUrl; a.download = 'architecture.png';
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a);
+  };
+  img.src = url;
+}
+
 </script>
 </body>
-</html>
+</html<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+>

@@ -7,633 +7,79 @@
 <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Share+Tech+Mono&display=swap');
-
-  :root {
-    --bg: #000000;
-    --card: #0a0a0a;
-    --card-hover: #111111;
-    --border: #1a1a1a;
-    --border-hover: #f97316;
-    --orange: #f97316;
-    --orange-dark: #ea580c;
-    --gold: #fbbf24;
-    --gold-dim: #b45309;
-    --text: #e5e5e5;
-    --text-dim: #737373;
-    --text-muted: #404040;
-    --glow-orange: 0 0 20px rgba(249,115,22,0.15);
-    --glow-gold: 0 0 30px rgba(251,191,36,0.1);
-  }
-
+  :root { --bg: #000000; --card: #0a0a0a; --card-hover: #111111; --border: #1a1a1a; --border-hover: #f97316; --orange: #f97316; --orange-dark: #ea580c; --gold: #fbbf24; --gold-dim: #b45309; --text: #e5e5e5; --text-dim: #737373; --text-muted: #404040; --glow-orange: 0 0 20px rgba(249,115,22,0.15); --glow-gold: 0 0 30px rgba(251,191,36,0.1); }
   * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Share Tech Mono', monospace;
-    min-height: 100vh;
-    overflow-x: hidden;
-    position: relative;
-  }
-
-  #matrix-canvas {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    z-index: 0;
-    pointer-events: none;
-    opacity: 0.25;
-  }
-
-  .container {
-    position: relative;
-    z-index: 1;
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 0 20px 40px;
-  }
-
-  /* Header */
-  header {
-    text-align: center;
-    padding: 40px 20px 30px;
-    position: relative;
-  }
-
-  header::before {
-    content: '';
-    position: absolute;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    width: 600px; height: 200px;
-    background: radial-gradient(ellipse, rgba(249,115,22,0.08) 0%, transparent 70%);
-    pointer-events: none;
-  }
-
-  h1 {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 3.5rem;
-    font-weight: 900;
-    color: var(--orange);
-    text-transform: uppercase;
-    letter-spacing: 12px;
-    text-shadow: 0 0 40px rgba(249,115,22,0.4), 0 0 80px rgba(249,115,22,0.1);
-    position: relative;
-    animation: flicker 4s infinite alternate;
-  }
-
-  @keyframes flicker {
-    0%, 100% { opacity: 1; text-shadow: 0 0 40px rgba(249,115,22,0.4), 0 0 80px rgba(249,115,22,0.1); }
-    50% { opacity: 0.92; text-shadow: 0 0 30px rgba(249,115,22,0.3), 0 0 60px rgba(249,115,22,0.05); }
-  }
-
-  .subtitle {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 1rem;
-    color: var(--gold);
-    margin-top: 10px;
-    letter-spacing: 3px;
-    opacity: 0.8;
-  }
-
-  .glitch-line {
-    width: 200px;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--orange), var(--gold), transparent);
-    margin: 20px auto;
-    opacity: 0.5;
-  }
-
-  /* Navigation */
-  nav {
-    display: flex;
-    justify-content: center;
-    gap: 8px;
-    flex-wrap: wrap;
-    margin-bottom: 30px;
-    padding: 0 20px;
-  }
-
-  nav a {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    color: var(--text-dim);
-    text-decoration: none;
-    padding: 10px 18px;
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    transition: all 0.3s;
-    background: var(--card);
-  }
-
-  nav a:hover, nav a.active {
-    border-color: var(--orange);
-    color: var(--orange);
-    box-shadow: var(--glow-orange);
-    background: rgba(249,115,22,0.05);
-  }
-
-  /* Page title */
-  .page-title {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 1.6rem;
-    color: var(--orange);
-    text-transform: uppercase;
-    letter-spacing: 3px;
-    margin-bottom: 8px;
-  }
-
-  .page-desc {
-    color: var(--text-dim);
-    font-size: 0.9rem;
-    margin-bottom: 30px;
-    letter-spacing: 0.5px;
-  }
-
-  /* Cards */
-  .card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 24px;
-    margin-bottom: 16px;
-    transition: all 0.3s;
-  }
-
-  .card:hover {
-    border-color: var(--gold-dim);
-    box-shadow: 0 0 15px rgba(249,115,22,0.05);
-  }
-
-  .card h3 {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 0.95rem;
-    color: var(--gold);
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    margin-bottom: 12px;
-  }
-
-  .card p {
-    color: var(--text-dim);
-    font-size: 0.85rem;
-    line-height: 1.6;
-  }
-
-  /* Buttons */
-  .btn {
-    display: inline-block;
-    padding: 10px 22px;
-    background: linear-gradient(135deg, var(--orange), var(--orange-dark));
-    border: none;
-    border-radius: 4px;
-    color: #000;
-    font-family: 'Orbitron', sans-serif;
-    font-weight: 700;
-    font-size: 0.78rem;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    cursor: pointer;
-    transition: all 0.3s;
-    text-decoration: none;
-  }
-
-  .btn:hover {
-    background: linear-gradient(135deg, var(--gold), var(--orange));
-    box-shadow: 0 0 20px rgba(249,115,22,0.3);
-    transform: translateY(-1px);
-  }
-
-  .btn-outline {
-    background: transparent;
-    border: 1px solid var(--border);
-    color: var(--text-dim);
-  }
-
-  .btn-outline:hover {
-    border-color: var(--gold);
-    color: var(--gold);
-    background: rgba(251,191,36,0.05);
-    box-shadow: var(--glow-gold);
-  }
-
-  /* Code blocks */
-  .code-block {
-    background: #050505;
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 14px 18px;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.82rem;
-    color: var(--gold);
-    overflow-x: auto;
-    white-space: pre-wrap;
-    line-height: 1.6;
-    margin: 8px 0;
-  }
-
-  /* Link tags */
-  .link-tag {
-    display: inline-block;
-    padding: 6px 14px;
-    background: rgba(249,115,22,0.08);
-    border: 1px solid rgba(249,115,22,0.2);
-    border-radius: 20px;
-    color: var(--orange);
-    font-size: 0.78rem;
-    text-decoration: none;
-    transition: all 0.3s;
-    letter-spacing: 0.5px;
-    margin: 4px 4px 4px 0;
-  }
-
-  .link-tag:hover {
-    background: rgba(249,115,22,0.2);
-    border-color: var(--orange);
-    box-shadow: var(--glow-orange);
-  }
-
-  /* Grid */
-  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-
-  @media (max-width: 900px) {
-    .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
-    h1 { font-size: 2.2rem; letter-spacing: 6px; }
-    nav a { padding: 8px 12px; font-size: 0.7rem; }
-  }
-
-  /* Footer */
-  footer {
-    text-align: center;
-    padding: 50px 20px 30px;
-    color: var(--text-muted);
-    font-size: 0.75rem;
-    letter-spacing: 2px;
-  }
-
-  .footer-line {
-    width: 100px;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
-    margin: 0 auto 16px;
-  }
-
-  /* Scrollbar */
+  body { background: var(--bg); color: var(--text); font-family: 'Share Tech Mono', monospace; min-height: 100vh; overflow-x: hidden; position: relative; }
+  #matrix-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; opacity: 0.25; }
+  .container { position: relative; z-index: 1; max-width: 1400px; margin: 0 auto; padding: 0 20px 40px; }
+  header { text-align: center; padding: 40px 20px 30px; position: relative; }
+  header::before { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 600px; height: 200px; background: radial-gradient(ellipse, rgba(249,115,22,0.08) 0%, transparent 70%); pointer-events: none; }
+  h1 { font-family: 'Orbitron', sans-serif; font-size: 3.5rem; font-weight: 900; color: var(--orange); text-transform: uppercase; letter-spacing: 12px; text-shadow: 0 0 40px rgba(249,115,22,0.4), 0 0 80px rgba(249,115,22,0.1); position: relative; animation: flicker 4s infinite alternate; }
+  @keyframes flicker { 0%, 100% { opacity: 1; text-shadow: 0 0 40px rgba(249,115,22,0.4), 0 0 80px rgba(249,115,22,0.1); } 50% { opacity: 0.92; text-shadow: 0 0 30px rgba(249,115,22,0.3), 0 0 60px rgba(249,115,22,0.05); } }
+  .subtitle { font-family: 'Share Tech Mono', monospace; font-size: 1rem; color: var(--gold); margin-top: 10px; letter-spacing: 3px; opacity: 0.8; }
+  .glitch-line { width: 200px; height: 1px; background: linear-gradient(90deg, transparent, var(--orange), var(--gold), transparent); margin: 20px auto; opacity: 0.5; }
+  nav { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-bottom: 30px; padding: 0 20px; }
+  nav a { font-family: 'Orbitron', sans-serif; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-dim); text-decoration: none; padding: 10px 18px; border: 1px solid var(--border); border-radius: 4px; transition: all 0.3s; background: var(--card); }
+  nav a:hover, nav a.active { border-color: var(--orange); color: var(--orange); box-shadow: var(--glow-orange); background: rgba(249,115,22,0.05); }
+  .page-title { font-family: 'Orbitron', sans-serif; font-size: 1.6rem; color: var(--orange); text-transform: uppercase; letter-spacing: 3px; margin-bottom: 8px; }
+  .page-desc { color: var(--text-dim); font-size: 0.9rem; margin-bottom: 30px; letter-spacing: 0.5px; }
+  .search-box { display: flex; gap: 0; max-width: 600px; margin: 0 auto 10px; border: 1px solid var(--border); border-radius: 4px; overflow: hidden; background: var(--card); }
+  .search-box input { flex: 1; background: transparent; border: none; padding: 14px 18px; color: var(--text); font-family: 'Share Tech Mono', monospace; font-size: 0.9rem; outline: none; }
+  .search-box input::placeholder { color: var(--text-muted); }
+  .search-box button { padding: 0 24px; background: linear-gradient(135deg, var(--orange), var(--orange-dark)); border: none; color: #000; font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; transition: all 0.3s; }
+  .search-box button:hover { background: linear-gradient(135deg, var(--gold), var(--orange)); box-shadow: 0 0 20px rgba(249,115,22,0.3); }
+  .search-meta { text-align: center; color: var(--text-muted); font-size: 0.75rem; margin-bottom: 30px; letter-spacing: 1px; }
+  .roadmap { position: relative; padding-left: 34px; max-width: 900px; margin: 0 auto; }
+  .roadmap::before { content: ''; position: absolute; left: 6px; top: 0; bottom: 0; width: 2px; background: linear-gradient(180deg, var(--orange), var(--gold) 50%, var(--orange)); opacity: 0.35; }
+  .category-node { position: relative; margin-bottom: 28px; animation: fadeIn 0.5s ease both; }
+  .category-node::before { content: ''; position: absolute; left: -28px; top: 6px; width: 10px; height: 10px; background: var(--orange); border-radius: 50%; box-shadow: 0 0 12px rgba(249,115,22,0.5); border: 2px solid var(--bg); }
+  .category-header-tree { display: flex; align-items: center; gap: 14px; cursor: pointer; padding: 6px 0; user-select: none; }
+  .category-title-tree { font-family: 'Orbitron', sans-serif; font-size: 1.05rem; color: var(--text); letter-spacing: 2px; text-transform: uppercase; transition: color 0.3s; }
+  .category-header-tree:hover .category-title-tree { color: var(--orange); }
+  .category-count-tree { font-size: 0.7rem; color: var(--text-dim); background: rgba(249,115,22,0.08); padding: 3px 12px; border-radius: 20px; border: 1px solid rgba(249,115,22,0.15); }
+  .category-toggle-tree { font-size: 0.9rem; color: var(--orange); transition: transform 0.3s; margin-left: auto; }
+  .category-node.collapsed .category-toggle-tree { transform: rotate(-90deg); }
+  .node-branch { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); transition: all 0.4s ease; }
+  .category-node.collapsed .node-branch { display: none; }
+  .node-card-tree { background: linear-gradient(145deg, #0d0d0d, #080808); border: 1px solid var(--border); border-radius: 6px; padding: 18px 16px; cursor: pointer; transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden; }
+  .node-card-tree::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--orange), var(--gold)); transform: scaleX(0); transform-origin: left; transition: transform 0.4s; }
+  .node-card-tree:hover { border-color: var(--orange); transform: translateX(6px); box-shadow: var(--glow-orange), 0 10px 40px rgba(0,0,0,0.5); }
+  .node-card-tree:hover::after { transform: scaleX(1); }
+  .node-name-tree { font-family: 'Orbitron', sans-serif; font-size: 0.88rem; font-weight: 600; color: var(--text); letter-spacing: 1px; margin-bottom: 5px; }
+  .node-desc-tree { font-size: 0.74rem; color: var(--text-dim); line-height: 1.4; }
+  mark { background: rgba(249,115,22,0.25); color: var(--orange); padding: 0 3px; border-radius: 2px; font-weight: 600; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.92); backdrop-filter: blur(8px); z-index: 1000; display: none; align-items: center; justify-content: center; padding: 20px; opacity: 0; transition: opacity 0.3s; }
+  .modal-overlay.active { display: flex; opacity: 1; }
+  .modal { background: var(--card); border: 1px solid var(--border); border-radius: 8px; width: 100%; max-width: 850px; max-height: 90vh; overflow-y: auto; position: relative; box-shadow: 0 0 60px rgba(249,115,22,0.1), 0 25px 50px rgba(0,0,0,0.8); transform: scale(0.95) translateY(20px); transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+  .modal-overlay.active .modal { transform: scale(1) translateY(0); }
+  .modal-header { padding: 26px 30px 20px; border-bottom: 1px solid var(--border); position: relative; }
+  .modal-header::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--orange), var(--gold), var(--orange)); }
+  .modal-title { font-family: 'Orbitron', sans-serif; font-size: 1.4rem; font-weight: 700; color: var(--orange); letter-spacing: 2px; }
+  .modal-subtitle { color: var(--text-dim); font-size: 0.82rem; margin-top: 5px; letter-spacing: 1px; }
+  .modal-close { position: absolute; top: 22px; right: 22px; background: none; border: 1px solid var(--border); color: var(--text-dim); width: 36px; height: 36px; border-radius: 4px; cursor: pointer; font-size: 1.2rem; transition: all 0.3s; display: flex; align-items: center; justify-content: center; }
+  .modal-close:hover { border-color: var(--orange); color: var(--orange); box-shadow: var(--glow-orange); }
+  .modal-body { padding: 26px 30px; }
+  .section-title { font-family: 'Orbitron', sans-serif; font-size: 0.82rem; font-weight: 600; color: var(--gold); text-transform: uppercase; letter-spacing: 2px; margin: 22px 0 10px; display: flex; align-items: center; gap: 10px; }
+  .section-title:first-child { margin-top: 0; }
+  .section-title::before { content: ''; width: 20px; height: 1px; background: var(--gold); }
+  .section-content { color: var(--text-dim); font-size: 0.86rem; line-height: 1.7; padding-left: 30px; }
+  .section-content p { margin-bottom: 10px; color: var(--text); }
+  .issue-item { padding: 10px 14px; background: rgba(249,115,22,0.04); border-left: 2px solid var(--orange); margin-bottom: 8px; border-radius: 0 4px 4px 0; font-size: 0.84rem; color: var(--text); }
+  .cmd-block { background: #050505; border: 1px solid var(--border); border-radius: 4px; padding: 12px 16px; font-family: 'Share Tech Mono', monospace; font-size: 0.8rem; color: var(--gold); overflow-x: auto; margin-bottom: 8px; position: relative; }
+  .usecase-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; padding-left: 30px; }
+  .usecase-item { background: rgba(251,191,36,0.05); border: 1px solid rgba(251,191,36,0.15); border-radius: 4px; padding: 12px 14px; font-size: 0.8rem; color: var(--text); transition: all 0.3s; }
+  .usecase-item:hover { border-color: var(--gold); background: rgba(251,191,36,0.08); }
+  .link-list { display: flex; flex-wrap: wrap; gap: 6px; padding-left: 30px; }
+  .link-tag { display: inline-block; padding: 6px 14px; background: rgba(249,115,22,0.08); border: 1px solid rgba(249,115,22,0.2); border-radius: 20px; color: var(--orange); font-size: 0.78rem; text-decoration: none; transition: all 0.3s; letter-spacing: 0.5px; margin: 4px 4px 4px 0; }
+  .link-tag:hover { background: rgba(249,115,22,0.2); border-color: var(--orange); box-shadow: var(--glow-orange); }
+  footer { text-align: center; padding: 50px 20px 30px; color: var(--text-muted); font-size: 0.75rem; letter-spacing: 2px; }
+  .footer-line { width: 100px; height: 1px; background: linear-gradient(90deg, transparent, var(--gold-dim), transparent); margin: 0 auto 16px; }
   ::-webkit-scrollbar { width: 6px; }
   ::-webkit-scrollbar-track { background: var(--bg); }
   ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
   ::-webkit-scrollbar-thumb:hover { background: var(--orange); }
-
-  .hidden { display: none !important; }
-
-  /* Mind Map Categories */
-  .category {
-    margin-bottom: 14px;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    overflow: hidden;
-    background: var(--card);
-    transition: border-color 0.4s, box-shadow 0.4s;
-  }
-
-  .category:hover { border-color: var(--gold-dim); }
-
-  .category-header {
-    padding: 20px 26px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    transition: all 0.3s;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .category-header::before {
-    content: '';
-    position: absolute;
-    left: 0; top: 0; bottom: 0;
-    width: 3px;
-    background: linear-gradient(180deg, var(--orange), var(--gold));
-    opacity: 0;
-    transition: opacity 0.3s;
-  }
-
-  .category-header:hover::before { opacity: 1; }
-  .category-header:hover { background: var(--card-hover); }
-
-  .category-title {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: var(--text);
-    letter-spacing: 2px;
-    text-transform: uppercase;
-  }
-
-  .category-count {
-    font-size: 0.72rem;
-    color: var(--text-dim);
-    background: rgba(249,115,22,0.1);
-    padding: 4px 12px;
-    border-radius: 20px;
-    border: 1px solid rgba(249,115,22,0.2);
-  }
-
-  .category-toggle {
-    font-size: 1.2rem;
-    color: var(--orange);
-    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    margin-left: 16px;
-  }
-
-  .category.expanded .category-toggle { transform: rotate(90deg); }
-
-  .category-body {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.6s cubic-bezier(0.4, 0, 0.2, 1), padding 0.4s;
-    padding: 0 24px;
-  }
-
-  .category.expanded .category-body {
-    max-height: 3000px;
-    padding: 0 24px 24px;
-  }
-
-  .nodes-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 14px;
-    padding-top: 4px;
-  }
-
-  .node-card {
-    background: linear-gradient(145deg, #0d0d0d, #080808);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 18px 16px;
-    cursor: pointer;
-    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
-    overflow: hidden;
-  }
-
-  .node-card::after {
-    content: '';
-    position: absolute;
-    bottom: 0; left: 0; right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, var(--orange), var(--gold));
-    transform: scaleX(0);
-    transform-origin: left;
-    transition: transform 0.4s;
-  }
-
-  .node-card:hover {
-    border-color: var(--orange);
-    transform: translateY(-3px);
-    box-shadow: var(--glow-orange), 0 10px 40px rgba(0,0,0,0.5);
-  }
-
-  .node-card:hover::after { transform: scaleX(1); }
-
-  .node-name {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 0.88rem;
-    font-weight: 600;
-    color: var(--text);
-    letter-spacing: 1px;
-    margin-bottom: 5px;
-  }
-
-  .node-desc {
-    font-size: 0.74rem;
-    color: var(--text-dim);
-    line-height: 1.4;
-  }
-
-  /* Modal */
-  .modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.92);
-    backdrop-filter: blur(8px);
-    z-index: 1000;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-    opacity: 0;
-    transition: opacity 0.3s;
-  }
-
-  .modal-overlay.active {
-    display: flex;
-    opacity: 1;
-  }
-
-  .modal {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    width: 100%;
-    max-width: 850px;
-    max-height: 90vh;
-    overflow-y: auto;
-    position: relative;
-    box-shadow: 0 0 60px rgba(249,115,22,0.1), 0 25px 50px rgba(0,0,0,0.8);
-    transform: scale(0.95) translateY(20px);
-    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  .modal-overlay.active .modal {
-    transform: scale(1) translateY(0);
-  }
-
-  .modal-header {
-    padding: 26px 30px 20px;
-    border-bottom: 1px solid var(--border);
-    position: relative;
-  }
-
-  .modal-header::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, var(--orange), var(--gold), var(--orange));
-  }
-
-  .modal-title {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 1.4rem;
-    font-weight: 700;
-    color: var(--orange);
-    letter-spacing: 2px;
-  }
-
-  .modal-subtitle {
-    color: var(--text-dim);
-    font-size: 0.82rem;
-    margin-top: 5px;
-    letter-spacing: 1px;
-  }
-
-  .modal-close {
-    position: absolute;
-    top: 22px; right: 22px;
-    background: none;
-    border: 1px solid var(--border);
-    color: var(--text-dim);
-    width: 36px; height: 36px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 1.2rem;
-    transition: all 0.3s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .modal-close:hover {
-    border-color: var(--orange);
-    color: var(--orange);
-    box-shadow: var(--glow-orange);
-  }
-
-  .modal-body { padding: 26px 30px; }
-
-  .section-title {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 0.82rem;
-    font-weight: 600;
-    color: var(--gold);
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    margin: 22px 0 10px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .section-title:first-child { margin-top: 0; }
-  .section-title::before {
-    content: '';
-    width: 20px;
-    height: 1px;
-    background: var(--gold);
-  }
-
-  .section-content {
-    color: var(--text-dim);
-    font-size: 0.86rem;
-    line-height: 1.7;
-    padding-left: 30px;
-  }
-
-  .section-content p { margin-bottom: 10px; color: var(--text); }
-
-  .issue-item {
-    padding: 10px 14px;
-    background: rgba(249,115,22,0.04);
-    border-left: 2px solid var(--orange);
-    margin-bottom: 8px;
-    border-radius: 0 4px 4px 0;
-    font-size: 0.84rem;
-    color: var(--text);
-  }
-
-  .cmd-block {
-    background: #050505;
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 12px 16px;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.8rem;
-    color: var(--gold);
-    overflow-x: auto;
-    margin-bottom: 8px;
-    position: relative;
-  }
-
-  .usecase-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 10px;
-    padding-left: 30px;
-  }
-
-  .usecase-item {
-    background: rgba(251,191,36,0.05);
-    border: 1px solid rgba(251,191,36,0.15);
-    border-radius: 4px;
-    padding: 12px 14px;
-    font-size: 0.8rem;
-    color: var(--text);
-    transition: all 0.3s;
-  }
-
-  .usecase-item:hover {
-    border-color: var(--gold);
-    background: rgba(251,191,36,0.08);
-  }
-
-  .link-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    padding-left: 30px;
-  }
-
-  .search-box {
-    display: flex;
-    gap: 0;
-    max-width: 600px;
-    margin: 0 auto 40px;
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    overflow: hidden;
-    background: var(--card);
-  }
-
-  .search-box input {
-    flex: 1;
-    background: transparent;
-    border: none;
-    padding: 14px 18px;
-    color: var(--text);
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.9rem;
-    outline: none;
-  }
-
-  .search-box input::placeholder { color: var(--text-muted); }
-  .search-box input:focus { border-color: var(--orange); }
-
-  .search-box button {
-    padding: 0 24px;
-    background: linear-gradient(135deg, var(--orange), var(--orange-dark));
-    border: none;
-    color: #000;
-    font-family: 'Orbitron', sans-serif;
-    font-weight: 700;
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    cursor: pointer;
-    transition: all 0.3s;
-  }
-
-  .search-box button:hover {
-    background: linear-gradient(135deg, var(--gold), var(--orange));
-    box-shadow: 0 0 20px rgba(249,115,22,0.3);
-  }
+  @media (max-width: 900px) { h1 { font-size: 2.2rem; letter-spacing: 6px; } nav a { padding: 8px 12px; font-size: 0.7rem; } .roadmap { padding-left: 24px; } .node-branch { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
@@ -646,22 +92,27 @@
     <div class="glitch-line"></div>
   </header>
 
-
   <nav>
     <a href="index.html">Mind Map</a>
     <a href="arch.html">Architecture</a>
     <a href="search.html">Search</a>
     <a href="blog.html">Blog & Tech</a>
+    <a href="build.html">Build</a>
     <a href="about.html">About</a>
   </nav>
 
+  <div style="text-align:center;margin-bottom:10px;">
+    <div class="page-title">Knowledge Roadmap</div>
+    <div class="page-desc">11 categories. 54 nodes. Search, explore, deploy.</div>
+  </div>
 
-<div class="search-box">
-  <input type="text" id="globalSearch" placeholder="Search the construct..." autocomplete="off" onkeydown="if(event.key==='Enter')performSearch()">
-  <button onclick="performSearch()">Search</button>
-</div>
+  <div class="search-box">
+    <input type="text" id="globalSearch" placeholder="Filter the construct..." autocomplete="off" oninput="renderCategories(this.value)">
+    <button onclick="renderCategories(document.getElementById('globalSearch').value)">Filter</button>
+  </div>
+  <div class="search-meta" id="searchMeta">Showing all categories — click a category to expand</div>
 
-<div id="categories"></div>
+  <div id="categories"></div>
 
 </div>
 
@@ -677,16 +128,13 @@
   </div>
 </div>
 
-
   <footer>
     <div class="footer-line"></div>
     <div>Matrix &mdash; Built for GitHub Pages</div>
     <div style="margin-top:6px; font-size:0.7rem; color:#333;">Wake up, Neo...</div>
   </footer>
 
-
 <script>
-
 // Matrix rain
 (function initMatrix() {
   const canvas = document.getElementById('matrix-canvas');
@@ -696,8 +144,9 @@
   resize(); window.addEventListener('resize', resize);
   const chars = '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
   const fontSize = 14;
-  const columns = Math.floor(canvas.width / fontSize);
-  const drops = Array(columns).fill(1);
+  let columns = Math.floor(canvas.width / fontSize);
+  let drops = Array(columns).fill(1);
+  window.addEventListener('resize', () => { columns = Math.floor(canvas.width / fontSize); drops = Array(columns).fill(1); });
   function draw() {
     ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -718,7 +167,6 @@ const currentPage = window.location.pathname.split('/').pop() || 'index.html';
 document.querySelectorAll('nav a').forEach(a => {
   if (a.getAttribute('href') === currentPage) a.classList.add('active');
 });
-
 
 // ===================== DATA =====================
 const categories = [
@@ -836,65 +284,81 @@ const categories = [
 ];
 
 // ===================== RENDER =====================
-function renderCategories() {
+function highlight(text, q) {
+  if (!q) return text;
+  const regex = new RegExp('(' + q.replace(/[.*+?^${}()|[\]\\\\]/g, '\\\\$&') + ')', 'gi');
+  return text.replace(regex, '<mark>$1</mark>');
+}
+
+function renderCategories(filter) {
   const container = document.getElementById('categories');
-  container.innerHTML = categories.map((cat, ci) => `
-    <div class="category" id="cat-${ci}">
-      <div class="category-header" onclick="toggleCategory(${ci})">
-        <div style="display:flex;align-items:center;gap:16px;">
-          <span class="category-title">${cat.name}</span>
-          <span class="category-count">${cat.nodes.length} nodes</span>
-        </div>
-        <span class="category-toggle">&#8250;</span>
+  const q = (filter || '').toLowerCase().trim();
+  let visibleCats = 0, visibleNodes = 0;
+  let html = '<div class="roadmap">';
+  categories.forEach((cat, ci) => {
+    const matched = cat.nodes.map((n, ni) => ({ n, ni, match: 
+      n.name.toLowerCase().includes(q) || 
+      n.desc.toLowerCase().includes(q) ||
+      cat.name.toLowerCase().includes(q)
+    })).filter(x => x.match);
+    if (q && matched.length === 0) return;
+    visibleCats++; visibleNodes += matched.length;
+    const isCollapsed = q ? false : true;
+    html += `<div class="category-node ${isCollapsed ? 'collapsed' : ''}" id="cat-${ci}">
+      <div class="category-header-tree" onclick="toggleCategory(${ci})">
+        <span class="category-title-tree">${highlight(cat.name, q)}</span>
+        <span class="category-count-tree">${matched.length}/${cat.nodes.length} nodes</span>
+        <span class="category-toggle-tree">&#9660;</span>
       </div>
-      <div class="category-body">
-        <div class="nodes-grid">
-          ${cat.nodes.map((node, ni) => `
-            <div class="node-card" onclick="openModal(${ci}, ${ni})" data-name="${node.name.toLowerCase()}" data-cat="${cat.name.toLowerCase()}">
-              <div class="node-name">${node.name}</div>
-              <div class="node-desc">${node.desc}</div>
-            </div>
-          `).join('')}
-        </div>
+      <div class="node-branch">
+        ${matched.map(({n, ni}) => `
+          <div class="node-card-tree" onclick="openModal(${ci}, ${ni})">
+            <div class="node-name-tree">${highlight(n.name, q)}</div>
+            <div class="node-desc-tree">${highlight(n.desc, q)}</div>
+          </div>
+        `).join('')}
       </div>
-    </div>
-  `).join('');
+    </div>`;
+  });
+  html += '</div>';
+  container.innerHTML = html;
+  const meta = document.getElementById('searchMeta');
+  if (q) {
+    meta.textContent = `Found ${visibleNodes} nodes across ${visibleCats} categories matching "${q}"`;
+    meta.style.color = 'var(--orange)';
+  } else {
+    meta.textContent = 'Showing all ' + categories.length + ' categories — click a category to expand';
+    meta.style.color = 'var(--text-muted)';
+  }
 }
 
 function toggleCategory(idx) {
-  const cat = document.getElementById('cat-' + idx);
-  cat.classList.toggle('expanded');
+  document.getElementById('cat-' + idx).classList.toggle('collapsed');
 }
 
 function openModal(ci, ni) {
   const node = categories[ci].nodes[ni];
   document.getElementById('modalTitle').textContent = node.name;
   document.getElementById('modalSubtitle').textContent = categories[ci].name + ' // ' + node.desc;
-
   document.getElementById('modalBody').innerHTML = `
     <div class="section-title">Overview</div>
     <div class="section-content"><p>${node.overview}</p></div>
-
     <div class="section-title">Common Issues</div>
     <div class="section-content">
       ${node.issues.map(i => `<div class="issue-item">${i}</div>`).join('')}
     </div>
-
     <div class="section-title">Commands</div>
     <div class="section-content">
       ${node.commands.map(c => `<div class="cmd-block">${c}</div>`).join('')}
     </div>
-
     <div class="section-title">Use Cases</div>
     <div class="usecase-grid">
       ${node.usecases.map(u => `<div class="usecase-item">${u}</div>`).join('')}
     </div>
-
     <div class="section-title">References</div>
     <div class="link-list">
       ${node.links.map(l => `<a class="link-tag" href="https://www.google.com/search?q=${encodeURIComponent(l + ' ' + node.name)}" target="_blank" rel="noopener">${l}</a>`).join('')}
     </div>
-
     <div class="section-title">Web Search</div>
     <div class="section-content" style="padding-left:30px;">
       <div style="display:flex;gap:10px;margin-bottom:12px;">
@@ -907,7 +371,6 @@ function openModal(ci, ni) {
       <div id="nodeSearchResults" style="max-height:300px;overflow-y:auto;"></div>
     </div>
   `;
-
   document.getElementById('modalOverlay').classList.add('active');
   document.body.style.overflow = 'hidden';
 }
@@ -923,10 +386,8 @@ async function searchNodeWeb(ci, ni) {
   const input = document.getElementById('nodeSearchInput');
   const query = input.value.trim();
   if (!query) return;
-
   const container = document.getElementById('nodeSearchResults');
   container.innerHTML = '<div style="color:var(--text-muted);font-size:0.8rem;">Searching...</div>';
-
   try {
     const res = await fetch(`https://api.stackexchange.com/2.3/search/advanced?order=desc&sort=relevance&q=${encodeURIComponent(query + ' ' + node.name)}&site=stackoverflow&pagesize=5`);
     const data = await res.json();
@@ -941,24 +402,8 @@ async function searchNodeWeb(ci, ni) {
   }
 }
 
-function performSearch() {
-  const query = document.getElementById('globalSearch').value.trim().toLowerCase();
-  if (!query) {
-    document.querySelectorAll('.node-card').forEach(c => c.style.display = 'block');
-    return;
-  }
-  document.querySelectorAll('.node-card').forEach(card => {
-    const match = card.dataset.name.includes(query) || card.dataset.cat.includes(query);
-    card.style.display = match ? 'block' : 'none';
-    if (match) {
-      const parent = card.closest('.category');
-      if (!parent.classList.contains('expanded')) parent.classList.add('expanded');
-    }
-  });
-}
-
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
-document.addEventListener('DOMContentLoaded', renderCategories);
+document.addEventListener('DOMContentLoaded', () => renderCategories(''));
 </script>
 </body>
 </html>
