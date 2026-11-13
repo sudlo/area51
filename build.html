@@ -548,7 +548,7 @@
 
   <div class="card" id="build-card">
     <div class="card-title"><span class="icon">✦</span> What do you want to build?</div>
-    <textarea id="prompt" placeholder="Example: I need a Terraform script to deploy a 3-tier web app on AWS with an ALB, auto-scaling group, RDS PostgreSQL, and CloudWatch monitoring. Include VPC and SSL."></textarea>
+    <textarea id="prompt" placeholder="Example: I need a Terraform script to deploy a 3-tier web app on AWS with an ALB, auto-scaling group, RDS PostgreSQL, and CloudWatch monitoring. Include VPC and SSL." onkeydown="if((event.metaKey||event.ctrlKey)&&event.key==='Enter')analyze()"></textarea>
     <div class="hint">Be specific: mention the tool (Terraform, Ansible, Docker, K8s), cloud provider, and services.</div>
     <div class="btn-wrap">
       <button class="btn-pill-primary" id="analyze-btn" onclick="analyze()"><span class="sparkle">✦</span> Analyze &amp; Ask</button>
@@ -563,6 +563,7 @@
     <div class="btn-wrap">
       <button class="btn-pill-primary" onclick="generate()"><span class="sparkle">✦</span> BUILD ARTIFACTS</button>
     </div>
+    <div class="status" id="gen-status"></div>
   </div>
 
   <div class="output-area" id="output-area">
@@ -856,13 +857,29 @@ function getAnswers(){
 function generate(){
   try{
     var status=document.getElementById('status');
-    status.innerText='Building artifacts...';status.className='status info';
+    var genStatus=document.getElementById('gen-status');
+    var setMsg = function(msg, cls) {
+      if(status){ status.innerText=msg; status.className='status '+cls; }
+      if(genStatus){ genStatus.innerText=msg; genStatus.className='status '+cls; }
+    };
+    setMsg('Building artifacts...', 'info');
     var ans=getAnswers();
     var prompt=document.getElementById('prompt').value;
     var params={
-      name:ans.project||'area51',region:ans.region||'us-east-1',env:'prod',instance:'t3.medium',
-      desc:prompt,monitoring:!!ans.monitoring,backup:!!ans.backup,ssl:!!ans.ssl,vpc:!!ans.vpc,
-      db:ans.db||'None',lb:!!ans.lb,autoscale:!!ans.autoscale,compute:ans.compute||'EC2/VM Instances',replicas:ans.replicas||'3'
+      name: ans.project || 'area51',
+      region: ans.region || 'us-east-1',
+      env: 'prod',
+      instance: 't3.medium',
+      desc: prompt,
+      monitoring: ans.monitoring !== undefined ? !!ans.monitoring : !!currentDetected.monitoring,
+      backup: ans.backup !== undefined ? !!ans.backup : !!currentDetected.backup,
+      ssl: ans.ssl !== undefined ? !!ans.ssl : !!currentDetected.ssl,
+      vpc: ans.vpc !== undefined ? !!ans.vpc : (currentDetected.vpc !== undefined ? !!currentDetected.vpc : true),
+      db: ans.db !== undefined ? ans.db : (currentDetected.db ? 'PostgreSQL (RDS/Cloud SQL)' : 'None'),
+      lb: ans.lb !== undefined ? !!ans.lb : !!currentDetected.lb,
+      autoscale: ans.autoscale !== undefined ? !!ans.autoscale : !!currentDetected.autoscale,
+      compute: ans.compute || (currentDetected.serverless ? 'Serverless (Lambda/Functions)' : (currentDetected.kubernetes || currentDetected.eks ? 'Kubernetes (EKS/GKE/AKS)' : 'EC2/VM Instances')),
+      replicas: ans.replicas || '3'
     };
     var result=runGenerator(currentStack,params);
     document.getElementById('code-main').innerText=result.main;
@@ -870,12 +887,12 @@ function generate(){
     document.getElementById('code-outputs').innerText=result.outputs;
     document.getElementById('code-readme').innerText=result.readme;
     document.getElementById('output-area').classList.add('active');
-    status.innerText='SUCCESS: '+currentStack.toUpperCase()+' artifacts generated.';
-    status.className='status success';
+    setMsg('SUCCESS: '+currentStack.toUpperCase()+' artifacts generated.', 'success');
     document.getElementById('output-area').scrollIntoView({behavior:'smooth'});
   }catch(e){
-    document.getElementById('status').innerText='ERROR: '+e.message;
-    document.getElementById('status').className='status error';
+    var errText = 'ERROR: ' + e.message;
+    if(status){ status.innerText=errText; status.className='status error'; }
+    if(genStatus){ genStatus.innerText=errText; genStatus.className='status error'; }
     console.error(e);
   }
 }
@@ -2061,7 +2078,7 @@ function genAnsible(p){
     '',
     '## Features',
     '- Nginx installation and configuration',
-    (p.ssl ? '- SSL via Let\\'s Encrypt' : ''),
+    (p.ssl ? "- SSL via Let's Encrypt" : ''),
     (p.monitoring ? '- Prometheus node_exporter' : ''),
     (p.db !== 'None' ? '- PostgreSQL installation' : '')
   ].filter(function(s){return s!=='';}).join('\n');
