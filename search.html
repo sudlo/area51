@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>KAMUI | Federated Intelligence Search</title>
+<title>AREA 51 | Federated Intelligence Search</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -1115,8 +1115,7 @@
 <header class="site-header">
     <div class="header-inner">
       <a href="index.html" class="logo">
-        <span style="font-family:'Cinzel',serif;font-weight:900;letter-spacing:0.18em;color:#fcd6d9;font-size:1.35rem;">KAMUI</span>
-        <span style="font-size:0.62rem;letter-spacing:0.22em;color:#d9658b;font-family:'JetBrains Mono',monospace;text-transform:uppercase;margin-left:6px;background:rgba(217,101,139,0.15);padding:2px 7px;border-radius:4px;border:1px solid rgba(217,101,139,0.3);">AREA 51</span>
+        <span style="font-family:'Cinzel',serif;font-weight:900;letter-spacing:0.18em;color:#fcd6d9;font-size:1.35rem;">AREA 51</span>
       </a>
       <nav class="nav-links">
         <a href="arch.html">Arch</a>
@@ -1124,35 +1123,112 @@
         <a href="build.html">Build</a>
         <a href="search.html" class="active">Search</a>
       </nav>
-      <div class="header-cta">
-        <a href="https://github.com/sudlo/area51" target="_blank" rel="noopener" class="btn-signin">GitHub</a>
-        <a href="build.html" class="btn-getstarted">Launch Studio</a>
-      </div>
     </div>
   </header>
 
 <div class="container">
-  <div class="kamui-hero">
-    <div class="kamui-watermark">カムイ</div>
-    <div class="kamui-eyebrow">— Federated Intelligence —</div>
-    <h1 class="kamui-title">KAMUI FEDERATED SEARCH</h1>
-    <p class="kamui-desc">Unified intelligence querying local architecture nodes, live GitHub repositories, and StackOverflow solutions simultaneously.</p>
-    <div class="kamui-actions">
-      <a href="#searchQuery" class="btn-kamui-primary">Search Knowledge Base</a>
-      <a href="index.html" class="btn-kamui-secondary">Browse All Nodes</a>
+  <div class="hero-banner" style="text-align:center; padding:45px 20px 24px; max-width:960px; margin:0 auto;">
+    <div class="hero-eyebrow" style="font-family:'Cinzel',serif; font-size:0.82rem; font-weight:700; letter-spacing:0.25em; color:#f4a4b8; text-transform:uppercase; margin-bottom:10px;">
+      — Federated Intelligence —
+    </div>
+    <h1 class="hero-title" style="font-family:'Cinzel','Outfit',sans-serif; font-size:clamp(2.2rem, 5vw, 3.6rem); font-weight:900; letter-spacing:0.04em; line-height:1.15; background:linear-gradient(135deg, #ffffff 15%, #fcd6d9 50%, #d9658b 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin-bottom:12px;">
+      FEDERATED INTELLIGENCE SEARCH
+    </h1>
+    <p class="hero-desc" style="color:#e2d9f3; font-size:1.02rem; max-width:680px; margin:0 auto 28px; line-height:1.6;">
+      Simultaneous search across 45 offline architecture nodes, live GitHub repositories, and StackOverflow solutions.
+    </p>
+
+    <!-- Search Input Wrap -->
+    <div class="search-hub" style="max-width:720px; margin:0 auto 24px;">
+      <div class="search-input-wrap" style="display:flex; gap:10px; background:rgba(18,9,30,0.88); border:1px solid rgba(217,101,139,0.35); border-radius:12px; padding:8px 14px; box-shadow:0 4px 25px rgba(0,0,0,0.5);">
+        <input type="text" id="searchQuery" placeholder="Search architecture nodes, GitHub repos, or StackOverflow (e.g. 'Kubernetes', 'Terraform', 'vLLM', 'eBPF')..." 
+          style="flex:1; background:transparent; border:none; color:#ffffff; font-size:0.95rem; font-family:inherit; outline:none;"
+          autocomplete="off" onkeydown="if(event.key==='Enter')doSearch()">
+        <button onclick="doSearch()" style="background:linear-gradient(135deg, #ffffff 0%, #fcd6d9 100%); color:#160a22; border:none; padding:8px 24px; border-radius:8px; font-weight:700; font-size:0.85rem; cursor:pointer; transition:all 0.2s;">
+          Search
+        </button>
+      </div>
+    </div>
+
+    <!-- Quick Tags -->
+    <div style="max-width:860px; margin:0 auto 30px;">
+      <div style="font-family:'JetBrains Mono',monospace; font-size:0.75rem; color:#fbbf24; letter-spacing:0.12em; text-transform:uppercase; margin:14px 0 8px;">Cloud Architecture</div>
+      <div style="display:flex; flex-wrap:wrap; gap:8px; justify-content:center;">
+        <span class="quick-tag" onclick="quickSearch('AWS EKS Lambda Fargate')">AWS Cloud</span>
+        <span class="quick-tag" onclick="quickSearch('Azure AKS CosmosDB Entra')">Azure Enterprise</span>
+        <span class="quick-tag" onclick="quickSearch('GCP BigQuery GKE Spanner')">Google Cloud</span>
+        <span class="quick-tag" onclick="quickSearch('Multi-cloud transit gateway interconnect')">Multi-Cloud</span>
+      </div>
+
+      <div style="font-family:'JetBrains Mono',monospace; font-size:0.75rem; color:#fbbf24; letter-spacing:0.12em; text-transform:uppercase; margin:14px 0 8px;">DevOps &amp; IaC</div>
+      <div style="display:flex; flex-wrap:wrap; gap:8px; justify-content:center;">
+        <span class="quick-tag" onclick="quickSearch('ArgoCD GitOps progressive delivery')">ArgoCD &amp; GitOps</span>
+        <span class="quick-tag" onclick="quickSearch('Kubernetes ingress envoy service mesh')">Kubernetes Mesh</span>
+        <span class="quick-tag" onclick="quickSearch('Terraform OpenTofu terragrunt state')">Terraform / OpenTofu</span>
+        <span class="quick-tag" onclick="quickSearch('Ansible playbook automation roles')">Ansible</span>
+      </div>
+
+      <div style="font-family:'JetBrains Mono',monospace; font-size:0.75rem; color:#fbbf24; letter-spacing:0.12em; text-transform:uppercase; margin:14px 0 8px;">AIOps &amp; MLOps</div>
+      <div style="display:flex; flex-wrap:wrap; gap:8px; justify-content:center;">
+        <span class="quick-tag" onclick="quickSearch('vLLM triton inference model serving')">vLLM &amp; Inference</span>
+        <span class="quick-tag" onclick="quickSearch('LangChain LlamaIndex RAG hybrid')">Enterprise RAG</span>
+        <span class="quick-tag" onclick="quickSearch('Prometheus AI anomaly telemetry')">Prometheus AIOps</span>
+        <span class="quick-tag" onclick="quickSearch('Qdrant Milvus pgvector embeddings')">Vector Databases</span>
+      </div>
+
+      <div style="font-family:'JetBrains Mono',monospace; font-size:0.75rem; color:#fbbf24; letter-spacing:0.12em; text-transform:uppercase; margin:14px 0 8px;">Operating Systems</div>
+      <div style="display:flex; flex-wrap:wrap; gap:8px; justify-content:center;">
+        <span class="quick-tag" onclick="quickSearch('Linux eBPF bpftrace kernel')">Linux eBPF</span>
+        <span class="quick-tag" onclick="quickSearch('systemd cgroups v2 resource slices')">Systemd &amp; cgroups</span>
+        <span class="quick-tag" onclick="quickSearch('Windows sysinternals procmon procexp')">Sysinternals</span>
+        <span class="quick-tag" onclick="quickSearch('PowerShell Core automation remoting')">PowerShell Core</span>
+      </div>
     </div>
   </div>
 
-  <div class="card" id="historyCard" <div class="card" id="historyCard" style="display:none; max-width:720px; margin:40px auto 0;">
-    <h3>Recent Searches</h3>
-    <div class="history-list" id="historyList"></div>
+  <!-- Source Filtering Tabs -->
+  <div class="source-filter-bar" id="sourceFilterBar" style="display:none; max-width:1200px; margin: 20px auto 16px; justify-content: center; gap: 10px;">
+    <button class="source-tab active" onclick="filterSource('all', this)">All Sources</button>
+    <button class="source-tab" onclick="filterSource('local', this)">Architecture Nodes (<span id="localCount">0</span>)</button>
+    <button class="source-tab" onclick="filterSource('github', this)">GitHub Repos (<span id="ghCount">0</span>)</button>
+    <button class="source-tab" onclick="filterSource('so', this)">StackOverflow (<span id="soCount">0</span>)</button>
+  </div>
+
+  <!-- Results Grid -->
+  <div class="results-grid" id="resultsGrid" style="display:none; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 20px; max-width:1200px; margin:0 auto 40px;">
+    <div class="result-col" id="col-local">
+      <div class="result-col-header" style="color:var(--amber); border-bottom:1px solid rgba(245, 158, 11, 0.3); padding-bottom:10px; margin-bottom:14px; display:flex; justify-content:space-between; align-items:center;">
+        <span style="font-weight:700;">Knowledge Mesh</span>
+        <span style="font-size:0.75rem; background:rgba(245,158,11,0.15); color:var(--amber); padding:2px 8px; border-radius:12px;">Local Offline</span>
+      </div>
+      <div class="result-col-body" id="localResults"></div>
+    </div>
+    <div class="result-col" id="col-github">
+      <div class="result-col-header" style="color:#60a5fa; border-bottom:1px solid rgba(96, 165, 250, 0.3); padding-bottom:10px; margin-bottom:14px; display:flex; justify-content:space-between; align-items:center;">
+        <span style="font-weight:700;">GitHub Repositories</span>
+        <span style="font-size:0.75rem; background:rgba(96,165,250,0.15); color:#60a5fa; padding:2px 8px; border-radius:12px;">Live API</span>
+      </div>
+      <div class="result-col-body" id="githubResults"></div>
+    </div>
+    <div class="result-col" id="col-so">
+      <div class="result-col-header" style="color:#f97316; border-bottom:1px solid rgba(249, 115, 22, 0.3); padding-bottom:10px; margin-bottom:14px; display:flex; justify-content:space-between; align-items:center;">
+        <span style="font-weight:700;">StackOverflow Engineering</span>
+        <span style="font-size:0.75rem; background:rgba(249,115,22,0.15); color:#f97316; padding:2px 8px; border-radius:12px;">Discussions</span>
+      </div>
+      <div class="result-col-body" id="soResults"></div>
+    </div>
+  </div>
+
+  <!-- History Card -->
+  <div class="card" id="historyCard" style="display:none; max-width:720px; margin:30px auto 40px; background:rgba(24, 13, 38, 0.76); border:1px solid rgba(217,101,139,0.25); border-radius:12px; padding:20px;">
+    <h3 style="font-size:1rem; margin-bottom:10px; color:#ffffff;">Recent Searches</h3>
+    <div class="history-list" id="historyList" style="display:flex; flex-wrap:wrap; gap:8px;"></div>
     <div style="text-align:right; margin-top:14px;">
-      <button class="btn-outline" onclick="clearHistory()">Clear History</button>
+      <button class="btn-outline" onclick="clearHistory()" style="background:none; border:1px solid rgba(255,255,255,0.15); color:#b8a9cf; padding:4px 12px; border-radius:4px; font-size:0.75rem; cursor:pointer;">Clear History</button>
     </div>
   </div>
 
-  
-  <!-- SCREENSHOT 3: Styled Split Feature Card -->
+  <!-- Split Feature Card -->
   <div class="split-feature-card">
     <div class="split-left">
       <h3>AI × HUMANITY: <span class="amber">ONE FUTURE,</span> ONE FORCE</h3>
@@ -1173,14 +1249,13 @@
   </div>
 
   <footer>
-    <div class="footer-line"></div>
-    evolute &mdash; The Future of Thinking &copy; 2026
+    AREA 51 &mdash; Federated Intelligence &copy; 2026
   </footer>
 </div>
 
 <script>
-// Kamui Twilight Sakura & Dusk Embers Canvas
-(function initKamuiParticles() {
+// Twilight Sakura & Dusk Embers Canvas
+(function initTwilightParticles() {
   const canvas = document.getElementById('matrix-canvas');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');

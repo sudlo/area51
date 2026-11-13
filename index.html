@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>KAMUI | Developer &amp; Cloud Roadmaps</title>
+<title>AREA 51 | Developer &amp; Cloud Roadmaps</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -170,7 +170,7 @@
     max-width: 960px;
     margin: 0 auto;
   }
-  .kamui-watermark {
+  .hero-watermark {
     position: absolute;
     top: 45%;
     left: 50%;
@@ -1007,8 +1007,7 @@
   <header class="site-header">
     <div class="header-inner">
       <a href="index.html" class="logo">
-        <span style="font-family:'Cinzel',serif;font-weight:900;letter-spacing:0.18em;color:#fcd6d9;font-size:1.35rem;">KAMUI</span>
-        <span style="font-size:0.62rem;letter-spacing:0.22em;color:#d9658b;font-family:'JetBrains Mono',monospace;text-transform:uppercase;margin-left:6px;background:rgba(217,101,139,0.15);padding:2px 7px;border-radius:4px;border:1px solid rgba(217,101,139,0.3);">ROADMAP.SH</span>
+        <span style="font-family:'Cinzel',serif;font-weight:900;letter-spacing:0.18em;color:#fcd6d9;font-size:1.35rem;">AREA 51</span>
       </a>
       <nav class="nav-links">
         <a href="arch.html">Arch</a>
@@ -1025,7 +1024,6 @@
 
   <!-- Roadmap.sh Hero -->
   <div class="roadmap-hero">
-    <div class="kamui-watermark">カムイ</div>
     <div class="roadmap-badge">✦ COMMUNITY-DRIVEN ENGINEERING ROADMAPS</div>
     <h1 class="roadmap-title">Developer &amp; Cloud Roadmaps</h1>
     <p class="roadmap-subtitle">
@@ -1086,13 +1084,13 @@
   <div class="split-feature-card">
     <div class="split-left">
       <div style="font-family:'Cinzel',serif;font-size:0.75rem;letter-spacing:0.25em;color:#f4a4b8;margin-bottom:8px;text-transform:uppercase;">Autonomous Intelligence × Human Intuition</div>
-      <h3 style="font-family:'Cinzel',serif;letter-spacing:0.04em;">KAMUI KNOWLEDGE: <span class="amber">ONE HORIZON,</span> ONE FORCE</h3>
+      <h3 style="font-family:'Cinzel',serif;letter-spacing:0.04em;">AI × HUMANITY: <span class="amber">ONE FUTURE,</span> ONE FORCE</h3>
       <p>Power your multi-cloud infrastructure and DevOps delivery with serene, AI-orchestrated architectures. Designed for curious engineers to enterprise architects.</p>
       <a href="build.html" class="btn-explore-demo">EXPLORE DEMO</a>
     </div>
     <div class="split-right">
       <div class="chip-card">
-        <div class="chip-card-brand">KAMUI CORE</div>
+        <div class="chip-card-brand">EVOLUTE SPYRE</div>
         <div class="chip-card-meta">
           Enterprise Hardware Accelerator<br>
           3221.0078236500 &bull; Low Latency<br>
@@ -1104,7 +1102,7 @@
   </div>
 
   <footer>
-    KAMUI &mdash; Developer &amp; Cloud Roadmaps &bull; Area51 &copy; 2026
+    AREA 51 &mdash; Developer &amp; Cloud Roadmaps &bull; Area51 &copy; 2026
   </footer>
 </div>
 
@@ -1132,8 +1130,8 @@
 </div>
 
 <script>
-// Kamui Twilight Sakura & Dusk Embers Canvas
-(function initKamuiParticles() {
+// Twilight Sakura & Dusk Embers Canvas
+(function initTwilightParticles() {
   const canvas = document.getElementById('matrix-canvas');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
@@ -3048,7 +3046,7 @@ const roleRoadmaps = [
   }
 ];
 
-let completedTopics = new Set(JSON.parse(localStorage.getItem('kamui_completed_topics') || '[]'));
+let completedTopics = new Set(JSON.parse(localStorage.getItem('area51_completed_topics') || '[]'));
 let filterIncompleteOnly = false;
 let currentModalNode = null;
 let currentModalCatIndex = -1;
@@ -3095,7 +3093,7 @@ function updateModalCompletionBtn() {
 }
 
 function saveProgress() {
-  localStorage.setItem('kamui_completed_topics', JSON.stringify([...completedTopics]));
+  localStorage.setItem('area51_completed_topics', JSON.stringify([...completedTopics]));
 }
 
 function resetProgress() {
