@@ -1015,6 +1015,98 @@
     .nav-links { gap: 16px; padding: 7px 18px; }
   }
 
+
+  .source-filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .source-tab {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: #94a3b8;
+    padding: 6px 16px;
+    border-radius: 9999px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .source-tab:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
+  }
+  .source-tab.active {
+    background: rgba(245, 158, 11, 0.15);
+    border-color: rgba(245, 158, 11, 0.6);
+    color: #f59e0b;
+    font-weight: 600;
+  }
+  .local-node-card {
+    background: rgba(11, 16, 33, 0.8);
+    border: 1px solid rgba(245, 158, 11, 0.2);
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin-bottom: 12px;
+    transition: all 0.2s;
+  }
+  .local-node-card:hover {
+    border-color: rgba(245, 158, 11, 0.5);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(245, 158, 11, 0.1);
+  }
+  .local-node-title {
+    color: #f59e0b;
+    font-weight: 700;
+    font-size: 0.95rem;
+    margin-bottom: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .local-node-cat {
+    font-size: 0.72rem;
+    color: #94a3b8;
+    font-weight: 400;
+    background: rgba(255,255,255,0.05);
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+  .local-node-desc {
+    color: #cbd5e1;
+    font-size: 0.82rem;
+    line-height: 1.4;
+    margin-bottom: 8px;
+  }
+  .local-node-cmd {
+    background: #030712;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 4px;
+    padding: 6px 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    color: #38bdf8;
+    overflow-x: auto;
+    white-space: nowrap;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .copy-btn {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #94a3b8;
+    padding: 2px 6px;
+    font-size: 0.68rem;
+    border-radius: 3px;
+    cursor: pointer;
+    margin-left: 8px;
+  }
+  .copy-btn:hover {
+    color: #ffffff;
+    border-color: #f59e0b;
+  }
+
 </style>
 </head>
 <body>
@@ -1027,7 +1119,6 @@
       <a href="index.html">Home</a>
       <a href="arch.html">Features</a>
       <a href="search.html" class="active">Search</a>
-      <a href="blog.html">Radar</a>
       <a href="build.html">Build</a>
     </nav>
     <div class="header-cta">
@@ -1205,18 +1296,39 @@
     </div>
   </div>
 
-  <div class="results-grid" id="resultsGrid" style="display:none;">
-    <div class="result-col">
-      <div class="result-col-header">GitHub Repositories</div>
+  <!-- Source Filtering Tabs -->
+  <div class="source-filter-bar" id="sourceFilterBar" style="display:none; max-width:1200px; margin: 30px auto 16px; justify-content: center; gap: 10px;">
+    <button class="source-tab active" onclick="filterSource('all', this)">All Sources</button>
+    <button class="source-tab" onclick="filterSource('local', this)">Architecture Nodes (<span id="localCount">0</span>)</button>
+    <button class="source-tab" onclick="filterSource('github', this)">GitHub Repos (<span id="ghCount">0</span>)</button>
+    <button class="source-tab" onclick="filterSource('so', this)">StackOverflow (<span id="soCount">0</span>)</button>
+  </div>
+
+  <div class="results-grid" id="resultsGrid" style="display:none; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 20px;">
+    <div class="result-col" id="col-local">
+      <div class="result-col-header" style="color:var(--amber); border-bottom-color: rgba(245, 158, 11, 0.3);">
+        <span>Enterprise Knowledge Mesh</span>
+        <span style="font-size:0.75rem; background:rgba(245,158,11,0.15); color:var(--amber); padding:2px 8px; border-radius:12px;">Local Offline</span>
+      </div>
+      <div class="result-col-body" id="localResults"></div>
+    </div>
+    <div class="result-col" id="col-github">
+      <div class="result-col-header" style="color:#60a5fa; border-bottom-color: rgba(96, 165, 250, 0.3);">
+        <span>GitHub Repositories</span>
+        <span style="font-size:0.75rem; background:rgba(96,165,250,0.15); color:#60a5fa; padding:2px 8px; border-radius:12px;">Live API</span>
+      </div>
       <div class="result-col-body" id="githubResults"></div>
     </div>
-    <div class="result-col">
-      <div class="result-col-header">StackOverflow</div>
+    <div class="result-col" id="col-so">
+      <div class="result-col-header" style="color:#f97316; border-bottom-color: rgba(249, 115, 22, 0.3);">
+        <span>StackOverflow Engineering</span>
+        <span style="font-size:0.75rem; background:rgba(249,115,22,0.15); color:#f97316; padding:2px 8px; border-radius:12px;">Discussions</span>
+      </div>
       <div class="result-col-body" id="soResults"></div>
     </div>
   </div>
 
-  <div class="card" id="historyCard" style="display:none; max-width:720px; margin:40px auto 0;">
+  <div class="card" id="historyCard" <div class="card" id="historyCard" style="display:none; max-width:720px; margin:40px auto 0;">
     <h3>Recent Searches</h3>
     <div class="history-list" id="historyList"></div>
     <div style="text-align:right; margin-top:14px;">
@@ -1262,44 +1374,36 @@
     width = canvas.width = window.innerWidth;
     height = canvas.height = window.innerHeight;
   }
-  resize();
   window.addEventListener('resize', resize);
+  resize();
 
-  const particles = Array.from({ length: 90 }, () => ({
-    x: Math.random() * width,
-    y: Math.random() * height,
-    radius: Math.random() * 1.4 + 0.4,
-    vx: (Math.random() - 0.5) * 0.2,
-    vy: -(Math.random() * 0.3 + 0.08),
-    alpha: Math.random() * 0.65 + 0.2,
-    pulseSpeed: Math.random() * 0.02 + 0.008,
-    isAmber: Math.random() > 0.6
-  }));
+  const numParticles = 75;
+  const particles = [];
+  for (let i = 0; i < numParticles; i++) {
+    particles.push({
+      x: Math.random() * width,
+      y: Math.random() * height,
+      size: Math.random() * 1.8 + 0.4,
+      vx: (Math.random() - 0.5) * 0.25,
+      vy: (Math.random() - 0.5) * 0.25,
+      alpha: Math.random() * 0.65 + 0.2,
+      amber: Math.random() > 0.65
+    });
+  }
 
   function animate() {
     ctx.clearRect(0, 0, width, height);
-    for (const p of particles) {
+    for (let p of particles) {
       p.x += p.vx;
       p.y += p.vy;
-      p.alpha += Math.sin(Date.now() * p.pulseSpeed * 0.05) * 0.008;
-      if (p.alpha < 0.1) p.alpha = 0.1;
-      if (p.alpha > 0.85) p.alpha = 0.85;
-      if (p.y < -10) { p.y = height + 10; p.x = Math.random() * width; }
-      if (p.x < -10) p.x = width + 10;
-      if (p.x > width + 10) p.x = -10;
+      if (p.x < 0) p.x = width;
+      if (p.x > width) p.x = 0;
+      if (p.y < 0) p.y = height;
+      if (p.y > height) p.y = 0;
 
       ctx.beginPath();
-      ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-      ctx.fillStyle = p.isAmber
-        ? 'rgba(245, 158, 11, ' + p.alpha + ')'
-        : 'rgba(255, 255, 255, ' + (p.alpha * 0.8) + ')';
-      if (p.isAmber) {
-        ctx.shadowBlur = 8;
-        ctx.shadowColor = 'rgba(245, 158, 11, 0.7)';
-      } else {
-        ctx.shadowBlur = 4;
-        ctx.shadowColor = 'rgba(255, 255, 255, 0.5)';
-      }
+      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+      ctx.fillStyle = p.amber ? `rgba(245, 158, 11, ${p.alpha})` : `rgba(147, 197, 253, ${p.alpha})`;
       ctx.fill();
     }
     requestAnimationFrame(animate);
@@ -1307,66 +1411,1717 @@
   animate();
 })();
 
+const localKnowledgeMesh = [
+  {
+    "name": "Cloud Architecture \u2014 AWS",
+    "nodes": [
+      {
+        "name": "AWS Compute & Serverless",
+        "desc": "EC2, Lambda, Fargate, ECS, EKS, Batch",
+        "overview": "Amazon Web Services compute portfolio spans elastic virtual machines (EC2 Nitro instances), managed container platforms (ECS on Fargate, EKS Kubernetes), event-driven serverless runtimes (AWS Lambda with SnapStart), and scalable batch processing engines. Optimized for multi-AZ elasticity, Graviton ARM cost-performance, and autoscaling.",
+        "issues": [
+          "Lambda cold starts with VPC ENI attachment latency",
+          "EC2 instance store data loss upon stopping or hardware degradation",
+          "EKS node group upgrade drift and daemonset evictions",
+          "Fargate container memory leaks causing OOMKilled loop",
+          "Over-provisioned EC2 capacity driving unbudgeted cloud spend"
+        ],
+        "commands": [
+          "aws ec2 describe-instances --filters 'Name=instance-state-name,Values=running'",
+          "aws lambda update-function-code --function-name apiHandler --zip-file fileb://app.zip",
+          "aws eks update-kubeconfig --region us-east-1 --name prod-cluster",
+          "aws ecs update-service --cluster app-cluster --service web --force-new-deployment",
+          "aws compute-optimizer get-ec2-instance-recommendations"
+        ],
+        "usecases": [
+          "High-throughput microservices on Amazon EKS",
+          "Event-driven asynchronous webhooks via API Gateway + Lambda",
+          "Distributed AI training batch jobs with AWS Batch on EC2 P5",
+          "Mission-critical stateful workloads on Multi-AZ EC2",
+          "Containerized serverless backends with AWS Fargate"
+        ],
+        "links": [
+          "AWS EC2",
+          "AWS Lambda",
+          "Amazon EKS",
+          "AWS Fargate",
+          "AWS Compute Optimizer"
+        ]
+      },
+      {
+        "name": "AWS Storage & Content Delivery",
+        "desc": "S3 Glacier, EBS gp3/io2, EFS, CloudFront, FSx",
+        "overview": "Highly resilient, multi-region distributed object, block, and shared file storage integrated with global low-latency CDN edge networks. Includes S3 Intelligent-Tiering, sub-millisecond Provisioned IOPS EBS volumes, and CloudFront edge caching with Lambda@Edge and CloudFront Functions.",
+        "issues": [
+          "S3 unexpected cross-region data transfer and egress costs",
+          "EBS burst balance depletion causing disk I/O bottlenecks",
+          "EFS concurrent read-write locking contention across hundreds of pods",
+          "CloudFront cache invalidation propagation delays and high invalidation bills",
+          "Accidental public exposure through misconfigured S3 Bucket Policies"
+        ],
+        "commands": [
+          "aws s3 sync ./build s3://production-static-assets --delete",
+          "aws s3api put-bucket-encryption --bucket secure-vault --server-side-encryption-configuration '{\"Rules\":[{\"ApplyServerSideEncryptionByDefault\":{\"SSEAlgorithm\":\"aws:kms\"}}]}'",
+          "aws ec2 modify-volume --volume-id vol-0a1b2c3d --volume-type gp3 --iops 6000 --throughput 250",
+          "aws cloudfront create-invalidation --distribution-id EDFDVBD632BHDS --paths '/*'",
+          "aws efs describe-file-systems --query 'FileSystems[*].[FileSystemId,LifeCycleState,SizeInBytes.Value]'"
+        ],
+        "usecases": [
+          "Global static media and video streaming distribution via CloudFront",
+          "Tiered data archiving and compliance retention using S3 Glacier Flexible",
+          "Shared POSIX file system storage for Kubernetes stateful sets via EFS",
+          "High-IOPS transactional database storage on EBS io2 Block Express",
+          "HPC Lustre parallel file storage using FSx for Lustre"
+        ],
+        "links": [
+          "Amazon S3",
+          "Amazon EBS",
+          "Amazon CloudFront",
+          "Amazon EFS",
+          "AWS FSx"
+        ]
+      },
+      {
+        "name": "AWS Databases & Caching",
+        "desc": "RDS Multi-AZ, Aurora Serverless, DynamoDB, ElastiCache",
+        "overview": "Managed relational, distributed NoSQL, in-memory, and vector search engines. Features Aurora PostgreSQL/MySQL with global read replicas and sub-second failover, DynamoDB single-digit millisecond latency with Global Tables, and ElastiCache Redis for ultra-fast session state.",
+        "issues": [
+          "Aurora PostgreSQL connection pool exhaustion without RDS Proxy",
+          "DynamoDB hot partition throttling under unbalanced hash keys",
+          "ElastiCache Redis OOM eviction during sudden traffic surges",
+          "Long-running queries blocking vacuum operations in RDS Postgres",
+          "Multi-AZ synchronous replication latency spikes during bulk updates"
+        ],
+        "commands": [
+          "aws rds describe-db-instances --query 'DBInstances[*].[DBInstanceIdentifier,DBInstanceStatus,Engine]'",
+          "aws dynamodb describe-table --table-name OrdersTable --query 'Table.TableStatus'",
+          "aws elasticache describe-cache-clusters --show-cache-node-info",
+          "aws rds-data execute-statement --resource-arn $DB_ARN --secret-arn $SECRET_ARN --sql 'SELECT 1'",
+          "aws dynamodb update-table --table-name Users --billing-mode PAY_PER_REQUEST"
+        ],
+        "usecases": [
+          "High-volume e-commerce shopping carts with DynamoDB Global Tables",
+          "Financial transactional banking systems on Aurora PostgreSQL Multi-AZ",
+          "Sub-millisecond API response caching using ElastiCache Redis cluster",
+          "Serverless microservices with Aurora Serverless v2 auto-scaling",
+          "Real-time fraud analysis with DynamoDB Streams and Lambda"
+        ],
+        "links": [
+          "Amazon Aurora",
+          "Amazon DynamoDB",
+          "Amazon RDS",
+          "Amazon ElastiCache",
+          "RDS Proxy"
+        ]
+      },
+      {
+        "name": "AWS Networking & Transit",
+        "desc": "VPC, Transit Gateway, Route 53, Direct Connect, PrivateLink",
+        "overview": "Software-defined networking providing software isolation, hub-and-spoke multi-account interconnects, low-latency private connectivity, and intelligent DNS routing. Enforces strict zero-trust VPC endpoint policies with AWS PrivateLink to keep traffic entirely off the public internet.",
+        "issues": [
+          "CIDR overlapping in complex enterprise VPC peerings",
+          "Transit Gateway asymmetric routing and cross-AZ data transfer fees",
+          "Route 53 DNS propagation caching TTL lag during failover",
+          "Security Group limit exhaustion per Network Interface (ENI)",
+          "Subnet IP exhaustion in high-density EKS clusters without secondary CIDRs"
+        ],
+        "commands": [
+          "aws ec2 describe-vpcs --filters 'Name=isDefault,Values=false'",
+          "aws ec2 create-transit-gateway-vpc-attachment --transit-gateway-id tgw-01 --vpc-id vpc-02 --subnet-ids sub-01 sub-02",
+          "aws route53 list-resource-record-sets --hosted-zone-id Z148KRSTZBRFTZ",
+          "aws ec2 describe-vpc-endpoints --query 'VpcEndpoints[*].[VpcEndpointId,ServiceName,State]'",
+          "aws ec2 create-route --route-table-id rtb-03 --destination-cidr-block 10.0.0.0/8 --transit-gateway-id tgw-01"
+        ],
+        "usecases": [
+          "Hub-and-spoke enterprise multi-account routing via AWS Transit Gateway",
+          "Dedicated hybrid on-premises to cloud link via AWS Direct Connect",
+          "Private access to AWS SaaS APIs through interface VPC Endpoints",
+          "Active-passive multi-region disaster recovery DNS failover with Route 53",
+          "Zero-trust isolated backend subnets with strict egress NAT gateways"
+        ],
+        "links": [
+          "AWS Transit Gateway",
+          "Amazon Route 53",
+          "AWS PrivateLink",
+          "AWS Direct Connect",
+          "Amazon VPC"
+        ]
+      },
+      {
+        "name": "AWS Security, IAM & Governance",
+        "desc": "IAM Policies, KMS, Secrets Manager, GuardDuty, Organizations",
+        "overview": "Defense-in-depth security model featuring least-privilege IAM role federation, envelope encryption with AWS KMS hardware security modules, automated credential rotation in Secrets Manager, intelligent threat detection with GuardDuty, and multi-account guardrails via AWS Organizations SCPs.",
+        "issues": [
+          "Wildcard (*) IAM permissions violating least-privilege policies",
+          "KMS key policy circular dependency or accidental deletion lockouts",
+          "Cross-account role assumption failures due to missing ExternalId checks",
+          "Secrets Manager API quota throttling during sudden container restarts",
+          "GuardDuty alert fatigue without automated notification triage filtering"
+        ],
+        "commands": [
+          "aws iam simulate-principal-policy --policy-source-arn arn:aws:iam::123:role/AppRole --action-names s3:GetObject --resource-arns arn:aws:s3:::data-bucket/*",
+          "aws kms create-key --description 'Enterprise App Key' --key-spec SYMMETRIC_DEFAULT",
+          "aws secretsmanager get-secret-value --secret-id prod/database/credentials",
+          "aws guardduty list-detectors",
+          "aws organizations list-accounts"
+        ],
+        "usecases": [
+          "Enterprise landing zone management using AWS Control Tower & Organizations",
+          "Automated database password rotation using Secrets Manager & Lambda",
+          "Zero-trust temporary credential provisioning via AWS IAM Roles for Service Accounts (IRSA)",
+          "Continuous compliance auditing with AWS Config and Security Hub",
+          "Encrypted multi-tenant data pipelines using customer-managed KMS keys"
+        ],
+        "links": [
+          "AWS IAM",
+          "AWS KMS",
+          "AWS Secrets Manager",
+          "Amazon GuardDuty",
+          "AWS Organizations"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Cloud Architecture \u2014 Azure",
+    "nodes": [
+      {
+        "name": "Azure Compute & Containers",
+        "desc": "Azure VMs, VM Scale Sets, AKS, Container Apps, App Service",
+        "overview": "Microsoft Azure compute ecosystem delivering enterprise Windows and Linux VMs, automated VM Scale Sets (VMSS) for elastic scaling, fully managed Azure Kubernetes Service (AKS) with Azure CNI, serverless Azure Container Apps (ACA) built on KEDA, and enterprise Azure App Services.",
+        "issues": [
+          "Azure CNI subnet IP exhaustion due to pre-allocated pod IP reservations",
+          "VMSS instance termination notifications causing abruptly dropped TCP sessions",
+          "AKS cluster upgrade API breaking changes and deprecated ingress definitions",
+          "App Service cold start latency in Consumption plans",
+          "Regional quota limits blocking on-demand high-spec GPU VM provisioning"
+        ],
+        "commands": [
+          "az vm list --resource-group prod-rg -o table",
+          "az aks get-credentials --resource-group prod-rg --name prod-aks-cluster",
+          "az containerapp up --name api-service --source . --ingress external --target-port 8080",
+          "az vmss scale --resource-group prod-rg --name prod-vmss --new-capacity 8",
+          "az webapp deployment source config-zip --resource-group prod-rg --name myApp --src app.zip"
+        ],
+        "usecases": [
+          "Enterprise microservices on AKS with Azure Active Directory workload identity",
+          "Scalable API microservices with event-driven Azure Container Apps",
+          "Enterprise legacy .NET Framework applications on Azure App Service",
+          "Elastic web application tiers with Virtual Machine Scale Sets",
+          "High-performance batch rendering on Azure Batch VM clusters"
+        ],
+        "links": [
+          "Azure Kubernetes Service",
+          "Azure Container Apps",
+          "Azure Virtual Machines",
+          "Azure App Service",
+          "VM Scale Sets"
+        ]
+      },
+      {
+        "name": "Azure Storage & Data Platform",
+        "desc": "Blob Storage, Data Lake Gen2, Azure Files, NetApp Files",
+        "overview": "Scalable object, distributed hierarchical namespace, and enterprise SMB/NFS file systems. Features Blob Storage hot/cool/archive lifecycle policies, Azure Data Lake Gen2 for big data analytics, and ultra-low latency Azure NetApp Files for mission-critical enterprise SAP HANA databases.",
+        "issues": [
+          "Blob lifecycle tiering transaction fees exceeding storage savings",
+          "Hierarchical namespace ACL permission inheritance conflicts in ADLS Gen2",
+          "Azure Files SMB port 445 ISP blocking in hybrid remote workforce setups",
+          "Accidental soft-deleted blob retention inflating monthly storage costs",
+          "SAS token expiration causing silent data ingest failure in distributed jobs"
+        ],
+        "commands": [
+          "az storage account list --query '[].{name:name, location:location, sku:sku.name}' -o table",
+          "az storage blob upload-batch --account-name mylake --destination '$web' --source ./dist",
+          "az storage account show-connection-string --name prodstorage -g prod-rg",
+          "az storage fs directory create --name raw-data --file-system datalake --account-name mylake",
+          "az storage share create --name enterprise-share --account-name prodstorage"
+        ],
+        "usecases": [
+          "Enterprise Data Lake architecture using ADLS Gen2 + Azure Synapse",
+          "SAP HANA high-performance shared storage on Azure NetApp Files",
+          "Global static web app hosting on Azure Blob Storage with Azure CDN",
+          "Shared Kubernetes persistent volumes across pods using Azure Files NFS",
+          "Regulatory document archiving with Immutable Blob Storage and WORM policies"
+        ],
+        "links": [
+          "Azure Blob Storage",
+          "Azure Data Lake Storage",
+          "Azure Files",
+          "Azure NetApp Files",
+          "Storage Explorer"
+        ]
+      },
+      {
+        "name": "Azure Databases & Cache",
+        "desc": "Azure SQL, Cosmos DB, Flexible Server Postgres, Azure Cache Redis",
+        "overview": "Enterprise relational databases with built-in high availability, global distributed NoSQL, and caching. Features Azure SQL Hyperscale scaling to 100TB, Azure Cosmos DB with multi-region active-active writes and 99.999% SLA, and managed PostgreSQL Flexible Server with PgBouncer connection pooling.",
+        "issues": [
+          "Cosmos DB Request Unit (RU/s) spikes and HTTP 429 throttling on cross-partition queries",
+          "Azure SQL DTU/vCore sizing bottlenecks during month-end financial reporting",
+          "PostgreSQL Flexible Server connection limits exceeded without connection pooling",
+          "Redis cache key evictions during failover between primary and replica nodes",
+          "Cross-region data replication lag in Cosmos DB multi-region deployments"
+        ],
+        "commands": [
+          "az sql server list -o table",
+          "az cosmosdb list-keys --name prod-cosmos --resource-group prod-rg",
+          "az postgres flexible-server show --resource-group prod-rg --name prod-pg",
+          "az redis list-keys --resource-group prod-rg --name prod-cache",
+          "az sql db show --resource-group prod-rg --server prod-sql --name AppDb --query status"
+        ],
+        "usecases": [
+          "Globally distributed user profiles with Azure Cosmos DB multi-master writes",
+          "High-volume transactional ERP databases on Azure SQL Hyperscale",
+          "Modern microservices backing store using PostgreSQL Flexible Server",
+          "Session state and cache offloading using Azure Cache for Redis Enterprise",
+          "Real-time event streaming and analytical telemetry ingest with Cosmos DB analytical store"
+        ],
+        "links": [
+          "Azure Cosmos DB",
+          "Azure SQL Database",
+          "PostgreSQL Flexible Server",
+          "Azure Cache for Redis",
+          "Cosmos DB Capacity Planner"
+        ]
+      },
+      {
+        "name": "Azure Networking & Hybrid",
+        "desc": "VNet Peering, ExpressRoute, Azure Virtual WAN, Application Gateway",
+        "overview": "Global software-defined networking mesh interconnecting virtual networks, cloud regions, and on-premises datacenters. Incorporates Azure Virtual WAN for hub-and-spoke connectivity, private ExpressRoute circuits up to 100 Gbps, and Application Gateway with OWASP 3.2 Web Application Firewall.",
+        "issues": [
+          "VNet peering non-transitive routing requiring complex NVA route tables (UDRs)",
+          "ExpressRoute BGP peering flapping or route table prefix limit (4000 routes) breaches",
+          "Application Gateway backend health probe failures causing HTTP 502 bad gateway",
+          "Network Security Group (NSG) rule evaluation precedence conflicts",
+          "DNS resolution deadlocks between Azure Private DNS Zones and on-premises forwarders"
+        ],
+        "commands": [
+          "az network vnet list -o table",
+          "az network vnet peering create -g prod-rg -n HubToSpoke --vnet-name HubVNet --remote-vnet SpokeVNet --allow-vnet-access",
+          "az network express-route list -o table",
+          "az network application-gateway show-backend-health -g prod-rg -n appgw-prod",
+          "az network nsg rule list -g prod-rg --nsg-name prod-web-nsg -o table"
+        ],
+        "usecases": [
+          "Enterprise hub-and-spoke hybrid network via Azure Virtual WAN and ExpressRoute",
+          "Secure Layer 7 ingress and SSL offloading with Application Gateway + WAF",
+          "Private endpoints for SaaS and database isolation over Azure Private Link",
+          "Global traffic acceleration and multi-region failover via Azure Front Door",
+          "Multi-tenant VNet isolation with strict Network Security Groups and micro-segmentation"
+        ],
+        "links": [
+          "Azure Virtual Network",
+          "Azure ExpressRoute",
+          "Azure Virtual WAN",
+          "Azure Application Gateway",
+          "Azure Private Link"
+        ]
+      },
+      {
+        "name": "Azure Identity, Security & Arc",
+        "desc": "Microsoft Entra ID, Key Vault, Sentinel SIEM, Azure Arc, Defender",
+        "overview": "Zero-trust enterprise security architecture anchored by Microsoft Entra ID (formerly Azure AD), hardware-backed secrets and certificate management via Azure Key Vault, cloud-native SIEM/SOAR with Microsoft Sentinel, and Azure Arc extending Azure control plane to hybrid on-prem servers and Kubernetes clusters.",
+        "issues": [
+          "Conditional Access Policy misconfigurations locking out administrator accounts",
+          "Key Vault access policy vs Azure RBAC permission model discrepancies",
+          "Entra ID Connect synchronization sync loops and UPN attribute mismatches",
+          "Microsoft Sentinel log ingestion cost spikes from verbose debug logs",
+          "Azure Arc connected machine agent heartbeat disconnects after firewall changes"
+        ],
+        "commands": [
+          "az ad signed-in-user show",
+          "az keyvault secret show --vault-name prod-vault --name DbPassword --query value -o tsv",
+          "az sentinel incident list --resource-group sec-rg --workspace-name sec-workspace -o table",
+          "az connectedk8s list -g arc-rg -o table",
+          "az policy assignment list -o table"
+        ],
+        "usecases": [
+          "Single sign-on (SSO) and MFA for thousands of enterprise apps via Microsoft Entra ID",
+          "Automated certificate rotation and key protection using Azure Key Vault",
+          "Automated threat detection and AI security incident response via Microsoft Sentinel",
+          "Managing on-premises VMware VMs and edge Kubernetes clusters via Azure Arc",
+          "Enforcing enterprise governance across hundreds of subscriptions using Azure Policy"
+        ],
+        "links": [
+          "Microsoft Entra ID",
+          "Azure Key Vault",
+          "Microsoft Sentinel",
+          "Azure Arc",
+          "Microsoft Defender for Cloud"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Cloud Architecture \u2014 GCP",
+    "nodes": [
+      {
+        "name": "GCP Compute & Modernization",
+        "desc": "Compute Engine GCE, GKE Autopilot, Cloud Run, Cloud Functions v2",
+        "overview": "Google Cloud high-performance compute platform designed for modern container-native workloads. Features Google Kubernetes Engine (GKE) Autopilot for automated cluster management, Cloud Run for effortless container-to-serverless scaling to zero, and Compute Engine custom VM sizing with high-speed Andromeda networking.",
+        "issues": [
+          "GKE Autopilot resource request overhead causing higher minimum compute bills",
+          "Cloud Run container concurrency misconfigurations causing cold-start request throttling",
+          "Live migration CPU throttling during Compute Engine maintenance windows",
+          "GKE cluster autoscaler quota deadlocks when hitting regional IP limits",
+          "Cloud Functions v2 memory limits exceeded during large payload processing"
+        ],
+        "commands": [
+          "gcloud compute instances list --format='table(name,status,zone,machineType)'",
+          "gcloud container clusters get-credentials prod-gke --region us-central1",
+          "gcloud run deploy api-service --image gcr.io/proj/api:latest --platform managed --allow-unauthenticated",
+          "gcloud functions deploy processData --gen2 --runtime nodejs18 --trigger-http",
+          "gcloud compute machine-types list --zones us-central1-a"
+        ],
+        "usecases": [
+          "Enterprise Kubernetes at scale with GKE multi-cluster management and Anthos",
+          "Fast container microservices deployment scaling from 0 to 10,000 pods with Cloud Run",
+          "Custom machine configurations tailored for memory-intensive machine learning training",
+          "Serverless event processing from Cloud Storage bucket triggers via Cloud Functions",
+          "Zero-downtime rolling canary deployments using Google Cloud Deploy"
+        ],
+        "links": [
+          "Google Kubernetes Engine",
+          "Cloud Run",
+          "Google Compute Engine",
+          "Cloud Functions",
+          "Google Cloud Deploy"
+        ]
+      },
+      {
+        "name": "GCP Big Data & Analytics",
+        "desc": "BigQuery, Cloud Dataflow, Pub/Sub, Cloud Dataproc, Looker",
+        "overview": "Petabyte-scale serverless analytics and distributed streaming data engine. BigQuery allows ANSI SQL querying across exabytes with zero infrastructure management, Cloud Dataflow delivers unified streaming/batch processing powered by Apache Beam, and Pub/Sub serves as a globally distributed durable event bus.",
+        "issues": [
+          "BigQuery unpartitioned table queries scanning terabytes and incurring high on-demand costs",
+          "Dataflow streaming pipeline backpressure due to downstream database write bottlenecks",
+          "Pub/Sub subscriber message duplication when processing time exceeds ack deadline",
+          "Dataproc Spark cluster worker preemptible VM terminations causing stage restarts",
+          "BigQuery slot quota exhaustion during concurrent business intelligence dashboard refreshes"
+        ],
+        "commands": [
+          "bq query --use_legacy_sql=false 'SELECT count(*), status FROM `proj.analytics.orders` GROUP BY status'",
+          "gcloud pubsub topics list",
+          "gcloud pubsub subscriptions create order-sub --topic=orders-topic --ack-deadline=60",
+          "gcloud dataflow jobs list --status=active",
+          "gcloud dataproc clusters list --region=us-central1"
+        ],
+        "usecases": [
+          "Enterprise real-time data lake and business intelligence dashboards with BigQuery + Looker",
+          "High-volume streaming clickstream ingestion using Pub/Sub and Dataflow into BigQuery",
+          "Large-scale machine learning dataset preprocessing using Apache Spark on Dataproc",
+          "Fraud detection streaming pipeline analyzing real-time financial transactions",
+          "Serverless federated querying across BigQuery, Cloud Storage, and Cloud SQL"
+        ],
+        "links": [
+          "Google BigQuery",
+          "Cloud Dataflow",
+          "Cloud Pub/Sub",
+          "Cloud Dataproc",
+          "Looker"
+        ]
+      },
+      {
+        "name": "GCP Storage, Databases & Spanner",
+        "desc": "Cloud Storage, Cloud SQL, AlloyDB, Cloud Spanner, Bigtable",
+        "overview": "Google's globally unified storage and distributed database portfolio. Includes Cloud Spanner\u2014the world's first globally distributed database providing external consistency and SQL transactions with TrueTime atomic clocks, AlloyDB for PostgreSQL with 4x standard Postgres throughput, and Bigtable for sub-10ms key-value workloads.",
+        "issues": [
+          "Cloud Spanner hot-spotting caused by sequentially incrementing primary keys",
+          "AlloyDB columnar engine memory starvation during massive ad-hoc analytical queries",
+          "Cloud SQL replication lag during peak batch ingestion without read pool scaling",
+          "Cloud Bigtable row key schema anti-patterns leading to single-tablet overload",
+          "Cloud Storage cross-region dual-bucket replication sync delays"
+        ],
+        "commands": [
+          "gcloud spanner instances list",
+          "gcloud spanner databases execute-sql mydb --instance=prod-spanner --sql='SELECT * FROM Users LIMIT 5'",
+          "gcloud sql instances list --format='table(name,databaseVersion,state)'",
+          "gcloud storage ls --recursive gs://production-data-lake/",
+          "gcloud bigtable instances list"
+        ],
+        "usecases": [
+          "Global financial ledger with strict ACID compliance using Cloud Spanner TrueTime",
+          "High-performance operational PostgreSQL workloads modernized on AlloyDB",
+          "IoT and real-time sensor timeseries telemetry streaming into Cloud Bigtable",
+          "Multi-regional media asset storage with automated nearline/coldline archiving in GCS",
+          "Mission-critical relational ERP databases on Cloud SQL with automated failover"
+        ],
+        "links": [
+          "Cloud Spanner",
+          "Google Cloud Storage",
+          "Cloud SQL",
+          "AlloyDB for PostgreSQL",
+          "Cloud Bigtable"
+        ]
+      },
+      {
+        "name": "GCP Networking & Security",
+        "desc": "VPC Service Controls, Cloud Armor, Cloud CDN, Workload Identity, IAM",
+        "overview": "Global low-latency private backbone connecting regions over Google-owned fiber. Incorporates VPC Service Controls to prevent unauthorized data exfiltration, Cloud Armor for ML-powered DDoS and OWASP Top 10 web attack mitigation, and Workload Identity to eliminate hardcoded long-lived service account keys.",
+        "issues": [
+          "VPC Service Controls perimeter blocks causing unexpected IAM permission denied errors",
+          "Cloud Armor rate limiting rules blocking legitimate partner API webhooks",
+          "Workload Identity federation token exchange failures in GKE pod startup",
+          "Shared VPC cross-project subnet permission conflicts between platform and dev teams",
+          "Global External HTTP(S) Load Balancer backend health check timeout misconfigurations"
+        ],
+        "commands": [
+          "gcloud compute networks list",
+          "gcloud compute security-policies list",
+          "gcloud iam service-accounts list",
+          "gcloud container clusters describe prod-gke --format='value(workloadIdentityConfig.workloadPool)'",
+          "gcloud compute url-maps list"
+        ],
+        "usecases": [
+          "Defending public enterprise web apps against layer 7 DDoS and SQLi with Cloud Armor",
+          "Preventing data exfiltration from BigQuery and Cloud Storage with VPC Service Controls",
+          "Keyless authentication from Kubernetes pods to GCP APIs using Workload Identity",
+          "Global edge content acceleration via Google Cloud CDN and anycast IP routing",
+          "Centralized shared VPC networking across dozens of departmental GCP projects"
+        ],
+        "links": [
+          "Google Cloud Armor",
+          "VPC Service Controls",
+          "GCP Workload Identity",
+          "Cloud CDN",
+          "Cloud IAM"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Multi-Cloud & Hybrid Cloud Strategy",
+    "nodes": [
+      {
+        "name": "Cross-Cloud Networking & Interconnect",
+        "desc": "IPsec VPN, Megaport, Equinix Fabric, BGP Routing",
+        "overview": "Architecting resilient, high-speed, vendor-agnostic network fabrics connecting AWS Direct Connect, Azure ExpressRoute, and Google Cloud Interconnect. Employs software-defined cloud routers (Equinix, Megaport), redundant IPsec mesh failovers, and autonomous dynamic BGP route propagation.",
+        "issues": [
+          "BGP route flapping between primary private circuit and backup IPsec VPN",
+          "Asymmetric routing where packets enter via Azure and exit through AWS causing TCP drops",
+          "High inter-cloud data egress fees eroding multi-cloud cost benefits",
+          "MTU mismatch (1500 vs 1420 vs 9000 bytes) causing packet fragmentation and dropped TLS handshakes",
+          "DNS resolution splitting across AWS Route 53, Azure Private DNS, and on-premises bind9"
+        ],
+        "commands": [
+          "ip route show",
+          "traceroute -n -T -p 443 destination.cloud.internal",
+          "tcpdump -i eth0 -nn 'tcp[tcpflags] & (tcp-syn) != 0'",
+          "vtysh -c 'show ip bgp summary'",
+          "curl -Iv https://service.multi-cloud.internal:8443 --connect-timeout 5"
+        ],
+        "usecases": [
+          "Low-latency synchronous replication between on-prem primary data center and cloud disaster recovery",
+          "Cross-cloud data pipeline syncing AWS S3 datasets to Google BigQuery for analytics",
+          "Multi-cloud active-active API gateways routing requests based on regional latency",
+          "Unified corporate DNS namespace spanning AWS, Azure, GCP, and corporate datacenters",
+          "Secure zero-trust cloud interconnections utilizing WireGuard / IPsec tunnel overlays"
+        ],
+        "links": [
+          "Megaport Cloud Router",
+          "Equinix Fabric",
+          "AWS Direct Connect",
+          "Azure ExpressRoute",
+          "Google Interconnect"
+        ]
+      },
+      {
+        "name": "Unified Control Planes & Hybrid Platforms",
+        "desc": "Google Anthos, Azure Arc, AWS Outposts, Red Hat OpenShift, Rancher",
+        "overview": "Standardizing fleet management, security policy enforcement, and application deployments across heterogeneous bare-metal, on-prem VMware, and public cloud Kubernetes clusters through single-pane-of-glass management platforms like Anthos, Azure Arc, OpenShift, and SUSE Rancher.",
+        "issues": [
+          "Agent connectivity disconnects when corporate firewalls block outbound gRPC / TLS",
+          "Configuration drift when teams apply local kubectl changes bypassing GitOps repos",
+          "Kubernetes version skew and API deprecation differences across multiple cloud providers",
+          "Storage provisioner abstraction leaks between AWS EBS and on-prem SAN/NFS storage",
+          "Complex RBAC translation between AWS IAM, Azure Entra ID, and LDAP directories"
+        ],
+        "commands": [
+          "kubectl get nodes -o wide",
+          "az connectedk8s show -g hybrid-rg -n onprem-k8s",
+          "gcloud anthos config sync status",
+          "rancher clusters",
+          "oc get clusterversion"
+        ],
+        "usecases": [
+          "Single GitOps repository deploying microservices identically to on-prem and multi-cloud clusters",
+          "Extending Azure database services (Azure SQL Managed Instance) to bare-metal servers via Arc",
+          "Running strict data-sovereignty workloads on-premises using AWS Outposts racks",
+          "Centralized security policy compliance auditing across 50+ Kubernetes clusters via Rancher",
+          "Hybrid enterprise modernization migrating monolithic VM apps to OpenShift containers"
+        ],
+        "links": [
+          "Google Anthos",
+          "Azure Arc",
+          "AWS Outposts",
+          "Red Hat OpenShift",
+          "SUSE Rancher"
+        ]
+      },
+      {
+        "name": "Multi-Cloud Governance & FinOps",
+        "desc": "Infracost, Kubecost, CloudHealth, OpenCost, Landing Zones",
+        "overview": "Institutionalizing cloud financial management (FinOps) to track, allocate, and optimize spend across AWS, Azure, and GCP. Integrates Infracost into pull request CI pipelines to detect cost increases before code is merged, Kubecost for granular Kubernetes pod-level chargebacks, and automated tagging governance.",
+        "issues": [
+          "Untagged cloud resources preventing accurate departmental billing and cost allocation",
+          "Orphaned cloud disks, unattached elastic IPs, and forgotten test environments accumulating charges",
+          "Commitment mismatch: over-purchasing AWS Savings Plans while shifting workloads to GCP",
+          "Kubernetes CPU/Memory over-provisioning with pods requesting 4x their actual usage",
+          "Hidden cross-AZ and egress transfer costs dominating infrastructure invoices"
+        ],
+        "commands": [
+          "infracost breakdown --path .",
+          "infracost diff --path . --compare-to infracost-base.json",
+          "kubectl cost --service-port 9090 namespace --show-all-resources",
+          "aws ce get-cost-and-usage --time-period Start=2026-10-01,End=2026-11-01 --granularity MONTHLY --metrics 'UnblendedCost'",
+          "az consumption usage list -m 5"
+        ],
+        "usecases": [
+          "Automated pull-request cost impact comments on GitHub Actions via Infracost",
+          "Accurate microservice cost attribution and chargeback reporting using Kubecost",
+          "Centralized executive FinOps dashboard tracking multi-cloud spend trends and anomalies",
+          "Automated termination of idle non-production environments on nights and weekends",
+          "Multi-cloud discount optimization coordinating AWS RIs and Azure Savings Plans"
+        ],
+        "links": [
+          "FinOps Foundation",
+          "Infracost",
+          "Kubecost",
+          "OpenCost",
+          "AWS Cost Explorer"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "DevOps & CI/CD Pipelines",
+    "nodes": [
+      {
+        "name": "GitOps & Progressive Delivery",
+        "desc": "ArgoCD, Flux v2, Argo Rollouts, Flagger, Kargo",
+        "overview": "Declarative GitOps continuous delivery where Git repositories act as the single source of truth for desired infrastructure and application state. ArgoCD and Flux v2 continuously reconcile cluster drift, while Argo Rollouts and Flagger automate canary releases, blue/green cutovers, and automated rollback upon metric degradation.",
+        "issues": [
+          "Sync storms where hundreds of ArgoCD applications reconcile simultaneously hammering the K8s API",
+          "Git repository merge conflict deadlocks during automated image tag updates",
+          "Canary rollback failures due to noisy Prometheus error-rate metric thresholds",
+          "Secret management race conditions when syncing sealed secrets or external secrets",
+          "Cluster drift masked by manual 'kubectl apply' overrides that bypass GitOps"
+        ],
+        "commands": [
+          "argocd app list",
+          "argocd app sync production-backend --prune",
+          "flux get kustomizations",
+          "kubectl argo rollouts get rollout api-rollout --watch",
+          "kubectl argo rollouts promote api-rollout"
+        ],
+        "usecases": [
+          "Automated canary deployments testing new releases against 5% of live traffic with Argo Rollouts",
+          "Multi-cluster state synchronization managing 200+ Kubernetes clusters via Flux v2",
+          "Self-healing infrastructure that immediately reverts manual unauthorized changes",
+          "Automated rollbacks triggered within 10 seconds of HTTP 5xx error rate spikes",
+          "Multi-environment promotion pipelines from staging to production driven by Git PR merges"
+        ],
+        "links": [
+          "ArgoCD",
+          "Flux CD",
+          "Argo Rollouts",
+          "Flagger",
+          "OpenGitOps"
+        ]
+      },
+      {
+        "name": "Modern CI/CD Engines & Workflows",
+        "desc": "GitHub Actions, GitLab CI, Jenkins Declarative, Azure Pipelines",
+        "overview": "Next-generation continuous integration pipelines orchestrating multi-platform builds, matrix test suites, security scans, and artifact publishing. Leverages ephemeral self-hosted autoscaling runners (Kubernetes ARC), reusable workflow modules, secure OIDC cloud authentication, and distributed build caching.",
+        "issues": [
+          "Long pipeline queues caused by insufficient runner capacity during peak commit hours",
+          "Secret leakage into build logs from unmasked bash environment variables",
+          "Flaky integration tests causing false-positive pipeline failures and deployment blockers",
+          "Cache miss penalties slowing Docker image builds without remote registry caching (Buildx)",
+          "Supply chain attacks from unpinned third-party GitHub Actions without commit SHA hashes"
+        ],
+        "commands": [
+          "gh workflow list",
+          "gh run list --workflow=ci.yml",
+          "gh run view 123456 --log-failed",
+          "act -j test --container-architecture linux/amd64",
+          "gitlab-runner exec docker test"
+        ],
+        "usecases": [
+          "Keyless authentication to AWS/Azure/GCP using GitHub Actions OIDC federation",
+          "Autoscaling self-hosted CI runners on Kubernetes via Actions Runner Controller (ARC)",
+          "Multi-architecture container builds (amd64/arm64) using Docker Buildx and QEMU",
+          "Automated pull-request code quality, unit test, and linting gates",
+          "Matrix testing across multiple Node, Python, and Go runtime versions simultaneously"
+        ],
+        "links": [
+          "GitHub Actions",
+          "GitLab CI",
+          "Actions Runner Controller",
+          "Jenkins Declarative",
+          "Azure Pipelines"
+        ]
+      },
+      {
+        "name": "Artifact Management & Packaging",
+        "desc": "Helm Charts, Kustomize, Harbor Registry, Trivy, Nexus",
+        "overview": "Standardized packaging, templating, and distribution of Kubernetes applications and container images. Combines Helm parameterized charts, Kustomize overlay-based configuration management, enterprise Harbor container registries with notary signing, and integrated Trivy security vulnerability scanning.",
+        "issues": [
+          "Helm chart release deadlock due to failed pre-install hooks blocking upgrades",
+          "Kustomize patch collisions across deeply nested base and overlay configurations",
+          "Harbor container registry disk exhaustion caused by untagged dangling image layers",
+          "Trivy vulnerability scan false positives halting critical production emergency hotfixes",
+          "Helm values.yaml secret exposure in plaintext within Git repositories"
+        ],
+        "commands": [
+          "helm upgrade --install myapp ./charts/myapp --namespace prod --values ./values-prod.yaml",
+          "helm template myapp ./charts/myapp --debug",
+          "kustomize build overlays/production | kubectl diff -f -",
+          "trivy image --severity HIGH,CRITICAL myrepo/myapp:v1.2.0",
+          "crane digest myrepo/myapp:v1.2.0"
+        ],
+        "usecases": [
+          "Enterprise software distribution packaging with versioned, signed Helm charts",
+          "Multi-tier Kubernetes deployments customizing environments with Kustomize overlays",
+          "Private, enterprise container registry with automated CVE scanning via Harbor and Trivy",
+          "Automated garbage collection and retention policies for ephemeral build artifacts",
+          "Cryptographic container image signing and verification using Cosign and Sigstore"
+        ],
+        "links": [
+          "Helm",
+          "Kustomize",
+          "Harbor Registry",
+          "Trivy",
+          "Artifact Hub"
+        ]
+      },
+      {
+        "name": "DevSecOps & Supply Chain Security",
+        "desc": "Cosign, SLSA Framework, SBOM Syft/Grype, Snyk, Semgrep",
+        "overview": "Embedding automated security controls into every stage of the software delivery lifecycle. Enforces Software Bill of Materials (SBOM) generation, container image cryptographic signing with Cosign, static application security testing (SAST) with Semgrep, dependency auditing with Snyk, and adherence to SLSA Level 3 supply chain standards.",
+        "issues": [
+          "Unpatched zero-day vulnerabilities in transitive open-source software dependencies",
+          "Developers bypassing local pre-commit security hooks under tight deadlines",
+          "Container images running as root users violating baseline pod security standards",
+          "High false-positive noise in SAST scanner reports obscuring actual exploitable flaws",
+          "Compromised build server dependencies injecting malicious code into compiled binaries"
+        ],
+        "commands": [
+          "cosign sign --key k8s://sec-namespace/cosign-key myrepo/image:v1.0",
+          "cosign verify --key cosign.pub myrepo/image:v1.0",
+          "syft packages dir:. -o spdx-json=sbom.json",
+          "grype sbom:sbom.json",
+          "semgrep --config=auto ."
+        ],
+        "usecases": [
+          "Cryptographically verifying container image provenance at Kubernetes admission via Kyverno",
+          "Generating and publishing compliant SBOMs (SPDX/CycloneDX) for every production release",
+          "Automated PR blocking when high-severity CVEs are introduced into third-party libraries",
+          "Static code scanning for hardcoded API tokens, passwords, and private keys in Git repos",
+          "Attaining SLSA Level 3 compliance for mission-critical enterprise banking software"
+        ],
+        "links": [
+          "Sigstore Cosign",
+          "SLSA Framework",
+          "Anchore Syft",
+          "Semgrep",
+          "Snyk"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "DevOps Tools & Platform Engineering",
+    "nodes": [
+      {
+        "name": "Container Runtimes & Tooling",
+        "desc": "Docker Buildx, Containerd, Podman, Skopeo, Kaniko",
+        "overview": "Low-level container runtimes and daemonless build utilities. Encompasses Containerd powering Kubernetes CRI, rootless Podman daemonless execution for enhanced container security, Skopeo for inspecting and copying remote container images without docker pull, and Kaniko for building containers safely inside Kubernetes pods.",
+        "issues": [
+          "Docker daemon socket exposure (/var/run/docker.sock) allowing privilege escalation",
+          "Containerd disk inode exhaustion from abandoned snapshotter directories",
+          "Rootless Podman user namespace mapping issues with mounted volume permissions",
+          "Multi-architecture Docker build cross-compilation emulation slowdowns with QEMU",
+          "Kaniko build context upload latency when packaging large repositories"
+        ],
+        "commands": [
+          "podman run -d --name secure-app -p 8080:80 nginx:alpine",
+          "ctr images list",
+          "crictl ps",
+          "skopeo inspect docker://docker.io/library/alpine:latest",
+          "docker buildx build --platform linux/amd64,linux/arm64 -t myapp:latest --push ."
+        ],
+        "usecases": [
+          "Secure daemonless container image compilation inside Kubernetes using Kaniko",
+          "Cross-compiling multi-architecture images (Intel x86 and ARM64 Graviton) with Docker Buildx",
+          "Rootless container execution on multi-tenant developer bastion servers via Podman",
+          "Syncing container images across isolated air-gapped private registries using Skopeo",
+          "Debugging low-level Kubernetes node container runtimes using crictl and ctr"
+        ],
+        "links": [
+          "Containerd",
+          "Podman",
+          "Docker Buildx",
+          "Skopeo",
+          "Kaniko"
+        ]
+      },
+      {
+        "name": "Kubernetes Platform Engineering",
+        "desc": "K8s Architecture, CRDs, Operator SDK, Kyverno, Gatekeeper",
+        "overview": "Internal Developer Platforms (IDP) and platform engineering built on Kubernetes extension points. Custom Resource Definitions (CRDs) and Golang Operator SDK controllers automate lifecycle management of complex databases and infrastructure, while Kyverno and OPA Gatekeeper validate and enforce declarative governance policies.",
+        "issues": [
+          "Custom Controller crash loops causing unhandled reconciliation queue backlogs",
+          "etcd database performance degradation due to thousands of oversized CRD objects",
+          "Webhook admission controllers timing out and blocking all cluster pod deployments",
+          "Node pressure evictions caused by unconfigured pod resource requests and limits",
+          "Ingress controller CPU saturation during massive TLS renegotiation spikes"
+        ],
+        "commands": [
+          "kubectl get crds",
+          "kubectl get pods -A -o wide --sort-by='.status.startTime'",
+          "kubectl top nodes",
+          "kubectl apply -f https://raw.githubusercontent.com/kyverno/kyverno/main/config/install.yaml",
+          "operator-sdk init --domain mycompany.com --repo github.com/mycompany/my-operator"
+        ],
+        "usecases": [
+          "Self-service database provisioning for developers using Kubernetes Operators (e.g. CloudNativePG)",
+          "Enforcing mandatory security labels, non-root users, and read-only root filesystems via Kyverno",
+          "Dynamic cluster autoscaling combining Karpenter with Horizontal Pod Autoscalers (HPA)",
+          "Building internal developer portals with Spotify Backstage backed by Kubernetes APIs",
+          "Automating cluster backup and disaster recovery state preservation using Velero"
+        ],
+        "links": [
+          "Kubernetes Documentation",
+          "Operator SDK",
+          "Kyverno",
+          "OPA Gatekeeper",
+          "Karpenter"
+        ]
+      },
+      {
+        "name": "Service Mesh & Modern Ingress",
+        "desc": "Istio Ambient, Envoy Gateway, Cilium eBPF, Linkerd, Traefik",
+        "overview": "Zero-trust microservices networking, mutual TLS (mTLS) encryption, traffic steering, and deep observability. Modern architectures shift from resource-heavy sidecars to sidecarless ambient meshes (Istio Ambient, Cilium Service Mesh with eBPF) and Kubernetes Gateway API implementations powered by Envoy Proxy.",
+        "issues": [
+          "Sidecar proxy memory footprint doubling total cluster resource consumption",
+          "mTLS certificate expiry or rotation mismatch causing cross-service HTTP 503 errors",
+          "Envoy routing configuration bloat slowing down control plane distribution (xDS)",
+          "Increased latency overhead on high-throughput microservice HTTP call chains",
+          "Debugging distributed tracing spans lost through non-propagated B3/W3C HTTP headers"
+        ],
+        "commands": [
+          "istioctl analyze",
+          "istioctl proxy-status",
+          "cilium status",
+          "cilium connectivity test",
+          "linkerd check"
+        ],
+        "usecases": [
+          "Enforcing automatic mutual TLS (mTLS) encryption between all cluster microservices",
+          "Fine-grained canary traffic shifting (e.g. 90% v1, 10% v2) at the ingress proxy layer",
+          "High-performance sidecarless service mesh traffic routing leveraging Cilium and Linux eBPF",
+          "Circuit breaking and automatic request retry budgets to prevent cascading microservice outages",
+          "Zero-trust authorization policies restricting database access strictly to authenticated services"
+        ],
+        "links": [
+          "Istio",
+          "Cilium Service Mesh",
+          "Envoy Proxy",
+          "Linkerd",
+          "Kubernetes Gateway API"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "IaC Tools (Infrastructure as Code)",
+    "nodes": [
+      {
+        "name": "Terraform & OpenTofu",
+        "desc": "State Management, Modules, Terragrunt, Drift Detection",
+        "overview": "Declarative multi-cloud provisioning using HashiCorp Configuration Language (HCL). Encompasses state locking via S3/DynamoDB or Consul, DRY hierarchical architecture with Terragrunt, open-source OpenTofu fork, automated drift detection, and modular reusable cloud blueprints.",
+        "issues": [
+          "State lock deadlock when a CI pipeline runner terminates abruptly mid-apply",
+          "Terraform state file containing unencrypted sensitive database credentials and tokens",
+          "Provider breaking changes across minor versions without strict version constraint pinning",
+          "Accidental resource destruction caused by refactoring resource names without terraform state mv",
+          "Large state file performance degradation causing plan commands to take over 20 minutes"
+        ],
+        "commands": [
+          "tofu init -upgrade",
+          "tofu plan -out=tfplan.binary",
+          "tofu apply tfplan.binary",
+          "tofu state list",
+          "tofu force-unlock <LOCK-ID>"
+        ],
+        "usecases": [
+          "Multi-cloud foundational VPC, subnet, routing, and IAM provisioning across AWS and Azure",
+          "DRY multi-account infrastructure orchestration utilizing Terragrunt and OpenTofu",
+          "Automated infrastructure drift detection running hourly scheduled CI audits",
+          "Golden module publishing to private internal Terraform registries for development teams",
+          "Blue/Green infrastructure cutover managing zero-downtime database upgrades"
+        ],
+        "links": [
+          "OpenTofu",
+          "Terraform Documentation",
+          "Terragrunt",
+          "Terraform Registry",
+          "TFLint"
+        ]
+      },
+      {
+        "name": "Ansible Automation & Configuration",
+        "desc": "Playbooks, Roles, Collections, Ansible Vault, AWX",
+        "overview": "Agentless configuration management, application deployment, and OS orchestration over SSH and WinRM. Leverages YAML playbooks, modular reusable roles, encrypted secrets via Ansible Vault, enterprise web UI execution via AWX/Red Hat Ansible Automation Platform, and dynamic cloud inventories.",
+        "issues": [
+          "Playbook tasks failing idempotency tests and making unnecessary modifications on rerun",
+          "Variable precedence confusion across host_vars, group_vars, and role defaults",
+          "Slow execution performance across thousands of nodes without forks tuning and pipelining",
+          "Ansible Vault decryption key loss rendering encrypted credential files unrecoverable",
+          "Python interpreter version mismatch on remote target managed nodes"
+        ],
+        "commands": [
+          "ansible-playbook -i inventories/prod site.yml --check",
+          "ansible-playbook -i inventories/prod site.yml --vault-password-file .vault_pass",
+          "ansible-vault encrypt vars/secrets.yml",
+          "ansible all -m ping -i inventories/hosts.ini",
+          "ansible-galaxy role install geerlingguy.docker"
+        ],
+        "usecases": [
+          "Zero-touch base OS configuration, security hardening, and SSH key provisioning",
+          "Automated operating system kernel patching and rolling application restarts",
+          "Configuring on-premises Cisco/Arista network switches using Ansible network modules",
+          "Deploying and configuring complex multi-node distributed database clusters",
+          "Scheduled compliance audit verification across 5,000+ hybrid Linux and Windows servers"
+        ],
+        "links": [
+          "Ansible Documentation",
+          "Ansible Galaxy",
+          "AWX Project",
+          "Ansible Vault",
+          "Molecule Testing"
+        ]
+      },
+      {
+        "name": "Pulumi & Code-Based IaC",
+        "desc": "TypeScript, Python, Go, CrossGuard, Component Resources",
+        "overview": "Infrastructure as Code leveraging real programming languages (TypeScript, Python, Go, C#) instead of domain-specific languages. Unlocks full IDE auto-complete, unit testing frameworks (Jest, PyTest), object-oriented component abstractions, and programmatic policy-as-code enforcement with Pulumi CrossGuard.",
+        "issues": [
+          "Stack state synchronization mismatches between local developer environments and CI runs",
+          "Unintended resource replacement caused by changing immutable resource constructor parameters",
+          "Async promise resolution bugs in TypeScript leading to out-of-order resource provisioning",
+          "Pulumi Service backend authentication token expiration in unattended batch jobs",
+          "Complex unit test mocking for deeply nested cloud provider SDK responses"
+        ],
+        "commands": [
+          "pulumi up --yes",
+          "pulumi preview --diff",
+          "pulumi stack select prod",
+          "pulumi state delete <URN>",
+          "pulumi config set --secret dbPassword MySecurePass123"
+        ],
+        "usecases": [
+          "Creating highly customized, reusable infrastructure component libraries in TypeScript",
+          "Unit testing cloud infrastructure logic with native PyTest test suites before deployment",
+          "Dynamic infrastructure provisioning where resource counts depend on live external API data",
+          "Multi-tier Kubernetes cluster and application deployment in a single cohesive codebase",
+          "Enforcing corporate security policies at code compile time using Pulumi CrossGuard"
+        ],
+        "links": [
+          "Pulumi Documentation",
+          "Pulumi Registry",
+          "Pulumi CrossGuard",
+          "Pulumi Examples",
+          "Pulumi Architecture"
+        ]
+      },
+      {
+        "name": "Cloud Native IaC & Image Baking",
+        "desc": "Azure Bicep, AWS CDK, HashiCorp Packer, Checkov, tfsec",
+        "overview": "First-party cloud-native templating and automated golden image construction. Azure Bicep offers first-class Azure resource support without JSON verbosity, AWS CDK compiles TypeScript/Python to CloudFormation, and HashiCorp Packer bakes fully patched, pre-configured AMIs and VHD images with security scanning tools like Checkov.",
+        "issues": [
+          "AWS CDK synthesized CloudFormation template exceeding 1MB or 500-resource limits",
+          "Bicep deployment failures masked by asynchronous Azure Resource Manager (ARM) error codes",
+          "Packer image baking build failures caused by external package mirror timeouts (apt/yum)",
+          "Golden AMIs accumulating out-of-date security patches if automated rebuild pipelines stall",
+          "Checkov security scan failures due to rigid policy requirements conflicting with legacy architecture"
+        ],
+        "commands": [
+          "az deployment group create --resource-group prod-rg --template-file main.bicep",
+          "cdk synth",
+          "cdk deploy --all",
+          "packer build -var-file=prod.pkrvars.hcl golden-image.pkr.hcl",
+          "checkov -d . --framework terraform,bicep,cloudformation"
+        ],
+        "usecases": [
+          "Automated nightly baking of hardened golden AMIs and Azure VHDs via Packer and Ansible",
+          "First-party Azure infrastructure provisioning using clean, modular Azure Bicep code",
+          "Expressing complex AWS serverless architectures with type safety using AWS CDK TypeScript",
+          "Automating infrastructure security policy scans in pull requests using Checkov and tfsec",
+          "Ensuring zero configuration drift by rotating immutable VM scale sets with fresh golden images"
+        ],
+        "links": [
+          "Azure Bicep",
+          "AWS CDK",
+          "HashiCorp Packer",
+          "Checkov",
+          "tfsec"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "AIOps & Intelligent Observability",
+    "nodes": [
+      {
+        "name": "AI Anomaly Detection & Telemetry",
+        "desc": "Prometheus, Thanos, OpenTelemetry, Grafana, Dynamic Baselines",
+        "overview": "Next-generation observability capturing high-cardinality metrics, distributed traces, and logs. Integrates OpenTelemetry (OTel) collectors for vendor-neutral instrumentation, Prometheus and Thanos for petabyte-scale long-term metric federation, and AI dynamic baselining to detect subtle anomalies before human alerting limits trigger.",
+        "issues": [
+          "Prometheus high-cardinality metric explosion from dynamic user IDs exhausting memory",
+          "OpenTelemetry collector memory buffer overflow and dropped spans during traffic bursts",
+          "Thanos Compactor out-of-memory errors during long-range block downsampling",
+          "Alert fatigue caused by static threshold alerts triggering on expected periodic spikes",
+          "Time-sync clock drift between distributed microservice nodes corrupting trace spans"
+        ],
+        "commands": [
+          "promtool check config prometheus.yml",
+          "promtool check rules alerts.yml",
+          "curl -s http://localhost:9090/api/v1/query?query=up | jq .",
+          "otelcol --config=/etc/otelcol/config.yaml",
+          "thanos rule --data-dir=/data --eval-interval=1m --rule-file=/etc/thanos/rules/*.yml"
+        ],
+        "usecases": [
+          "Dynamic anomaly detection alerting on statistical deviations rather than fixed CPU thresholds",
+          "Global unified metric federation spanning 30 Kubernetes clusters using Thanos and Grafana",
+          "End-to-end distributed transaction tracing across polyglot microservices via OpenTelemetry",
+          "Real-time SLO/SLI tracking and error-budget burning alerting for core customer journeys",
+          "Cost reduction through selective metric downsampling and high-volume trace tail-sampling"
+        ],
+        "links": [
+          "Prometheus",
+          "Thanos",
+          "OpenTelemetry",
+          "Grafana",
+          "PromQL Cheat Sheet"
+        ]
+      },
+      {
+        "name": "Log Intelligence & Root Cause Analysis",
+        "desc": "Grafana Loki, OpenSearch Vector Logs, Tempo, AI Root Cause Analysis",
+        "overview": "Intelligent log aggregation and AI-assisted root cause analysis. Grafana Loki indexes only metadata labels for lightweight cost-efficient storage, OpenSearch uses vector search to cluster semantically related error logs, and AI incident engines correlate distributed traces with log exceptions to isolate root causes in seconds.",
+        "issues": [
+          "Loki log ingestion rate limit throttling (entry too far behind/ahead) during outages",
+          "Elasticsearch/OpenSearch JVM heap exhaustion and cluster yellow/red status under heavy indexing",
+          "High storage costs driven by unbounded uncompressed log retention policies",
+          "Inconsistent log formats (JSON vs unstructured plaintext) across legacy and modern services",
+          "AI log correlation models generating hallucinations or false root-cause correlations"
+        ],
+        "commands": [
+          "logcli query '{app=\"api-gateway\"} |= \"ERROR\"' --since=1h",
+          "curl -X GET 'localhost:9200/_cat/indices?v'",
+          "curl -X GET 'localhost:9200/_cluster/health?pretty'",
+          "tempo-cli query <TRACE_ID>",
+          "journalctl -u my-service.service -p err -n 100 --no-pager"
+        ],
+        "usecases": [
+          "Instant trace-to-log correlation clicking from a slow Grafana Tempo trace directly to Loki logs",
+          "Automated root-cause summarization using LLMs analyzing error log clusters during Sev-1 incidents",
+          "Cost-effective log retention retaining high-volume debug logs for 7 days and errors for 1 year",
+          "Vector semantic search identifying recurring error patterns across distributed applications",
+          "Automated audit compliance logging meeting SOC2 and HIPAA regulatory retention standards"
+        ],
+        "links": [
+          "Grafana Loki",
+          "OpenSearch",
+          "Grafana Tempo",
+          "Vector Log Agent",
+          "OpenTelemetry Logging"
+        ]
+      },
+      {
+        "name": "Self-Healing Infrastructure & Remediation",
+        "desc": "K8s Auto-Remediation, Event-Driven Ansible, KEDA, Robusta",
+        "overview": "Autonomous closed-loop infrastructure operations that detect, triage, and automatically remediate outages without human intervention. Employs KEDA to scale workloads on external business metrics, Robusta to run automated diagnosis and remediation on Kubernetes alerts, and Event-Driven Ansible to self-heal enterprise servers.",
+        "issues": [
+          "Runaway remediation loops where automated restart scripts exacerbate database load",
+          "Flapping services causing thrashing auto-scaling between zero and maximum replicas",
+          "Stale or incorrect remediation playbooks executing against changed production environments",
+          "KEDA scaler connection timeouts to external message brokers during network partitions",
+          "Lack of audit trails documenting autonomous self-healing actions taken during incidents"
+        ],
+        "commands": [
+          "kubectl get scaledobjects -A",
+          "kubectl get robustaactions",
+          "ansible-rulebook --rulebook rules.yml -i inventory.yml",
+          "kubectl describe horizontalpodautoscaler api-hpa",
+          "keda logs -n keda"
+        ],
+        "usecases": [
+          "Auto-remediating Kubernetes CrashLoopBackOff pods by gathering heap dumps and restarting cleanly",
+          "Event-driven Ansible automatically expanding cloud disks upon 85% storage capacity threshold alerts",
+          "Autoscaling worker pods from 0 to 500 based on RabbitMQ queue depth using KEDA",
+          "Automated SSL certificate renewal and deployment triggered 14 days before expiration",
+          "Autonomous traffic redirection away from degraded availability zones during cloud provider incidents"
+        ],
+        "links": [
+          "KEDA",
+          "Robusta K8s",
+          "Event-Driven Ansible",
+          "Kubernetes HPA",
+          "PagerDuty Automation"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "MLOps & GenAI Infrastructure",
+    "nodes": [
+      {
+        "name": "Model Serving & High-Throughput Inference",
+        "desc": "vLLM, Triton Inference Server, Ollama, TGI, TensorRT-LLM",
+        "overview": "Production-grade, low-latency deep learning and Large Language Model inference serving. Employs vLLM with PagedAttention memory management for massive KV cache throughput, NVIDIA Triton for multi-framework (PyTorch/ONNX/TensorRT) concurrent model execution, and Ollama for rapid local developer inference testing.",
+        "issues": [
+          "GPU VRAM Out-of-Memory (OOM) during long context window prompt processing",
+          "KV cache memory fragmentation limiting maximum concurrent request concurrency",
+          "High Time-to-First-Token (TTFT) latency under heavy batching queues",
+          "Model cold-start latency when downloading 30GB+ weights from object storage",
+          "CUDA driver version mismatch between container base image and host kernel"
+        ],
+        "commands": [
+          "python3 -m vllm.entrypoints.openai.api_server --model mistralai/Mistral-7B-Instruct-v0.2 --port 8000",
+          "tritonserver --model-repository=/models --strict-model-config=false",
+          "ollama run llama3",
+          "nvidia-smi --query-gpu=utilization.gpu,memory.used,memory.total --format=csv",
+          "curl http://localhost:8000/v1/models"
+        ],
+        "usecases": [
+          "High-throughput enterprise internal LLM API gateway serving thousands of concurrent employees",
+          "Low-latency real-time fraud detection scoring with NVIDIA Triton and TensorRT",
+          "Local developer GenAI prototyping and offline code evaluation using Ollama",
+          "Multi-LoRA fine-tuned model serving dynamically swapping adapter weights without restarting GPUs",
+          "Cost-effective serverless model inference scaling GPU pods down to zero when idle"
+        ],
+        "links": [
+          "vLLM Documentation",
+          "Triton Inference Server",
+          "Ollama",
+          "Hugging Face TGI",
+          "TensorRT-LLM"
+        ]
+      },
+      {
+        "name": "LLM Orchestration & Enterprise RAG",
+        "desc": "LangChain, LlamaIndex, Semantic Kernel, Hybrid Retrieval, Rerankers",
+        "overview": "Architecting production Retrieval-Augmented Generation (RAG) pipelines and autonomous AI agent workflows. Utilizes LlamaIndex for advanced hierarchical document indexing, LangChain for multi-step reasoning chains, hybrid semantic/BM25 retrieval with cross-encoder rerankers, and guardrail validation.",
+        "issues": [
+          "LLM hallucinations caused by low-quality or irrelevant retrieved context chunks",
+          "Token context window truncation discarding critical document sections",
+          "Document chunking boundaries splitting key tables or semantic sentences",
+          "High latency introduced by sequential LLM chaining and multiple reranking steps",
+          "Prompt injection vulnerabilities leaking system prompts or executing unauthorized tools"
+        ],
+        "commands": [
+          "pip install langchain llama-index chromadb sentence-transformers",
+          "python -c 'from llama_index.core import VectorStoreIndex, SimpleDirectoryReader; print(\"RAG Ready\")'",
+          "curl -X POST http://localhost:8000/api/rag/query -H 'Content-Type: application/json' -d '{\"query\":\"architecture overview\"}'",
+          "python -m spacy download en_core_web_sm",
+          "pytest tests/test_rag_pipeline.py -v"
+        ],
+        "usecases": [
+          "Enterprise internal technical documentation search answering developer questions accurately",
+          "Automated legal contract analysis and compliance extraction over 500-page PDF documents",
+          "Customer support Copilot retrieving real-time account data and answering queries with citations",
+          "Multi-agent code generation systems with automated linting and unit test execution loops",
+          "Semantic search engines combining keyword lexical search with dense vector embeddings"
+        ],
+        "links": [
+          "LlamaIndex",
+          "LangChain",
+          "Semantic Kernel",
+          "Cohere Rerank",
+          "NeMo Guardrails"
+        ]
+      },
+      {
+        "name": "Vector Databases & Embeddings",
+        "desc": "Pinecone, Milvus, Qdrant, ChromaDB, pgvector",
+        "overview": "Specialized distributed vector databases optimized for billion-scale high-dimensional embedding storage and approximate nearest neighbor (ANN) similarity search. Leverages HNSW (Hierarchical Navigable Small World) and IVF-PQ indexing, scalar metadata filtering, and pgvector for native PostgreSQL vector storage.",
+        "issues": [
+          "Vector index construction memory overhead causing out-of-memory crashes on large datasets",
+          "Recall vs latency trade-offs: aggressive quantization reducing retrieval precision",
+          "Slow filtered vector queries when filtering on low-cardinality metadata fields",
+          "High cost of fully managed hosted vector database tiers at scale",
+          "Embedding model dimension changes requiring complete re-indexing of billions of documents"
+        ],
+        "commands": [
+          "docker run -p 6333:6333 qdrant/qdrant",
+          "docker run -p 19530:19530 milvusdb/milvus:v2.3.0",
+          "psql -d mydb -c 'CREATE EXTENSION IF NOT EXISTS vector;'",
+          "psql -d mydb -c 'SELECT * FROM items ORDER BY embedding <-> \"[0.1, 0.2, 0.3]\" LIMIT 5;'",
+          "curl http://localhost:6333/collections"
+        ],
+        "usecases": [
+          "Real-time semantic search powering recommendation engines for millions of e-commerce users",
+          "RAG knowledge base embedding storage with hybrid text and vector filtering in Qdrant",
+          "Billion-scale facial recognition or biometric vector matching using distributed Milvus",
+          "Native PostgreSQL application modernization adding vector search capabilities via pgvector",
+          "Serverless vector storage for ephemeral AI agents and chat sessions using Pinecone"
+        ],
+        "links": [
+          "Qdrant",
+          "Milvus",
+          "pgvector",
+          "Pinecone",
+          "ChromaDB"
+        ]
+      },
+      {
+        "name": "Model Lifecycle, MLOps & GPU Slicing",
+        "desc": "MLflow, Kubeflow, NVIDIA GPU Operator, MIG Partitioning, DVC",
+        "overview": "End-to-end machine learning engineering spanning experiment tracking with MLflow, containerized ML pipelines on Kubeflow, data version control with DVC, and bare-metal GPU acceleration managed by the NVIDIA GPU Operator with Multi-Instance GPU (MIG) hardware partitioning.",
+        "issues": [
+          "Training experiment tracking drift with unversioned datasets and code discrepancies",
+          "GPU idle time: expensive H100/A100 instances allocated to small workloads without MIG slicing",
+          "Kubeflow pipeline step data serialization bottlenecks when passing multi-gigabyte models",
+          "CUDA driver and container toolkit kernel mismatch preventing GPU detection",
+          "Model registry governance gaps leading to untested models accidentally promoted to production"
+        ],
+        "commands": [
+          "mlflow server --backend-store-uri sqlite:///mlflow.db --default-artifact-root ./artifacts --port 5000",
+          "nvidia-smi mig -lgi",
+          "nvidia-smi mig -cgi 19,19,19 -C",
+          "kubectl get nodes -o custom-columns=NAME:.metadata.name,GPUS:.status.allocatable.'nvidia\\.com/gpu'",
+          "dvc repro"
+        ],
+        "usecases": [
+          "Hardware GPU slicing splitting a single NVIDIA A100 80GB GPU into 7 isolated instances with MIG",
+          "Automated model training, evaluation, and registry promotion pipelines via Kubeflow",
+          "Auditable ML experimentation and model registry version control tracking with MLflow",
+          "Reproducible data science research versioning gigabyte datasets and model weights with DVC",
+          "Dynamic GPU auto-scaling provisioning spot GPU nodes on Kubernetes only when training starts"
+        ],
+        "links": [
+          "MLflow",
+          "Kubeflow",
+          "NVIDIA GPU Operator",
+          "NVIDIA MIG Guide",
+          "Data Version Control (DVC)"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Operating Systems \u2014 Linux Core & Deep Internals",
+    "nodes": [
+      {
+        "name": "Linux Kernel Internals & Architecture",
+        "desc": "VFS, CFS Scheduler, IPC, Memory Management, Namespaces",
+        "overview": "The foundational subsystems of the Linux monolithic kernel. Covers the Virtual File System (VFS) abstraction, Completely Fair Scheduler (CFS) CPU execution queues, Inter-Process Communication (IPC shared memory, UNIX sockets, message queues), virtual memory page cache allocation, and kernel isolation namespaces (PID, NET, MNT, IPC, UTS, USER).",
+        "issues": [
+          "Kernel panic caused by null pointer dereferences or unstable out-of-tree kernel modules",
+          "Zombie processes accumulation due to parent processes failing to invoke waitpid()",
+          "Page cache memory exhaustion leading to unexpected Linux Out-Of-Memory (OOM) killer invocations",
+          "I/O scheduler contention on NVMe disks under heavy random read/write database workloads",
+          "File descriptor exhaustion (EMFILE / ENFILE) when process or system limits are exceeded"
+        ],
+        "commands": [
+          "uname -r",
+          "cat /proc/sys/fs/file-nr",
+          "cat /proc/meminfo | grep -E 'MemTotal|MemAvailable|Cached|Dirty'",
+          "dmesg -T --level=err,warn",
+          "sysctl -a | grep -E 'kernel.sched|vm.swappiness'"
+        ],
+        "usecases": [
+          "Understanding container engine mechanics: how Docker uses cgroups and namespaces for process isolation",
+          "Fine-tuning kernel vm.dirty_ratio and vm.swappiness for high-write PostgreSQL databases",
+          "Diagnosing low-level hardware interrupt (IRQ) balancing across multi-core server CPUs",
+          "Optimizing IPC shared memory parameters for ultra-low latency algorithmic trading engines",
+          "Root-cause analysis of kernel crash dumps using the Linux crash utility and kdump"
+        ],
+        "links": [
+          "Linux Kernel Documentation",
+          "The Linux Programming Interface",
+          "LWN.net",
+          "Kernel Source Tree",
+          "Brendan Gregg Blog"
+        ]
+      },
+      {
+        "name": "eBPF & Modern Kernel Tracing",
+        "desc": "BCC Tools, bpftrace, XDP Packet Processing, kprobes, uprobes",
+        "overview": "Extended Berkeley Packet Filter (eBPF) running sandboxed bytecode programs inside the Linux kernel without changing kernel source code or loading kernel modules. Revolutionizes real-time performance observability, high-performance packet processing with eXpress Data Path (XDP), and dynamic system tracing with BCC and bpftrace.",
+        "issues": [
+          "eBPF program rejection by the in-kernel verifier due to unbound loops or memory safety checks",
+          "Older kernel versions (< 5.4) lacking modern BPF Type Format (BTF) and CO-RE support",
+          "CPU overhead introduced by tracing excessively high-frequency kernel functions (kprobes)",
+          "XDP driver mode unsupported on certain cloud virtual network interfaces, falling back to generic mode",
+          "Memory leakage in persistent BPF maps if cleanup routines fail to execute"
+        ],
+        "commands": [
+          "bpftrace -e 'kprobe:vfs_read { @[comm] = count(); }'",
+          "bpftrace -e 'tracepoint:syscalls:sys_enter_openat { printf(\"%s %s\\n\", comm, str(args->filename)); }'",
+          "bpftool prog list",
+          "bpftool net list",
+          "execsnoop-bpfcc"
+        ],
+        "usecases": [
+          "Real-time visibility into all newly spawned processes and executed binaries using execsnoop",
+          "Sub-microsecond DDoS mitigation dropping malicious packets at the NIC driver layer with XDP",
+          "Tracing disk I/O latency distribution across block devices using biolatency",
+          "Next-generation zero-overhead Kubernetes container network observability with Cilium eBPF",
+          "Debugging user-space application memory allocations and lock contention with uprobes"
+        ],
+        "links": [
+          "eBPF.io",
+          "bpftrace Reference Guide",
+          "BCC Tools",
+          "XDP Project",
+          "Brendan Gregg eBPF Books"
+        ]
+      },
+      {
+        "name": "Systemd Services & Cgroups v2",
+        "desc": "Unit Files, Timer Services, Resource Slices, cgroups v2, Journalctl",
+        "overview": "The standard Linux initialization and service management system. Leverages declarative unit files (.service, .socket, .timer, .mount), systemd journal for structured binary logging, systemd slices for hierarchical resource management, and unified cgroups v2 for strictly enforced CPU, memory, and I/O limits.",
+        "issues": [
+          "Systemd service restart loops failing silently without informative journalctl output",
+          "Zombie socket activation holding ports open after target daemon crashes",
+          "cgroups v1 to v2 migration incompatibilities breaking legacy container runtimes",
+          "Systemd timer execution delays caused by misconfigured RandomizedDelaySec settings",
+          "Memory limit (MemoryMax) enforcement causing immediate SIGKILL without warning"
+        ],
+        "commands": [
+          "systemctl list-units --type=service --state=running",
+          "systemctl status nginx.service -l",
+          "journalctl -u my-service.service -since '10 minutes ago' --no-pager",
+          "systemd-cgls",
+          "systemctl set-property my-service.service CPUQuota=200% MemoryMax=4G"
+        ],
+        "usecases": [
+          "Authoring robust, production-grade custom systemd unit files with automatic restart policies",
+          "Replacing cron jobs with reliable, monitored systemd timer units",
+          "Enforcing memory and CPU quotas on background worker services using systemd slices and cgroups v2",
+          "Fast structured debugging of system boot performance using systemd-analyze blame",
+          "Managing secure unprivileged user-level background services with systemd --user"
+        ],
+        "links": [
+          "systemd Documentation",
+          "cgroups v2 Kernel Docs",
+          "systemd.service Man Page",
+          "systemd.timer Man Page",
+          "Journalctl Guide"
+        ]
+      },
+      {
+        "name": "Linux Performance Profiling & Tuning",
+        "desc": "perf, strace, sysctl.conf, sar, vmstat, htop, iostat",
+        "overview": "Deep Linux performance profiling, latency analysis, and kernel parameter tuning. Combines Linux perf for hardware counter CPU profiling and flame graph generation, strace for system call inspection, sysctl.conf for network and memory tuning, and sysstat utilities (sar, iostat, vmstat) for historical capacity analysis.",
+        "issues": [
+          "strace overhead slowing target production processes by up to 10x while attached",
+          "High system CPU time (%sys) caused by excessive context switching or lock contention",
+          "Kernel TCP socket memory exhaustion (TCP: out of memory) under massive DDoS traffic",
+          "Disk I/O saturation (%util 100%) freezing processes waiting in uninterruptible sleep (D state)",
+          "Misconfigured transparent huge pages (THP) causing memory allocation latency spikes in databases"
+        ],
+        "commands": [
+          "perf top",
+          "perf record -F 99 -p <PID> -g -- sleep 30 && perf report",
+          "strace -c -p <PID>",
+          "vmstat 1 5",
+          "iostat -xz 1 5"
+        ],
+        "usecases": [
+          "Generating interactive SVG CPU Flame Graphs to identify application hot execution paths",
+          "Tuning Linux sysctl TCP buffer sizes (net.ipv4.tcp_rmem / wmem) for 100Gbps network throughput",
+          "Diagnosing high load averages caused by disk I/O bottlenecks vs CPU starvation",
+          "Analyzing memory leaks and swapping activity using vmstat, slabtop, and smem",
+          "Identifying thread synchronization lock contention using perf lock and pidstat"
+        ],
+        "links": [
+          "Linux perf Examples",
+          "Flame Graphs",
+          "Brendan Gregg Linux Performance",
+          "sysctl Documentation",
+          "sysstat Project"
+        ]
+      },
+      {
+        "name": "Linux Networking & Packet Filtering",
+        "desc": "nftables, iptables, iproute2, TCP Tuning, Conntrack, DNS",
+        "overview": "Linux kernel networking stack, traffic control, and stateful packet filtering. Covers modern nftables replacing legacy iptables, iproute2 (ip link, ip address, ip route, ip rule) for policy routing, connection tracking table (conntrack) tuning, and TCP socket optimization for high-concurrency servers.",
+        "issues": [
+          "nf_conntrack: table full, dropping packet causing sudden server-wide connection drops",
+          "iptables rule ordering causing linear evaluation overhead with thousands of rules",
+          "DNS lookup latency (5-second timeouts) caused by glibc single-request-reopen resolver issues",
+          "Asymmetric routing dropping packets due to reverse path filtering (rp_filter)",
+          "TCP TIME_WAIT socket accumulation exhausting ephemeral port ranges"
+        ],
+        "commands": [
+          "ip route show",
+          "nft list ruleset",
+          "conntrack -C && cat /proc/sys/net/netfilter/nf_conntrack_max",
+          "ss -s && ss -tulpn",
+          "ethtool -S eth0 | grep -E 'drop|err'"
+        ],
+        "usecases": [
+          "Modernizing legacy iptables firewalls to performant, atomic nftables rulesets",
+          "Tuning network connection tracking limits to support 1,000,000+ concurrent TCP connections",
+          "Configuring policy-based routing with multiple routing tables and network namespaces",
+          "Debugging network interface packet drops, CRC errors, and ring buffer overruns using ethtool",
+          "Optimizing TCP keepalive and BBR congestion control algorithm for WAN throughput"
+        ],
+        "links": [
+          "nftables Wiki",
+          "iproute2 Documentation",
+          "Linux Advanced Routing & Traffic Control",
+          "Kernel Networking Guide",
+          "BBR Congestion Control"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Operating Systems \u2014 Windows Internals & Administration",
+    "nodes": [
+      {
+        "name": "Windows NT Architecture & Subsystems",
+        "desc": "NT Kernel, HAL, Registry Hives, NTFS, Win32 API, Object Manager",
+        "overview": "The architectural foundation of Microsoft Windows NT operating system. Encompasses the Hardware Abstraction Layer (HAL), Executive subsystems (Memory Manager, Process Manager, I/O Manager), kernel vs user mode transitions, the Object Manager namespace, Registry hives transaction logs, and NTFS advanced access control lists (ACLs).",
+        "issues": [
+          "Blue Screen of Death (BSOD) stop codes caused by faulty kernel drivers (IRQL_NOT_LESS_OR_EQUAL)",
+          "NTFS file system corruption and dirty bit flags after unexpected power loss",
+          "Windows Registry hive fragmentation and bloat causing slow boot times",
+          "Token privilege escalation vulnerabilities (e.g. SeImpersonatePrivilege exploitation)",
+          "Application DLL search order hijacking exploiting unquoted service paths"
+        ],
+        "commands": [
+          "systeminfo",
+          "fsutil dirty query c:",
+          "dism /online /cleanup-image /restorehealth",
+          "sfc /scannow",
+          "Get-ItemProperty 'HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion' | Select-Object ProductName, ReleaseId, CurrentBuild"
+        ],
+        "usecases": [
+          "Analyzing Windows memory minidumps using WinDbg and Microsoft Symbol Servers",
+          "Hardening NTFS file system permissions on enterprise shared volumes using icacls",
+          "Repairing corrupted Windows system files and component stores using DISM and SFC",
+          "Understanding Windows security access tokens, security identifiers (SIDs), and integrity levels",
+          "Optimizing Windows Server virtual memory pagefile configuration across high-speed NVMe drives"
+        ],
+        "links": [
+          "Windows Internals Book",
+          "WinDbg Documentation",
+          "Windows API Index",
+          "NTFS Technical Reference",
+          "Sysinternals Live"
+        ]
+      },
+      {
+        "name": "Sysinternals Diagnostic Suite",
+        "desc": "Procmon, Process Explorer, TCPView, Autoruns, ProcDump",
+        "overview": "The gold-standard Microsoft diagnostic and troubleshooting toolset developed by Mark Russinovich. Enables real-time tracing of file system, registry, and thread activity with Process Monitor (Procmon), deep DLL and handle inspection with Process Explorer, startup program auditing with Autoruns, and crash dump capture with ProcDump.",
+        "issues": [
+          "Procmon high-volume event capture consuming gigabytes of system RAM in minutes",
+          "File lock deadlocks where locked DLLs prevent software updates from completing",
+          "Hidden persistence malware mechanisms embedded into obscure Windows registry Run keys",
+          "Application hangs that don't trigger crashes, requiring manual process dump capture",
+          "High CPU usage masked by DPCs and Hardware Interrupts in Process Explorer"
+        ],
+        "commands": [
+          "procexp.exe",
+          "procmon.exe /BackingFile C:\\temp\\trace.pml /Quiet",
+          "procdump.exe -ma -c 80 -s 5 <PID> C:\\temp\\crash.dmp",
+          "autorunsc.exe -a * -c > C:\\temp\\autoruns.csv",
+          "handle.exe -p <ProcessName>"
+        ],
+        "usecases": [
+          "Identifying which process is holding a file lock preventing file deletion or upgrade using handle.exe",
+          "Capturing an automated mini/full memory dump when an application CPU exceeds 80% for 5 seconds",
+          "Uncovering all persistent autostart programs, services, and scheduled tasks using Autoruns",
+          "Investigating 'Access Denied' errors by capturing registry and file system permission checks with Procmon",
+          "Inspecting process token privileges and loaded DLL signatures with Process Explorer"
+        ],
+        "links": [
+          "Windows Sysinternals",
+          "Process Explorer",
+          "Process Monitor",
+          "ProcDump",
+          "Autoruns"
+        ]
+      },
+      {
+        "name": "Event Tracing (ETW) & Security Telemetry",
+        "desc": "ETW Providers, Sysmon, Event Log Forwarding WEC, Script Block Logging",
+        "overview": "Enterprise telemetry collection and real-time kernel logging on Windows. Event Tracing for Windows (ETW) provides high-speed, kernel-level event tracing; Microsoft Sysmon monitors process creation with command lines, network connections, and file hashes; and Windows Event Collector (WEC) forwards logs to centralized SIEMs.",
+        "issues": [
+          "High event volume saturating local disks without properly tuned Sysmon XML configuration filters",
+          "Attackers blinding endpoint detection by disabling ETW providers via memory patching",
+          "Event log service channel corruption causing Windows to stop logging new security events",
+          "Windows Event Forwarding (WEF) subscription disconnects over WinRM / Kerberos",
+          "PowerShell Script Block Logging filling security logs with high-frequency administrative scripts"
+        ],
+        "commands": [
+          "logman query providers",
+          "wevtutil qe Security /q:\"*[System[(EventID=4624)]]\" /f:text /c:5",
+          "sysmon.exe -c sysmonconfig.xml",
+          "Get-WinEvent -FilterHashtable @{LogName='Microsoft-Windows-Sysmon/Operational'; Id=1} -MaxEvents 5",
+          "wevtutil el | findstr /i 'powershell'"
+        ],
+        "usecases": [
+          "Deploying SwiftOnSecurity Sysmon configuration to detect lateral movement and credential dumping",
+          "Centralizing Windows Security Event IDs (4624, 4625, 4688) into Splunk or Microsoft Sentinel",
+          "Enabling PowerShell Script Block Logging (Event 4104) and Transcription for forensic audits",
+          "Capturing kernel network socket and DNS query events without installing external agents",
+          "Detecting process injection and suspicious DLL loads using ETW kernel trace providers"
+        ],
+        "links": [
+          "Event Tracing for Windows",
+          "Microsoft Sysmon",
+          "Sysmon Modular Config",
+          "Windows Event Log Reference",
+          "MITRE ATT&CK Windows"
+        ]
+      },
+      {
+        "name": "PowerShell Core & Enterprise Automation",
+        "desc": "PowerShell 7+, WinRM/SSH Remoting, Modules, DSC, PSScriptAnalyzer",
+        "overview": "Cross-platform object-oriented automation engine and scripting language. Employs PowerShell 7+ (.NET Core), enterprise remote management over WinRM and SSH (Enter-PSSession / Invoke-Command), reusable custom binary and script modules, Desired State Configuration (DSC), and static code analysis with PSScriptAnalyzer.",
+        "issues": [
+          "PowerShell ExecutionPolicy restrictions blocking script execution on locked-down servers",
+          "Double-hop authentication failure in WinRM remoting when delegating credentials to a third server",
+          "Slow script performance caused by using += on large arrays instead of System.Collections.Generic.List",
+          "Format-Table pipeline output truncating raw object properties before downstream consumption",
+          "WinRM trusted hosts configuration errors preventing cross-domain remote administration"
+        ],
+        "commands": [
+          "Get-ExecutionPolicy -List",
+          "Invoke-Command -ComputerName (Get-Content servers.txt) -ScriptBlock { Get-Service -Name W3SVC }",
+          "Enter-PSSession -ComputerName srv01.corp.internal -Credential (Get-Credential)",
+          "Invoke-ScriptAnalyzer -Path ./DeployScript.ps1 -Severity Warning,Error",
+          "Install-Module -Name Microsoft.Graph -Scope CurrentUser -Repository PSGallery -Force"
+        ],
+        "usecases": [
+          "Orchestrating simultaneous software deployments across 2,000 Windows servers using Invoke-Command",
+          "Automating Active Directory user onboarding, group assignments, and Microsoft 365 licensing",
+          "Enforcing continuous server configuration compliance using PowerShell Desired State Configuration (DSC)",
+          "Automating SSL certificate installation and IIS website binding updates",
+          "Static security analysis of infrastructure automation scripts in GitHub Actions CI pipelines"
+        ],
+        "links": [
+          "PowerShell Documentation",
+          "PowerShell Gallery",
+          "PSScriptAnalyzer",
+          "PowerShell Remoting Guide",
+          "PowerShell DSC"
+        ]
+      },
+      {
+        "name": "Active Directory, Identity & GPO",
+        "desc": "Kerberos, NTLM Mitigation, Group Policy Objects, Entra Connect, LAPS",
+        "overview": "Enterprise identity fabric powering authentication and policy management across Windows domains. Encompasses Kerberos ticket granting (TGT/TGS), mitigating legacy vulnerable NTLM authentication, automating endpoint configuration via Group Policy Objects (GPOs), Local Administrator Password Solution (Windows LAPS), and hybrid sync via Entra Connect.",
+        "issues": [
+          "Kerberos SPN duplication causing authentication failovers to fall back to vulnerable NTLM",
+          "Replication latency and metadata deadlocks between Active Directory Domain Controllers",
+          "GPO processing delays caused by slow link detection or synchronous extension execution",
+          "Pass-the-Hash and Kerberoasting attacks targeting unmanaged service accounts with weak passwords",
+          "Entra Connect delta synchronization stopped due to expired service account credentials"
+        ],
+        "commands": [
+          "nltest /dsgetdc:corp.internal",
+          "klist tickets",
+          "gpupdate /force && gpresult /r",
+          "Get-ADUser -Filter {Enabled -eq $true} -Properties PasswordLastSet | Select-Object SamAccountName, PasswordLastSet",
+          "setspn -T corp.internal -Q http/myportal.corp.internal"
+        ],
+        "usecases": [
+          "Securing local administrator passwords on 10,000 domain endpoints using native Windows LAPS",
+          "Automating centralized security hardening (disabling SMBv1, enforcing TLS 1.3) via Group Policy",
+          "Synchronizing on-premises Active Directory identities to the cloud using Microsoft Entra Connect",
+          "Investigating Kerberos authentication failures and service ticket issuance issues with klist and setspn",
+          "Decommissioning legacy NTLM protocols to protect against NTLM relay and relay-to-LDAP attacks"
+        ],
+        "links": [
+          "Active Directory Technical Documentation",
+          "Windows LAPS Guide",
+          "Kerberos Authentication Reference",
+          "Group Policy Overview",
+          "Microsoft Entra Connect"
+        ]
+      }
+    ]
+  }
+];
+
+function copyToClipboard(text, btn) {
+  navigator.clipboard.writeText(text).then(() => {
+    const origText = btn.textContent;
+    btn.textContent = 'Copied!';
+    setTimeout(() => { btn.textContent = origText; }, 1500);
+  }).catch(() => {
+    prompt('Copy to clipboard: Ctrl+C, Enter', text);
+  });
+}
+
+function filterSource(source, btn) {
+  document.querySelectorAll('.source-tab').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+
+  const colLocal = document.getElementById('col-local');
+  const colGh = document.getElementById('col-github');
+  const colSo = document.getElementById('col-so');
+
+  if (source === 'all') {
+    colLocal.style.display = 'block';
+    colGh.style.display = 'block';
+    colSo.style.display = 'block';
+  } else if (source === 'local') {
+    colLocal.style.display = 'block';
+    colGh.style.display = 'none';
+    colSo.style.display = 'none';
+  } else if (source === 'github') {
+    colLocal.style.display = 'none';
+    colGh.style.display = 'block';
+    colSo.style.display = 'none';
+  } else if (source === 'so') {
+    colLocal.style.display = 'none';
+    colGh.style.display = 'none';
+    colSo.style.display = 'block';
+  }
+}
+
 function loadHistory() {
-  const history = JSON.parse(localStorage.getItem('matrix_search_history') || '[]');
-  const card = document.getElementById('historyCard');
+  const history = JSON.parse(localStorage.getItem('searchHistory') || '[]');
   const list = document.getElementById('historyList');
+  const card = document.getElementById('historyCard');
   if (history.length === 0) { card.style.display = 'none'; return; }
   card.style.display = 'block';
-  list.innerHTML = history.slice(0, 10).map(h => `
-    <div class="history-item" onclick="quickSearch('${h.query.replace(/'/g, "\\'")}')">
-      <span>${h.query}</span>
-      <span>${new Date(h.time).toLocaleDateString()}</span>
-    </div>
+  list.innerHTML = history.slice(0, 8).map(q => `
+    <span class="history-item" onclick="quickSearch('${q.replace(/'/g, "\\'")}')">${q}</span>
   `).join('');
 }
+
 function saveHistory(query) {
-  let history = JSON.parse(localStorage.getItem('matrix_search_history') || '[]');
-  history = history.filter(h => h.query !== query);
-  history.unshift({ query, time: Date.now() });
-  localStorage.setItem('matrix_search_history', JSON.stringify(history.slice(0, 20)));
+  let history = JSON.parse(localStorage.getItem('searchHistory') || '[]');
+  history = [query, ...history.filter(h => h !== query)].slice(0, 20);
+  localStorage.setItem('searchHistory', JSON.stringify(history));
   loadHistory();
 }
+
 function clearHistory() {
-  localStorage.removeItem('matrix_search_history');
+  localStorage.removeItem('searchHistory');
   loadHistory();
 }
-function quickSearch(q) {
-  document.getElementById('searchQuery').value = q;
+
+function quickSearch(query) {
+  document.getElementById('searchQuery').value = query;
   doSearch();
 }
+
 async function doSearch() {
   const q = document.getElementById('searchQuery').value.trim();
   if (!q) return;
   saveHistory(q);
+
+  document.getElementById('sourceFilterBar').style.display = 'flex';
   document.getElementById('resultsGrid').style.display = 'grid';
-  document.getElementById('githubResults').innerHTML = '<div style="color:var(--text-muted);font-size:0.8rem;padding:8px;">Searching GitHub...</div>';
-  document.getElementById('soResults').innerHTML = '<div style="color:var(--text-muted);font-size:0.8rem;padding:8px;">Searching StackOverflow...</div>';
+
+  // 1. Search Local Knowledge Mesh (Instant, offline-ready)
+  const qTokens = q.toLowerCase().split(/\s+/).filter(Boolean);
+  let localMatches = [];
+  localKnowledgeMesh.forEach(cat => {
+    cat.nodes.forEach(node => {
+      const textToSearch = `${cat.name} ${node.name} ${node.desc} ${node.overview} ${(node.commands||[]).join(' ')}`.toLowerCase();
+      const matchScore = qTokens.reduce((score, t) => score + (textToSearch.includes(t) ? 1 : 0), 0);
+      if (matchScore > 0) {
+        localMatches.push({ cat: cat.name, node, score: matchScore });
+      }
+    });
+  });
+
+  localMatches.sort((a, b) => b.score - a.score);
+  document.getElementById('localCount').textContent = localMatches.length;
+
+  const localContainer = document.getElementById('localResults');
+  if (localMatches.length > 0) {
+    localContainer.innerHTML = localMatches.slice(0, 8).map(m => `
+      <div class="local-node-card">
+        <div class="local-node-title">
+          <span>${m.node.name}</span>
+          <span class="local-node-cat">${m.cat}</span>
+        </div>
+        <div class="local-node-desc">${m.node.desc}</div>
+        ${m.node.commands && m.node.commands.length > 0 ? `
+          <div class="local-node-cmd">
+            <code>${m.node.commands[0]}</code>
+            <button class="copy-btn" onclick="copyToClipboard('${m.node.commands[0].replace(/'/g, "\\'")}', this)">Copy</button>
+          </div>
+        ` : ''}
+      </div>
+    `).join('');
+  } else {
+    localContainer.innerHTML = '<div style="color:var(--text-muted);font-size:0.82rem;padding:8px;">No matching local architecture nodes found.</div>';
+  }
+
+  // 2. Search GitHub Repositories
+  const ghContainer = document.getElementById('githubResults');
+  ghContainer.innerHTML = '<div style="color:var(--text-muted);font-size:0.8rem;padding:8px;">Searching GitHub...</div>';
   try {
     const gh = await fetch(`https://api.github.com/search/repositories?q=${encodeURIComponent(q)}&sort=stars&order=desc&per_page=10`);
-    const ghData = await gh.json();
-    document.getElementById('githubResults').innerHTML = (ghData.items || []).map(item => `
-      <div class="result-item">
-        <a href="${item.html_url}" target="_blank" rel="noopener">${item.full_name}</a>
-        <div class="result-meta">⭐ ${item.stargazers_count.toLocaleString()} | ${item.language || 'N/A'} | ${(item.description || '').substring(0,80)}</div>
-      </div>
-    `).join('') || '<div style="color:var(--text-muted);font-size:0.8rem;">No results found</div>';
-  } catch {
-    document.getElementById('githubResults').innerHTML = '<div style="color:var(--text-muted);font-size:0.8rem;">Search unavailable</div>';
+    if (gh.status === 403) {
+      ghContainer.innerHTML = `
+        <div style="background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3); padding:10px; border-radius:6px; font-size:0.8rem; color:#fca5a5;">
+          <strong>Rate limit reached:</strong> GitHub anonymous API allows 60 requests/hr. Please refer to Local Knowledge Mesh above.
+        </div>`;
+      document.getElementById('ghCount').textContent = '0';
+    } else {
+      const ghData = await gh.json();
+      const items = ghData.items || [];
+      document.getElementById('ghCount').textContent = items.length;
+      ghContainer.innerHTML = items.map(item => `
+        <div class="result-item" style="margin-bottom:10px; padding:10px; background:rgba(255,255,255,0.03); border-radius:6px; border:1px solid rgba(255,255,255,0.06);">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+            <a href="${item.html_url}" target="_blank" rel="noopener" style="color:#60a5fa; font-weight:600; text-decoration:none; font-size:0.88rem;">${item.full_name}</a>
+            <span style="font-size:0.75rem; color:#f59e0b; font-weight:600;">⭐ ${item.stargazers_count.toLocaleString()}</span>
+          </div>
+          <div style="color:#cbd5e1; font-size:0.78rem; margin:5px 0;">${(item.description || 'No description provided').substring(0, 110)}...</div>
+          <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.72rem; color:#94a3b8;">
+            <span>${item.language || 'Code'} &bull; Updated ${new Date(item.updated_at).toLocaleDateString()}</span>
+            <button class="copy-btn" onclick="copyToClipboard('git clone ${item.clone_url}', this)">Copy Clone</button>
+          </div>
+        </div>
+      `).join('') || '<div style="color:var(--text-muted);font-size:0.8rem;">No GitHub repositories found.</div>';
+    }
+  } catch (err) {
+    ghContainer.innerHTML = '<div style="color:var(--text-muted);font-size:0.8rem;">GitHub search temporarily unavailable.</div>';
+    document.getElementById('ghCount').textContent = '0';
   }
+
+  // 3. Search StackOverflow
+  const soContainer = document.getElementById('soResults');
+  soContainer.innerHTML = '<div style="color:var(--text-muted);font-size:0.8rem;padding:8px;">Searching StackOverflow...</div>';
   try {
     const so = await fetch(`https://api.stackexchange.com/2.3/search/advanced?order=desc&sort=relevance&q=${encodeURIComponent(q)}&site=stackoverflow&pagesize=10`);
     const soData = await so.json();
-    document.getElementById('soResults').innerHTML = (soData.items || []).map(item => `
-      <div class="result-item">
-        <a href="${item.link}" target="_blank" rel="noopener">${item.title}</a>
-        <div class="result-meta">Score: ${item.score} | Answers: ${item.answer_count} | ${new Date(item.creation_date*1000).toLocaleDateString()}</div>
+    const items = soData.items || [];
+    document.getElementById('soCount').textContent = items.length;
+    soContainer.innerHTML = items.map(item => `
+      <div class="result-item" style="margin-bottom:10px; padding:10px; background:rgba(255,255,255,0.03); border-radius:6px; border:1px solid rgba(255,255,255,0.06);">
+        <a href="${item.link}" target="_blank" rel="noopener" style="color:#f97316; font-weight:600; text-decoration:none; font-size:0.88rem;">${item.title}</a>
+        <div style="color:#94a3b8; font-size:0.75rem; margin-top:5px; display:flex; gap:12px;">
+          <span>Score: <strong>${item.score}</strong></span>
+          <span>Answers: <strong style="color:${item.is_answered ? '#34d399' : '#94a3b8'}">${item.answer_count}</strong></span>
+          <span>${new Date(item.creation_date * 1000).toLocaleDateString()}</span>
+        </div>
       </div>
-    `).join('') || '<div style="color:var(--text-muted);font-size:0.8rem;">No results found</div>';
-  } catch {
-    document.getElementById('soResults').innerHTML = '<div style="color:var(--text-muted);font-size:0.8rem;">Search unavailable</div>';
+    `).join('') || '<div style="color:var(--text-muted);font-size:0.8rem;">No StackOverflow discussions found.</div>';
+  } catch (err) {
+    soContainer.innerHTML = '<div style="color:var(--text-muted);font-size:0.8rem;">StackOverflow search temporarily unavailable.</div>';
+    document.getElementById('soCount').textContent = '0';
   }
 }
+
 document.addEventListener('DOMContentLoaded', loadHistory);
 </script>
 </body>

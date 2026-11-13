@@ -1009,7 +1009,6 @@ label {
       <a href="index.html">Home</a>
       <a href="arch.html">Features</a>
       <a href="search.html">Search</a>
-      <a href="blog.html">Radar</a>
       <a href="build.html" class="active">Build</a>
     </nav>
     <div class="header-cta">
@@ -1260,7 +1259,12 @@ function detectIntent(text){
   d.ec2       = /ec2|vm|instance|compute/.test(t);
   d.region    = /region|zone|location/.test(t);
 
-  if(d.terraform&&d.aws) currentStack='terraform-aws';
+  if(d.mlops) currentStack='mlops';
+  else if(d.aiops) currentStack='aiops';
+  else if(d.helm) currentStack='helm';
+  else if(d.linux) currentStack='linux';
+  else if(d.windows) currentStack='windows';
+  else if(d.terraform&&d.aws) currentStack='terraform-aws';
   else if(d.terraform&&d.azure) currentStack='terraform-azure';
   else if(d.terraform&&d.gcp) currentStack='terraform-gcp';
   else if(d.kubernetes||d.eks) currentStack='k8s';
@@ -1481,6 +1485,11 @@ function generate(){
 
 /* ===== Generators ===== */
 function runGenerator(stack,p){
+  if(stack==='mlops') return genMLOps(p);
+  if(stack==='aiops') return genAIOps(p);
+  if(stack==='helm') return genHelm(p);
+  if(stack==='linux') return genLinuxAdmin(p);
+  if(stack==='windows') return genWindowsAdmin(p);
   if(stack==='terraform-aws') return genTerraformAWS(p);
   if(stack==='terraform-aws-serverless') return genTerraformAWSServerless(p);
   if(stack==='terraform-azure') return genTerraformAzure(p);
@@ -3601,6 +3610,367 @@ function genPowerShell(p){
   ].filter(function(s){return s!=='';}).join('\n');
 
   return {main:main.join('\n'), variables:'# No variables file. Edit $ProjectName at top of script.', outputs:'# .\\deploy.ps1', readme:readme};
+}
+
+
+/* ===== NEW GENERATORS: MLOps, AIOps, Helm, Linux, Windows ===== */
+
+function genMLOps(p) {
+  var model = p.model || 'mistralai/Mistral-7B-Instruct-v0.2';
+  var gpuType = p.gpu || 'nvidia.com/gpu: 1';
+  var vllmYaml = `# Production vLLM Model Serving Deployment with PagedAttention
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vllm-inference-server
+  namespace: mlops
+  labels:
+    app: vllm-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vllm-server
+  template:
+    metadata:
+      labels:
+        app: vllm-server
+    spec:
+      containers:
+      - name: vllm-engine
+        image: vllm/vllm-openai:latest
+        args: [
+          "--model", "${model}",
+          "--tensor-parallel-size", "1",
+          "--gpu-memory-utilization", "0.90",
+          "--max-model-len", "8192"
+        ]
+        ports:
+        - containerPort: 8000
+        resources:
+          limits:
+            nvidia.com/gpu: "1"
+            memory: "32Gi"
+            cpu: "8"
+          requests:
+            nvidia.com/gpu: "1"
+            memory: "16Gi"
+            cpu: "4"
+        volumeMounts:
+        - name: model-cache
+          mountPath: /root/.cache/huggingface
+      volumes:
+      - name: model-cache
+        persistentVolumeClaim:
+          claimName: hf-cache-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: vllm-service
+  namespace: mlops
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8000
+    targetPort: 8000
+  selector:
+    app: vllm-server
+`;
+
+  var ragScript = `"""
+Enterprise RAG Pipeline with Hybrid Search and Reranker
+"""
+import os
+from langchain_community.vectorstores import Qdrant
+from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_openai import ChatOpenAI
+from langchain.chains import RetrievalQA
+
+def build_rag_chain():
+    # 1. Connect to Qdrant Vector Store
+    embeddings = HuggingFaceEmbeddings(model_name="BAAI/bge-large-en-v1.5")
+    qdrant = Qdrant.from_existing_collection(
+        embedding=embeddings,
+        collection_name="enterprise_knowledge",
+        url=os.getenv("QDRANT_URL", "http://qdrant.mlops.svc.cluster.local:6333")
+    )
+    retriever = qdrant.as_retriever(search_kwargs={"k": 5})
+
+    # 2. Connect to local vLLM OpenAI-compatible endpoint
+    llm = ChatOpenAI(
+        model="${model}",
+        openai_api_base="http://vllm-service.mlops.svc.cluster.local:8000/v1",
+        openai_api_key="EMPTY",
+        temperature=0.1
+    )
+
+    qa = RetrievalQA.from_chain_type(llm=llm, chain_type="stuff", retriever=retriever)
+    return qa
+
+if __name__ == "__main__":
+    chain = build_rag_chain()
+    response = chain.run("How do we configure zero-trust ingress?")
+    print(f"RAG Answer: {response}")
+`;
+
+  return [
+    { title: "vLLM-K8s.yaml", code: vllmYaml, lang: "yaml" },
+    { title: "rag_service.py", code: ragScript, lang: "python" }
+  ];
+}
+
+function genAIOps(p) {
+  var alertYaml = `# Prometheus Dynamic Anomaly & Latency Alerting
+groups:
+- name: aiops_anomaly_detection
+  rules:
+  - alert: APIHighLatencyAnomaly
+    expr: |
+      (
+        rate(http_request_duration_seconds_sum{job="api-gateway"}[5m])
+        /
+        rate(http_request_duration_seconds_count{job="api-gateway"}[5m])
+      ) > 1.5 * (
+        avg_over_time(
+          (rate(http_request_duration_seconds_sum{job="api-gateway"}[5m])
+          /
+          rate(http_request_duration_seconds_count{job="api-gateway"}[5m]))[1h:5m]
+        )
+      )
+    for: 3m
+    labels:
+      severity: warning
+      tier: aiops
+    annotations:
+      summary: "Latency anomaly detected on API Gateway"
+      description: "Latency is 50% higher than the dynamic 1-hour rolling baseline."
+  - alert: PodOOMKilledPrediction
+    expr: |
+      predict_linear(container_memory_working_set_bytes{container!=""}[15m], 3600)
+      > container_spec_memory_limit_bytes{container!=""}
+    for: 5m
+    labels:
+      severity: critical
+      remediation: "auto-scale"
+    annotations:
+      summary: "Pod memory leak trending towards OOM within 1 hour"
+`;
+
+  var robustaYaml = `# Robusta Self-Healing Automation for Kubernetes Alerts
+customPlaybooks:
+- name: "auto_remediate_crashloop"
+  triggers:
+    - on_pod_crash_loop:
+        restart_reason: CrashLoopBackOff
+  actions:
+    - pod_logs:
+        max_lines: 100
+    - restart_pod:
+        grace_period_seconds: 10
+    - notify_pagerduty:
+        title: "Autonomous Remediation Executed"
+        severity: "info"
+`;
+
+  return [
+    { title: "aiops-alerts.yaml", code: alertYaml, lang: "yaml" },
+    { title: "robusta-remediation.yaml", code: robustaYaml, lang: "yaml" }
+  ];
+}
+
+function genHelm(p) {
+  var chartYaml = `apiVersion: v2
+name: enterprise-service
+description: High-Availability Cloud Native Helm Chart
+type: application
+version: 1.0.0
+appVersion: "1.2.0"
+`;
+
+  var valuesYaml = `replicaCount: 3
+image:
+  repository: 123456789.dkr.ecr.us-east-1.amazonaws.com/api-service
+  pullPolicy: IfNotPresent
+  tag: "v1.2.0"
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8080
+
+ingress:
+  enabled: true
+  className: "alb"
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+  hosts:
+    - host: api.corp.internal
+      paths:
+        - path: /
+          pathType: Prefix
+
+resources:
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+  requests:
+    cpu: 250m
+    memory: 256Mi
+
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 75
+`;
+
+  var deployYaml = `apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}
+  labels:
+    app.kubernetes.io/name: {{ .Release.Name }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ .Release.Name }}
+    spec:
+      containers:
+      - name: app
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        ports:
+        - containerPort: {{ .Values.service.targetPort }}
+        resources:
+          {{- toYaml .Values.resources | nindent 10 }}
+`;
+
+  return [
+    { title: "Chart.yaml", code: chartYaml, lang: "yaml" },
+    { title: "values.yaml", code: valuesYaml, lang: "yaml" },
+    { title: "templates/deployment.yaml", code: deployYaml, lang: "yaml" }
+  ];
+}
+
+function genLinuxAdmin(p) {
+  var serviceFile = `[Unit]
+Description=High-Throughput Enterprise Backend Daemon
+After=network.target remote-fs.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=appuser
+Group=appuser
+WorkingDirectory=/opt/backend
+ExecStart=/opt/backend/bin/server --config /etc/backend/prod.json
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=always
+RestartSec=5s
+
+# Security Hardening & Sandboxing
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ProtectKernelTunables=true
+ProtectControlGroups=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+
+# Resource Limits (cgroups v2)
+LimitNOFILE=65535
+MemoryMax=4G
+CPUQuota=200%
+
+[Install]
+WantedBy=multi-user.target
+`;
+
+  var sysctlConf = `# Kernel Network & Virtual Memory Optimization
+# High-concurrency TCP & BBR Congestion Control
+net.core.somaxconn = 65535
+net.ipv4.tcp_max_syn_backlog = 16384
+net.ipv4.tcp_rmem = 4096 87380 16777216
+net.ipv4.tcp_wmem = 4096 65536 16777216
+net.core.rmem_max = 16777216
+net.core.wmem_max = 16777216
+net.ipv4.tcp_congestion_control = bbr
+net.core.default_qdisc = fq
+
+# Virtual Memory Tuning for Database Workloads
+vm.swappiness = 10
+vm.dirty_ratio = 15
+vm.dirty_background_ratio = 5
+fs.file-max = 2097152
+`;
+
+  return [
+    { title: "backend.service", code: serviceFile, lang: "ini" },
+    { title: "99-tuning.conf", code: sysctlConf, lang: "ini" }
+  ];
+}
+
+function genWindowsAdmin(p) {
+  var psScript = `# PowerShell 7+ Enterprise Diagnostic & Hardening Automation
+[CmdletBinding()]
+param(
+    [Parameter(Mandatory=$false)]
+    [string]$LogPath = "C:\Logs\EnterpriseAudit.log",
+    
+    [Parameter(Mandatory=$false)]
+    [int]$MaxEvents = 50
+)
+
+$ErrorActionPreference = "Stop"
+
+function Write-AuditLog {
+    param([string]$Message, [string]$Level = "INFO")
+    $timestamp = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
+    $logEntry = "[$timestamp] [$Level] $Message"
+    Write-Host $logEntry -ForegroundColor $(if($Level -eq "ERROR"){"Red"}else{"Cyan"})
+    if (!(Test-Path (Split-Path $LogPath))) {
+        New-Item -ItemType Directory -Path (Split-Path $LogPath) -Force | Out-Null
+    }
+    Add-Content -Path $LogPath -Value $logEntry
+}
+
+Write-AuditLog "Starting Enterprise Windows Diagnostic & Audit..."
+
+# 1. Enforce TLS 1.3 / 1.2
+$tlsPath = "HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\TLS 1.3\Server"
+if (!(Test-Path $tlsPath)) {
+    New-Item -Path $tlsPath -Force | Out-Null
+    New-ItemProperty -Path $tlsPath -Name "Enabled" -Value 1 -PropertyType DWord -Force | Out-Null
+    New-ItemProperty -Path $tlsPath -Name "DisabledByDefault" -Value 0 -PropertyType DWord -Force | Out-Null
+    Write-AuditLog "TLS 1.3 Server protocol enabled."
+}
+
+# 2. Inspect Sysmon / Security Event Log Telemetry
+try {
+    $failedLogons = Get-WinEvent -FilterHashtable @{LogName='Security'; Id=4625} -MaxEvents $MaxEvents -ErrorAction SilentlyContinue
+    Write-AuditLog "Found $($failedLogons.Count) failed logon attempts (Event 4625) in security log."
+} catch {
+    Write-AuditLog "No recent failed logon events found." "INFO"
+}
+
+# 3. Check Service Status
+$services = Get-Service -Name W3SVC, WinRM, Sysmon* -ErrorAction SilentlyContinue
+foreach ($svc in $services) {
+    Write-AuditLog "Service [$($svc.Name)]: $($svc.Status)"
+}
+
+Write-AuditLog "Enterprise Diagnostic Completed Successfully."
+`;
+
+  return [
+    { title: "Audit-Hardening.ps1", code: psScript, lang: "powershell" }
+  ];
 }
 
 </script>
