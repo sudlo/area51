@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>evolute | Autonomous Build &amp; Scaffold</title>
+<title>KAMUI | Autonomous Build &amp; Scaffold</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -1003,98 +1003,33 @@ label {
 <canvas id="matrix-canvas"></canvas>
 
 <header class="site-header">
-  <div class="header-inner">
-    <a href="index.html" class="logo">evolute</a>
-    <nav class="nav-links">
-      <a href="index.html">Home</a>
-      <a href="arch.html">Features</a>
-      <a href="search.html">Search</a>
-      <a href="build.html" class="active">Build</a>
-    </nav>
-    <div class="header-cta">
-      <a href="build.html" class="btn-try-now">Try Now</a>
+    <div class="header-inner">
+      <a href="index.html" class="logo">
+        <span style="font-family:'Cinzel',serif;font-weight:900;letter-spacing:0.18em;color:#fcd6d9;font-size:1.35rem;">KAMUI</span>
+        <span style="font-size:0.62rem;letter-spacing:0.22em;color:#d9658b;font-family:'JetBrains Mono',monospace;text-transform:uppercase;margin-left:6px;background:rgba(217,101,139,0.15);padding:2px 7px;border-radius:4px;border:1px solid rgba(217,101,139,0.3);">AREA 51</span>
+      </a>
+      <nav class="nav-links">
+        <a href="arch.html">Arch</a>
+        <a href="index.html">Index</a>
+        <a href="build.html" class="active">Build</a>
+        <a href="search.html">Search</a>
+      </nav>
+      <div class="header-cta">
+        <a href="https://github.com/sudlo/area51" target="_blank" rel="noopener" class="btn-signin">GitHub</a>
+        <a href="build.html" class="btn-getstarted">Launch Studio</a>
+      </div>
     </div>
-  </div>
-</header>
+  </header>
 
 <div class="container">
-  <div class="evolute-hero">
-
-    <div class="hero-avatar-wrap">
-      <div class="hero-avatar-glow"></div>
-      <svg class="hero-avatar-svg" viewBox="0 0 240 240" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <linearGradient id="helmGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#27272a"/>
-            <stop offset="50%" stop-color="#09090b"/>
-            <stop offset="100%" stop-color="#000000"/>
-          </linearGradient>
-          <filter id="amberGlow" x="-20%" y="-20%" width="140%" height="140%">
-            <feDropShadow dx="0" dy="0" stdDeviation="6" flood-color="#f59e0b" flood-opacity="0.9"/>
-          </filter>
-        </defs>
-        <!-- Torso & Harness -->
-        <path d="M 60 230 L 75 175 L 165 175 L 180 230 Z" fill="#18181b" stroke="#27272a" stroke-width="1.5"/>
-        <path d="M 85 175 L 90 230 M 150 175 L 145 230" stroke="#3f3f46" stroke-width="2"/>
-        <!-- Neck Core -->
-        <rect x="105" y="145" width="30" height="32" rx="4" fill="#09090b" stroke="#27272a"/>
-        <!-- Central glowing amber slit on neck/chest -->
-        <rect x="118" y="152" width="4" height="20" rx="2" fill="#fbbf24" filter="url(#amberGlow)"/>
-        <!-- Cybernetic Helmet / Head -->
-        <ellipse cx="120" cy="95" rx="55" ry="62" fill="url(#helmGrad)" stroke="#3f3f46" stroke-width="1.2"/>
-        <!-- Visor Surface Highlight -->
-        <path d="M 75 75 Q 120 45 165 75 Q 155 130 120 135 Q 85 130 75 75 Z" fill="#09090b" stroke="#27272a" stroke-width="1"/>
-        <ellipse cx="100" cy="65" rx="18" ry="8" fill="rgba(255,255,255,0.12)" transform="rotate(-15 100 65)"/>
-        <!-- Dual Glowing Amber Optical Slits -->
-        <rect x="86" y="94" width="7" height="12" rx="2" fill="#f59e0b" filter="url(#amberGlow)"/>
-        <rect x="147" y="94" width="7" height="12" rx="2" fill="#f59e0b" filter="url(#amberGlow)"/>
-      </svg>
-    </div>
-
-    <div class="hero-heading-wrap">
-      <div class="hero-ghost-text">of thinking</div>
-      <h1 class="hero-eyebrow">- the future -</h1>
-      <h2 class="hero-subtitle-stacked">of thinking</h2>
-    </div>
-
-    <div class="hero-meta-row">
-      <div class="hero-left-desc">
-        <div class="hero-desc-text">An AI system that works as fast as your mind, transforming cloud topologies into effortless, glowing structures.</div>
-        <div class="pill-group">
-          <span class="pill-tag">Technology</span>
-          <span class="pill-tag">Autonomous IaC</span>
-        </div>
-        <div class="hero-btn-row">
-          <a href="#build-card" class="btn-evolute-pill">Read More</a>
-          <a href="arch.html" class="btn-play-link"><span>▶</span> Play</a>
-        </div>
-      </div>
-
-      <div class="hero-right-stats">
-        <div class="evolute-stat-box">
-          <div class="evolute-stat-num">300+</div>
-          <div class="evolute-stat-lbl">Processed Systems</div>
-        </div>
-        <div class="evolute-stat-box">
-          <div class="evolute-stat-num">98%</div>
-          <div class="evolute-stat-lbl">Accuracy Increase</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="partners-bar">
-      <div class="partners-title">OUR PARTNERS</div>
-      <div class="partners-list">
-        <span class="partner-logo">BookStore</span>
-        <span class="partner-logo">zantic</span>
-        <span class="partner-logo">Crono</span>
-        <span class="partner-logo">Mercury</span>
-        <span class="partner-logo">Wager</span>
-      </div>
-    </div>
-
-    <div class="manifesto-block">
-      <div class="manifesto-text">WE MAKE THINKING FASTER, SMARTER, AND ACCESSIBLE <span class="dim">FOR EVERYONE — FROM</span> CURIOUS BEGINNERS TO POWER USERS.</div>
+  <div class="kamui-hero">
+    <div class="kamui-watermark">カムイ</div>
+    <div class="kamui-eyebrow">— Autonomous Cloud Scaffolder —</div>
+    <h1 class="kamui-title">KAMUI AUTONOMOUS BUILD</h1>
+    <p class="kamui-desc">Generate verified production configurations for Terraform, Ansible, Kubernetes, Helm, MLOps, Linux, and Windows.</p>
+    <div class="kamui-actions">
+      <a href="#prompt" class="btn-kamui-primary">Start Scaffolding</a>
+      <a href="arch.html" class="btn-kamui-secondary">View Architectures</a>
     </div>
   </div>
 
@@ -1168,8 +1103,8 @@ label {
 </div>
 
 <script>
-// NEONE Lumine Dust & Celestial Starfield Canvas
-(function initEvoluteParticles() {
+// Kamui Twilight Sakura & Dusk Embers Canvas
+(function initKamuiParticles() {
   const canvas = document.getElementById('matrix-canvas');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
@@ -1178,45 +1113,63 @@ label {
     width = canvas.width = window.innerWidth;
     height = canvas.height = window.innerHeight;
   }
-  resize();
   window.addEventListener('resize', resize);
+  resize();
 
-  const particles = Array.from({ length: 90 }, () => ({
-    x: Math.random() * width,
-    y: Math.random() * height,
-    radius: Math.random() * 1.4 + 0.4,
-    vx: (Math.random() - 0.5) * 0.2,
-    vy: -(Math.random() * 0.3 + 0.08),
-    alpha: Math.random() * 0.65 + 0.2,
-    pulseSpeed: Math.random() * 0.02 + 0.008,
-    isAmber: Math.random() > 0.6
-  }));
+  const numPetals = 45;
+  const petals = [];
+  for (let i = 0; i < numPetals; i++) {
+    petals.push({
+      x: Math.random() * width,
+      y: Math.random() * height,
+      size: Math.random() * 8 + 6,
+      vx: Math.random() * 0.7 + 0.25,
+      vy: Math.random() * 0.8 + 0.45,
+      angle: Math.random() * Math.PI * 2,
+      vAngle: (Math.random() - 0.5) * 0.025,
+      alpha: Math.random() * 0.45 + 0.25,
+      isEmbers: Math.random() > 0.75
+    });
+  }
+
+  function drawPetal(ctx, x, y, size, angle, alpha) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(angle);
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.bezierCurveTo(-size / 2, -size / 2, -size, size / 3, 0, size);
+    ctx.bezierCurveTo(size, size / 3, size / 2, -size / 2, 0, 0);
+    ctx.fillStyle = `rgba(244, 164, 184, ${alpha})`;
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function drawEmber(ctx, x, y, size, alpha) {
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(x, y, size / 3.5, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(251, 191, 36, ${alpha})`;
+    ctx.shadowBlur = 8;
+    ctx.shadowColor = 'rgba(251, 191, 36, 0.8)';
+    ctx.fill();
+    ctx.restore();
+  }
 
   function animate() {
     ctx.clearRect(0, 0, width, height);
-    for (const p of particles) {
+    for (let p of petals) {
       p.x += p.vx;
       p.y += p.vy;
-      p.alpha += Math.sin(Date.now() * p.pulseSpeed * 0.05) * 0.008;
-      if (p.alpha < 0.1) p.alpha = 0.1;
-      if (p.alpha > 0.85) p.alpha = 0.85;
-      if (p.y < -10) { p.y = height + 10; p.x = Math.random() * width; }
-      if (p.x < -10) p.x = width + 10;
-      if (p.x > width + 10) p.x = -10;
+      p.angle += p.vAngle;
+      if (p.x > width + 25) p.x = -25;
+      if (p.y > height + 25) p.y = -25;
 
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-      ctx.fillStyle = p.isAmber
-        ? 'rgba(245, 158, 11, ' + p.alpha + ')'
-        : 'rgba(255, 255, 255, ' + (p.alpha * 0.8) + ')';
-      if (p.isAmber) {
-        ctx.shadowBlur = 8;
-        ctx.shadowColor = 'rgba(245, 158, 11, 0.7)';
+      if (p.isEmbers) {
+        drawEmber(ctx, p.x, p.y, p.size, p.alpha);
       } else {
-        ctx.shadowBlur = 4;
-        ctx.shadowColor = 'rgba(255, 255, 255, 0.5)';
+        drawPetal(ctx, p.x, p.y, p.size, p.angle, p.alpha);
       }
-      ctx.fill();
     }
     requestAnimationFrame(animate);
   }
