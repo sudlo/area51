@@ -992,7 +992,7 @@ function detectIntent(text){
   d.ado       = /azure devops|ado|azure pipeline/.test(t);
   d.pulumi    = /pulumi/.test(t);
   d.bicep     = /bicep/.test(t);
-  d.bash      = /bash|shell script|sh script|#!/bin/.test(t);
+  d.bash      = /bash|shell script|sh script|#!\/bin/.test(t);
   d.powershell= /powershell|pwsh|\.ps1|ps script/.test(t);
   d.aws       = /aws|amazon|ec2|rds|s3|lambda|alb|nlb|vpc/.test(t);
   d.azure     = /azure|azurerm|aci|aks/.test(t);
