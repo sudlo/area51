@@ -674,6 +674,253 @@
     .nav-links { flex-wrap: wrap; justify-content: center; }
     .hero-title { font-size: 2.3rem; }
   }
+
+
+  :root {
+    --bg: #000000;
+    --bg-surface: #060608;
+    --card: rgba(14, 16, 22, 0.85);
+    --card-hover: rgba(22, 25, 34, 0.95);
+    --card-solid: #0d0e14;
+    --card-border: rgba(255, 255, 255, 0.1);
+    --border: rgba(255, 255, 255, 0.08);
+    --border-hover: rgba(255, 255, 255, 0.28);
+    --border-accent: rgba(245, 158, 11, 0.5);
+    --input-bg: rgba(9, 10, 14, 0.92);
+    --primary: #ffffff;
+    --primary-light: #f4f4f5;
+    --accent-amber: #f59e0b;
+    --accent-amber-glow: rgba(245, 158, 11, 0.4);
+    --accent-gold: #fbbf24;
+    --text: #ffffff;
+    --text-secondary: #cbd5e1;
+    --text-dim: #94a3b8;
+    --text-muted: #64748b;
+    --glow-amber: 0 0 35px rgba(245, 158, 11, 0.45);
+    --glow-card: 0 10px 40px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+
+    /* Backward compatibility aliases */
+    --orange: #f59e0b;
+    --orange-dark: #d97706;
+    --gold: #fbbf24;
+    --gold-dim: #b45309;
+    --aws: #f59e0b;
+    --azure: #38bdf8;
+    --gcp: #818cf8;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+    line-height: 1.6;
+    letter-spacing: -0.01em;
+  }
+
+  #matrix-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.75;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 1360px;
+    margin: 0 auto;
+    padding: 0 28px 80px;
+  }
+
+  /* Top Navigation Bar */
+  .site-header {
+    padding: 24px 0 16px;
+    position: relative;
+    z-index: 20;
+  }
+  .header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1360px;
+    margin: 0 auto;
+  }
+  .logo {
+    display: inline-flex;
+    align-items: center;
+    color: #ffffff;
+    font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif;
+    font-size: 1.35rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    text-decoration: none;
+    text-transform: lowercase;
+  }
+
+  /* SCREENSHOT 2: Floating Capsule Navbar */
+  .nav-links {
+    display: inline-flex;
+    align-items: center;
+    gap: 32px;
+    background: rgba(14, 18, 30, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    padding: 9px 32px;
+    border-radius: 9999px;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  }
+  .nav-links a {
+    color: #94a3b8;
+    text-decoration: none;
+    font-size: 0.88rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    letter-spacing: -0.01em;
+  }
+  .nav-links a:hover {
+    color: #ffffff;
+  }
+  .nav-links a.active {
+    color: #ffffff;
+    font-weight: 700;
+  }
+
+  .header-cta {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .btn-try-now {
+    background: #ffffff;
+    color: #000000;
+    padding: 9px 24px;
+    border-radius: 9999px;
+    text-decoration: none;
+    font-size: 0.86rem;
+    font-weight: 700;
+    transition: all 0.25s ease;
+    box-shadow: 0 0 25px rgba(255, 255, 255, 0.25);
+    border: none;
+    cursor: pointer;
+  }
+  .btn-try-now:hover {
+    background: #f4f4f5;
+    box-shadow: 0 0 35px rgba(255, 255, 255, 0.5);
+    transform: translateY(-1px);
+  }
+
+  /* SCREENSHOT 3: Split Feature Card */
+  .split-feature-card {
+    background: rgba(10, 12, 18, 0.88);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 16px;
+    padding: 32px 36px;
+    margin: 50px auto 30px;
+    display: grid;
+    grid-template-columns: 1.15fr 0.85fr;
+    gap: 36px;
+    align-items: center;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+  }
+  .split-left h3 {
+    font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif;
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: #ffffff;
+    letter-spacing: -0.01em;
+    line-height: 1.25;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+  }
+  .split-left h3 .amber {
+    color: #f59e0b;
+  }
+  .split-left p {
+    font-size: 0.88rem;
+    color: #a1a1aa;
+    line-height: 1.65;
+    margin-bottom: 22px;
+    max-width: 520px;
+  }
+  .btn-explore-demo {
+    display: inline-block;
+    padding: 10px 22px;
+    background: #ffffff;
+    color: #000000;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-decoration: none;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    border: none;
+  }
+  .btn-explore-demo:hover {
+    background: #e2e8f0;
+    color: #000000;
+    transform: translateY(-1px);
+  }
+
+  .split-right {
+    display: flex;
+    justify-content: flex-end;
+  }
+  .chip-card {
+    width: 100%;
+    max-width: 360px;
+    background: linear-gradient(135deg, #18191f 0%, #0d0e12 100%);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 12px;
+    position: relative;
+    overflow: hidden;
+    padding: 22px 24px 28px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 35px rgba(245, 158, 11, 0.08);
+  }
+  .chip-card-brand {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #ffffff;
+    margin-bottom: 12px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+  }
+  .chip-card-meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    color: #cbd5e1;
+    line-height: 1.8;
+  }
+  .chip-teeth {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 14px;
+    border-radius: 0 0 11px 11px;
+    background: repeating-linear-gradient(90deg, #d97706 0, #d97706 12px, #451a03 12px, #451a03 20px);
+    box-shadow: 0 0 16px rgba(217, 119, 6, 0.7);
+  }
+
+  @media(max-width: 860px) {
+    .split-feature-card { grid-template-columns: 1fr; }
+    .split-right { justify-content: flex-start; }
+    .nav-links { gap: 16px; padding: 7px 18px; }
+  }
+
 </style>
 </head>
 <body>
@@ -1511,21 +1758,22 @@
   </div>
 
   
+  <!-- SCREENSHOT 3: Styled Split Feature Card -->
   <div class="split-feature-card">
     <div class="split-left">
-      <h3>AI × HUMANITY: <span class="amber">ONE FUTURE</span>, ONE FORCE</h3>
+      <h3>AI × HUMANITY: <span class="amber">ONE FUTURE,</span> ONE FORCE</h3>
       <p>Power your cloud infrastructure through seamless integration with next-generation AI systems. Build connections that continually adapt, evolve, and touch every digital touchpoint.</p>
       <a href="build.html" class="btn-explore-demo">EXPLORE DEMO</a>
     </div>
     <div class="split-right">
-      <div class="chip-visual">
-        <div class="chip-brand">EVOLUTE SPYRE</div>
-        <div class="chip-core-text">
+      <div class="chip-card">
+        <div class="chip-card-brand">EVOLUTE SPYRE</div>
+        <div class="chip-card-meta">
           Enterprise Hardware Accelerator<br>
           3221.0078236500 &bull; Low Latency<br>
           000000123 &bull; Verified Mesh
         </div>
-        <div class="chip-copper-traces"></div>
+        <div class="chip-teeth"></div>
       </div>
     </div>
   </div>
