@@ -513,10 +513,10 @@
     <div class="card-title"><span class="icon">✦</span> Generated Artifacts</div>
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:12px;">
       <div class="tabs" style="margin-bottom:0;">
-        <button class="tab active" onclick="switchTab('main')" data-tab="main">Main</button>
-        <button class="tab" onclick="switchTab('variables')" data-tab="variables">Variables</button>
-        <button class="tab" onclick="switchTab('outputs')" data-tab="outputs">Outputs</button>
-        <button class="tab" onclick="switchTab('readme')" data-tab="readme">README</button>
+        <button class="tab active" onclick="switchTab('main')" data-tab="main" id="tab-btn-main">playbook.yml / main.tf</button>
+        <button class="tab" onclick="switchTab('variables')" data-tab="variables" id="tab-btn-variables">Variables</button>
+        <button class="tab" onclick="switchTab('outputs')" data-tab="outputs" id="tab-btn-outputs">Outputs / Inventory</button>
+        <button class="tab" onclick="switchTab('readme')" data-tab="readme" id="tab-btn-readme">README</button>
       </div>
       <button class="btn-download-zip" id="btnDownloadZip" onclick="downloadRepoZip()" style="background:linear-gradient(135deg, #ffffff 0%, #fcd6d9 100%); color:#160a22; border:none; padding:8px 20px; border-radius:9999px; font-weight:700; font-size:0.8rem; cursor:pointer; display:inline-flex; align-items:center; gap:6px; box-shadow:0 0 18px rgba(244,164,184,0.35); transition:all 0.2s;">
         <span>📦</span> Download Starter Repo (.zip)
@@ -627,25 +627,37 @@ var currentDetected={};
 function detectIntent(text){
   var t=text.toLowerCase();
   var d={};
-  d.terraform = /terraform|tf\b|iac/.test(t);
-  d.ansible   = /ansible|playbook/.test(t);
+  
+  // Format / Tool detection (handling typos like ynl -> yml, yaml)
+  d.yaml      = /\b(ya?ml|ynl)\b/.test(t);
+  d.terraform = /terraform|tf\b|\.tf\b/.test(t);
   d.docker    = /docker|compose|container/.test(t);
-  d.kubernetes= /kubernetes|k8s|helm/.test(t);
+  d.kubernetes= /kubernetes|k8s|pod|ingress|cluster/.test(t);
+  d.helm      = /helm|chart/.test(t);
   d.gha       = /github action|github-actions|gha/.test(t);
-  d.ado       = /azure devops|ado|azure pipeline/.test(t);
+  d.ado       = /azure devops|ado|azure pipeline|pipeline/.test(t) && /azure|ado|devops/.test(t);
   d.pulumi    = /pulumi/.test(t);
   d.bicep     = /bicep/.test(t);
-  d.bash      = /bash|shell script|sh script|#!\/bin/.test(t);
+  d.bash      = /bash|shell script|sh script|#!\/bin|\.sh\b/.test(t);
   d.powershell= /powershell|pwsh|\.ps1|ps script/.test(t);
+  d.linux     = /systemd|service file|journalctl|sysctl|linux service/.test(t);
+  d.mlops     = /mlops|vllm|llm serve|rag service|model serving/.test(t);
+  
+  // Ansible is matched directly, OR when YAML/YNL is requested for infrastructure without container/pipeline keywords
+  d.ansible   = /ansible|playbook/.test(t) || (d.yaml && !/docker|compose|k8s|kubernetes|helm|github.?action|pipeline|azure devops|ado/.test(t));
+  
+  // Cloud providers
   d.aws       = /aws|amazon|ec2|rds|s3|lambda|alb|nlb|vpc/.test(t);
-  d.azure     = /azure|azurerm|aci|aks/.test(t);
+  d.azure     = /azure|azurerm|aci|aks|arm|vnet/.test(t);
   d.gcp       = /gcp|google cloud|gke/.test(t);
-  d.vpc       = /vpc|network|subnet|isolation/.test(t);
+  
+  // Architecture & infrastructure components
+  d.vpc       = /vpc|vnet|virtual network|network|subnet|isolation/.test(t);
   d.ssl       = /ssl|tls|https|certificate/.test(t);
   d.monitoring= /monitor|cloudwatch|prometheus|grafana|observability/.test(t);
   d.backup    = /backup|snapshot/.test(t);
-  d.db        = /database|db|rds|postgres|mysql|dynamodb|sql/.test(t);
-  d.lb        = /load.?balancer|alb|nlb|elb/.test(t);
+  d.db        = /database|db|rds|postgres|mysql|dynamodb|sql|cosmos/.test(t);
+  d.lb        = /load.?balancer|alb|nlb|elb|app.?gateway/.test(t);
   d.autoscale = /auto.?scal|asg|vmss/.test(t);
   d.serverless= /lambda|function|serverless/.test(t);
   d.storage   = /s3|bucket|blob|storage/.test(t);
@@ -655,30 +667,36 @@ function detectIntent(text){
   d.ec2       = /ec2|vm|instance|compute/.test(t);
   d.region    = /region|zone|location/.test(t);
 
+  // Stack selection hierarchy:
   if(d.mlops) currentStack='mlops';
-  else if(d.aiops) currentStack='aiops';
   else if(d.helm) currentStack='helm';
   else if(d.linux) currentStack='linux';
   else if(d.windows) currentStack='windows';
-  else if(d.terraform&&d.aws) currentStack='terraform-aws';
-  else if(d.terraform&&d.azure) currentStack='terraform-azure';
-  else if(d.terraform&&d.gcp) currentStack='terraform-gcp';
-  else if(d.kubernetes||d.eks) currentStack='k8s';
+  // YAML / Ansible priority (explicitly honors requests for YAML/YNL scripts)
+  else if((d.ansible || d.yaml) && d.azure) currentStack='ansible-azure';
+  else if((d.ansible || d.yaml) && d.aws) currentStack='ansible-aws';
+  else if((d.ansible || d.yaml) && d.gcp) currentStack='ansible-gcp';
+  else if(d.ansible || d.yaml) currentStack='ansible';
+  // Containers & K8s
+  else if(d.kubernetes || d.eks) currentStack='k8s';
   else if(d.docker) currentStack='docker';
-  else if(d.ansible&&d.azure) currentStack='ansible-azure';
-  else if(d.ansible&&d.aws) currentStack='ansible-aws';
-  else if(d.ansible&&d.gcp) currentStack='ansible-gcp';
-  else if(d.ansible) currentStack='ansible';
-  else if(d.bash) currentStack='bash';
-  else if(d.powershell) currentStack='powershell';
+  // CI/CD pipelines
   else if(d.gha) currentStack='github-actions';
   else if(d.ado) currentStack='azure-devops';
+  // Shell scripts
+  else if(d.bash) currentStack='bash';
+  else if(d.powershell) currentStack='powershell';
+  // Pulumi / Bicep
   else if(d.pulumi) currentStack='pulumi';
   else if(d.bicep) currentStack='bicep';
+  // Explicit Terraform
+  else if(d.terraform && d.azure) currentStack='terraform-azure';
+  else if(d.terraform && d.gcp) currentStack='terraform-gcp';
   else if(d.terraform) currentStack='terraform-aws';
-  else if(d.aws) currentStack='terraform-aws';
+  // Cloud specified without tool: default to Terraform
   else if(d.azure) currentStack='terraform-azure';
   else if(d.gcp) currentStack='terraform-gcp';
+  else if(d.aws) currentStack='terraform-aws';
   else currentStack='terraform-aws';
 
   currentDetected=d;
@@ -696,8 +714,11 @@ function buildQuestions(detected){
   if((detected.bash||detected.powershell)&&!detected.aws&&!detected.azure&&!detected.gcp){
     qs.push({id:'target',label:'Target OS',type:'select',options:['Linux','Windows','macOS','Cross-platform'],defaultVal:'Linux'});
   }
+  var defaultReg = 'us-east-1';
+  if(detected.azure) defaultReg = 'eastus';
+  else if(detected.gcp) defaultReg = 'us-central1';
   if(!detected.region){
-    qs.push({id:'region',label:'Region / Location',type:'text',placeholder:'us-east-1',defaultVal:'us-east-1'});
+    qs.push({id:'region',label:'Region / Location',type:'text',placeholder:defaultReg,defaultVal:defaultReg});
   }
   if(!detected.ec2&&!detected.serverless&&!detected.eks&&(detected.aws||detected.azure||detected.gcp||detected.terraform)){
     qs.push({id:'compute',label:'Compute Type',type:'select',options:['EC2/VM Instances','Serverless (Lambda/Functions)','Kubernetes (EKS/GKE/AKS)'],defaultVal:'EC2/VM Instances'});
@@ -768,6 +789,7 @@ function analyze(){
     var tagBox=document.getElementById('detected-tags');
     var tags=[];
     if(currentStack) tags.push('Stack: '+currentStack.replace(/-/g,' ').toUpperCase());
+    if(d.yaml) tags.push('Format: YAML / Playbook');
     if(d.aws) tags.push('AWS');if(d.azure) tags.push('Azure');if(d.gcp) tags.push('GCP');
     if(d.vpc) tags.push('VPC');if(d.ssl) tags.push('SSL');if(d.monitoring) tags.push('Monitoring');
     if(d.db) tags.push('Database');if(d.lb) tags.push('Load Balancer');if(d.autoscale) tags.push('Auto Scaling');
@@ -835,9 +857,9 @@ function downloadRepoZip() {
     gitignore = ".env\nnode_modules/\n*.log\n";
   } else if (currentStack.indexOf('ansible') !== -1) {
     mainFileName = 'playbook.yml';
-    varFileName = 'inventory.ini';
-    outFileName = 'vars.yml';
-    gitignore = "*.retry\n.vault_pass\n";
+    varFileName = 'group_vars/all.yml';
+    outFileName = 'inventory.ini';
+    gitignore = "*.retry\n.vault_pass\n.env\n";
   } else if (currentStack === 'helm') {
     mainFileName = 'Chart.yaml';
     varFileName = 'values.yaml';
@@ -914,19 +936,27 @@ function getAnswers(){
     var key=el.id.replace('q-','');
     ans[key]=el.type==='checkbox'?el.checked:el.value;
   }
-  if(currentDetected.ansible){
+  if(currentDetected.ansible || currentDetected.yaml){
     if(ans.cloud==='AWS') currentStack='ansible-aws';
-    if(ans.cloud==='Azure') currentStack='ansible-azure';
-    if(ans.cloud==='GCP') currentStack='ansible-gcp';
-    if(ans.cloud==='None') currentStack='ansible';
+    else if(ans.cloud==='Azure') currentStack='ansible-azure';
+    else if(ans.cloud==='GCP') currentStack='ansible-gcp';
+    else if(ans.cloud==='None') currentStack='ansible';
+    else if(currentDetected.azure) currentStack='ansible-azure';
+    else if(currentDetected.aws) currentStack='ansible-aws';
+    else if(currentDetected.gcp) currentStack='ansible-gcp';
+    else currentStack='ansible';
   } else if(currentDetected.bash){
     currentStack='bash';
   } else if(currentDetected.powershell){
     currentStack='powershell';
+  } else if(currentDetected.kubernetes || currentDetected.eks){
+    currentStack='k8s';
+  } else if(currentDetected.docker){
+    currentStack='docker';
   } else {
     if(ans.cloud==='AWS') currentStack='terraform-aws';
-    if(ans.cloud==='Azure') currentStack='terraform-azure';
-    if(ans.cloud==='GCP') currentStack='terraform-gcp';
+    else if(ans.cloud==='Azure') currentStack='terraform-azure';
+    else if(ans.cloud==='GCP') currentStack='terraform-gcp';
   }
   if(ans.compute==='Serverless (Lambda/Functions)') currentStack='terraform-aws-serverless';
   if(ans.compute==='Kubernetes (EKS/GKE/AKS)') currentStack='k8s';
@@ -934,6 +964,52 @@ function getAnswers(){
 }
 
 /* ===== Generate ===== */
+
+function updateTabLabels(stack) {
+  var main = document.getElementById('tab-btn-main');
+  var vars = document.getElementById('tab-btn-variables');
+  var outs = document.getElementById('tab-btn-outputs');
+  var read = document.getElementById('tab-btn-readme');
+  if (!main) return;
+  
+  if (stack.indexOf('ansible') !== -1) {
+    main.innerText = 'playbook.yml';
+    vars.innerText = 'group_vars/all.yml';
+    outs.innerText = 'inventory.ini';
+    read.innerText = 'README.md';
+  } else if (stack === 'k8s') {
+    main.innerText = 'deployment.yaml';
+    vars.innerText = 'service.yaml';
+    outs.innerText = 'ingress.yaml';
+    read.innerText = 'README.md';
+  } else if (stack === 'docker') {
+    main.innerText = 'docker-compose.yml';
+    vars.innerText = 'Dockerfile';
+    outs.innerText = '.env.example';
+    read.innerText = 'README.md';
+  } else if (stack === 'helm') {
+    main.innerText = 'Chart.yaml';
+    vars.innerText = 'values.yaml';
+    outs.innerText = 'deployment.yaml';
+    read.innerText = 'README.md';
+  } else if (stack === 'bash') {
+    main.innerText = 'deploy.sh';
+    vars.innerText = 'env.sh';
+    outs.innerText = 'config.conf';
+    read.innerText = 'README.md';
+  } else if (stack === 'powershell') {
+    main.innerText = 'Deploy.ps1';
+    vars.innerText = 'Config.psd1';
+    outs.innerText = 'Test.ps1';
+    read.innerText = 'README.md';
+  } else {
+    main.innerText = 'main.tf';
+    vars.innerText = 'variables.tf';
+    outs.innerText = 'outputs.tf';
+    read.innerText = 'README.md';
+  }
+}
+
 function generate(){
   try{
     var status=document.getElementById('status');
@@ -961,6 +1037,7 @@ function generate(){
       compute: ans.compute || (currentDetected.serverless ? 'Serverless (Lambda/Functions)' : (currentDetected.kubernetes || currentDetected.eks ? 'Kubernetes (EKS/GKE/AKS)' : 'EC2/VM Instances')),
       replicas: ans.replicas || '3'
     };
+    updateTabLabels(currentStack);
     var result=runGenerator(currentStack,params);
     document.getElementById('code-main').innerText=result.main;
     document.getElementById('code-variables').innerText=result.variables;
