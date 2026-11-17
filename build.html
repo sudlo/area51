@@ -141,8 +141,8 @@
     transform: translateY(-1px);
   }
 
-  /* Evolute Hero Section */
-  .evolute-hero {
+  /* Hero Section */
+  .horizon-hero {
     position: relative;
     padding: 40px 0 30px;
     text-align: center;
@@ -251,7 +251,7 @@
     align-items: center;
     gap: 16px;
   }
-  .btn-evolute-pill {
+  .btn-horizon-pill {
     background: rgba(255, 255, 255, 0.06);
     border: 1px solid rgba(255, 255, 255, 0.2);
     color: #ffffff;
@@ -265,7 +265,7 @@
     align-items: center;
     gap: 6px;
   }
-  .btn-evolute-pill:hover {
+  .btn-horizon-pill:hover {
     background: rgba(255, 255, 255, 0.15);
     border-color: #ffffff;
     transform: translateY(-1px);
@@ -287,7 +287,7 @@
     display: flex;
     gap: 32px;
   }
-  .evolute-stat-box {
+  .stat-card-box {
     text-align: right;
     padding: 16px 20px;
     background: rgba(14, 14, 18, 0.6);
@@ -295,7 +295,7 @@
     border-radius: 14px;
     min-width: 140px;
   }
-  .evolute-stat-num {
+  .stat-card-num {
     font-family: 'Outfit', sans-serif;
     font-size: 2.4rem;
     font-weight: 800;
@@ -303,7 +303,7 @@
     line-height: 1;
     margin-bottom: 6px;
   }
-  .evolute-stat-lbl {
+  .stat-card-lbl {
     font-size: 0.72rem;
     color: #71717a;
     font-weight: 500;
@@ -364,7 +364,7 @@
     color: #3f3f46;
   }
 
-  /* Split Feature Card (AI x HUMANITY) */
+  /* Feature Card */
   .split-feature-card {
     background: var(--card);
     border: 1px solid var(--card-border);
@@ -457,7 +457,7 @@
     letter-spacing: 2px;
   }
 
-  /* Evolute Card Styling */
+  /* Card Styling */
   .card {
     background: var(--card);
     border: 1px solid var(--card-border);
@@ -998,6 +998,7 @@ label {
   }
 
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 </head>
 <body>
 <canvas id="matrix-canvas"></canvas>
@@ -1013,10 +1014,6 @@ label {
         <a href="build.html" class="active">Build</a>
         <a href="search.html">Search</a>
       </nav>
-      <div class="header-cta">
-        <a href="https://github.com/sudlo/area51" target="_blank" rel="noopener" class="btn-signin">GitHub</a>
-        <a href="build.html" class="btn-getstarted">Launch Studio</a>
-      </div>
     </div>
   </header>
 
@@ -1053,11 +1050,16 @@ label {
 
   <div class="output-area" id="output-area">
     <div class="card-title"><span class="icon">✦</span> Generated Artifacts</div>
-    <div class="tabs">
-      <button class="tab active" onclick="switchTab('main')" data-tab="main">Main</button>
-      <button class="tab" onclick="switchTab('variables')" data-tab="variables">Variables</button>
-      <button class="tab" onclick="switchTab('outputs')" data-tab="outputs">Outputs</button>
-      <button class="tab" onclick="switchTab('readme')" data-tab="readme">README</button>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:12px;">
+      <div class="tabs" style="margin-bottom:0;">
+        <button class="tab active" onclick="switchTab('main')" data-tab="main">Main</button>
+        <button class="tab" onclick="switchTab('variables')" data-tab="variables">Variables</button>
+        <button class="tab" onclick="switchTab('outputs')" data-tab="outputs">Outputs</button>
+        <button class="tab" onclick="switchTab('readme')" data-tab="readme">README</button>
+      </div>
+      <button class="btn-download-zip" id="btnDownloadZip" onclick="downloadRepoZip()" style="background:linear-gradient(135deg, #ffffff 0%, #fcd6d9 100%); color:#160a22; border:none; padding:8px 20px; border-radius:9999px; font-weight:700; font-size:0.8rem; cursor:pointer; display:inline-flex; align-items:center; gap:6px; box-shadow:0 0 18px rgba(244,164,184,0.35); transition:all 0.2s;">
+        <span>📦</span> Download Starter Repo (.zip)
+      </button>
     </div>
     <div class="tab-content active" id="tab-main">
       <pre><button class="copy-btn" onclick="copyCode('code-main')">Copy</button><code id="code-main"></code></pre>
@@ -1078,7 +1080,7 @@ label {
 
   <footer>
     <div class="footer-line"></div>
-    evolute &mdash; The Future of Thinking &copy; 2026
+    AREA 51 &mdash; IaC &amp; Cloud Scaffolding &bull; Area51 &copy; 2026
   </footer>
 </div>
 
@@ -1334,6 +1336,104 @@ function switchTab(name){
 }
 
 /* ===== Copy ===== */
+
+/* ===== Download as Zip Repository Scaffolder ===== */
+function downloadRepoZip() {
+  if (typeof JSZip === 'undefined') {
+    alert('JSZip library is still loading. Please check your internet connection or try again in a moment.');
+    return;
+  }
+  var zip = new JSZip();
+  var ans = getAnswers();
+  var projectName = (ans.project || currentStack || 'area51-starter').toLowerCase().replace(/[^a-z0-9_-]/g, '-');
+  
+  var mainEl = document.getElementById('code-main');
+  var varEl = document.getElementById('code-variables');
+  var outEl = document.getElementById('code-outputs');
+  var readmeEl = document.getElementById('code-readme');
+
+  var mainCode = mainEl ? mainEl.innerText : '';
+  var varCode = varEl ? varEl.innerText : '';
+  var outCode = outEl ? outEl.innerText : '';
+  var readmeCode = readmeEl ? readmeEl.innerText : '';
+
+  var mainFileName = 'main.tf';
+  var varFileName = 'variables.tf';
+  var outFileName = 'outputs.tf';
+  var gitignore = ".terraform/\n*.tfstate\n*.tfstate.*\n.env\n.DS_Store\n*.log\n";
+
+  if (currentStack === 'k8s') {
+    mainFileName = 'deployment.yaml';
+    varFileName = 'service.yaml';
+    outFileName = 'ingress.yaml';
+    gitignore = "*.log\n.DS_Store\n";
+  } else if (currentStack === 'docker') {
+    mainFileName = 'docker-compose.yml';
+    varFileName = 'Dockerfile';
+    outFileName = '.env.example';
+    gitignore = ".env\nnode_modules/\n*.log\n";
+  } else if (currentStack.indexOf('ansible') !== -1) {
+    mainFileName = 'playbook.yml';
+    varFileName = 'inventory.ini';
+    outFileName = 'vars.yml';
+    gitignore = "*.retry\n.vault_pass\n";
+  } else if (currentStack === 'helm') {
+    mainFileName = 'Chart.yaml';
+    varFileName = 'values.yaml';
+    outFileName = 'templates/deployment.yaml';
+    gitignore = "*.tgz\n";
+  } else if (currentStack === 'bash') {
+    mainFileName = 'deploy.sh';
+    varFileName = 'env.sh';
+    outFileName = 'config.conf';
+    gitignore = "*.log\n.env\n";
+  } else if (currentStack === 'powershell') {
+    mainFileName = 'Deploy.ps1';
+    varFileName = 'Config.psd1';
+    outFileName = 'Test.ps1';
+    gitignore = "*.log\n";
+  } else if (currentStack === 'mlops') {
+    mainFileName = 'vllm-deployment.yaml';
+    varFileName = 'rag_service.py';
+    outFileName = 'requirements.txt';
+    gitignore = "__pycache__/\n*.pyc\n.env\n";
+  } else if (currentStack === 'linux') {
+    mainFileName = 'backend.service';
+    varFileName = '99-tuning.conf';
+    outFileName = 'setup.sh';
+    gitignore = "*.log\n";
+  } else if (currentStack === 'github-actions') {
+    mainFileName = '.github/workflows/ci.yml';
+    varFileName = 'action.yml';
+    outFileName = 'scripts/build.sh';
+  }
+
+  zip.file(mainFileName, mainCode);
+  if (varCode && varCode.trim()) zip.file(varFileName, varCode);
+  if (outCode && outCode.trim()) zip.file(outFileName, outCode);
+  zip.file('README.md', readmeCode || ("# " + projectName + "\n\nGenerated by AREA 51 Autonomous Build & Scaffold.\n"));
+  zip.file('.gitignore', gitignore);
+
+  var btn = document.getElementById('btnDownloadZip');
+  var origText = btn.innerHTML;
+  btn.innerHTML = '<span>⏳</span> Zipping repo...';
+
+  zip.generateAsync({ type: 'blob' }).then(function(content) {
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(content);
+    a.download = projectName + '-repo.zip';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(a.href);
+    btn.innerHTML = '<span>✓</span> Downloaded!';
+    setTimeout(function() { btn.innerHTML = origText; }, 1800);
+  }).catch(function(err) {
+    alert('Error generating zip: ' + err.message);
+    btn.innerHTML = origText;
+  });
+}
+
 function copyCode(id){
   var el=document.getElementById(id);
   navigator.clipboard.writeText(el.innerText).then(function(){

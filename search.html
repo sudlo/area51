@@ -141,8 +141,8 @@
     transform: translateY(-1px);
   }
 
-  /* Evolute Hero Section */
-  .evolute-hero {
+  /* Hero Section */
+  .horizon-hero {
     position: relative;
     padding: 40px 0 30px;
     text-align: center;
@@ -251,7 +251,7 @@
     align-items: center;
     gap: 16px;
   }
-  .btn-evolute-pill {
+  .btn-horizon-pill {
     background: rgba(255, 255, 255, 0.06);
     border: 1px solid rgba(255, 255, 255, 0.2);
     color: #ffffff;
@@ -265,7 +265,7 @@
     align-items: center;
     gap: 6px;
   }
-  .btn-evolute-pill:hover {
+  .btn-horizon-pill:hover {
     background: rgba(255, 255, 255, 0.15);
     border-color: #ffffff;
     transform: translateY(-1px);
@@ -287,7 +287,7 @@
     display: flex;
     gap: 32px;
   }
-  .evolute-stat-box {
+  .stat-card-box {
     text-align: right;
     padding: 16px 20px;
     background: rgba(14, 14, 18, 0.6);
@@ -295,7 +295,7 @@
     border-radius: 14px;
     min-width: 140px;
   }
-  .evolute-stat-num {
+  .stat-card-num {
     font-family: 'Outfit', sans-serif;
     font-size: 2.4rem;
     font-weight: 800;
@@ -303,7 +303,7 @@
     line-height: 1;
     margin-bottom: 6px;
   }
-  .evolute-stat-lbl {
+  .stat-card-lbl {
     font-size: 0.72rem;
     color: #71717a;
     font-weight: 500;
@@ -364,7 +364,7 @@
     color: #3f3f46;
   }
 
-  /* Split Feature Card (AI x HUMANITY) */
+  /* Feature Card */
   .split-feature-card {
     background: var(--card);
     border: 1px solid var(--card-border);
@@ -457,7 +457,7 @@
     letter-spacing: 2px;
   }
 
-  /* Evolute Card Styling */
+  /* Card Styling */
   .card {
     background: var(--card);
     border: 1px solid var(--card-border);
@@ -1139,7 +1139,7 @@
     </p>
 
     <!-- Search Input Wrap -->
-    <div class="search-hub" style="max-width:720px; margin:0 auto 24px;">
+    <div class="search-hub" style="max-width:720px; margin:0 auto 16px;">
       <div class="search-input-wrap" style="display:flex; gap:10px; background:rgba(18,9,30,0.88); border:1px solid rgba(217,101,139,0.35); border-radius:12px; padding:8px 14px; box-shadow:0 4px 25px rgba(0,0,0,0.5);">
         <input type="text" id="searchQuery" placeholder="Search architecture nodes, GitHub repos, or StackOverflow (e.g. 'Kubernetes', 'Terraform', 'vLLM', 'eBPF')..." 
           style="flex:1; background:transparent; border:none; color:#ffffff; font-size:0.95rem; font-family:inherit; outline:none;"
@@ -1148,6 +1148,17 @@
           Search
         </button>
       </div>
+    </div>
+
+    <!-- Rate Limit Indicator & Token Setting Trigger -->
+    <div style="display:flex; justify-content:space-between; align-items:center; max-width:720px; margin:-4px auto 26px; padding:0 4px; font-size:0.75rem; color:#b8a9cf; flex-wrap:wrap; gap:8px;">
+      <div id="ghRateBadge" style="display:inline-flex; align-items:center; gap:6px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); padding:3px 12px; border-radius:9999px;">
+        <span id="ghStatusDot" style="width:7px; height:7px; border-radius:50%; background:#34d399; display:inline-block;"></span>
+        <span id="ghRateText">GitHub API: 60/hr public quota</span>
+      </div>
+      <button onclick="openTokenModal()" style="background:transparent; border:1px solid rgba(244,164,184,0.3); color:#fcd6d9; padding:4px 14px; border-radius:9999px; font-size:0.75rem; cursor:pointer; display:inline-flex; align-items:center; gap:5px; transition:all 0.2s;">
+        <span>⚙️</span> <span id="tokenStatusLabel">Configure GitHub Token (Unlock 5,000/hr)</span>
+      </button>
     </div>
 
     <!-- Quick Tags -->
@@ -1229,6 +1240,47 @@
   </div>
 
   </div>
+
+  
+<!-- GITHUB TOKEN SETTINGS MODAL -->
+<div class="modal-overlay" id="tokenModal" onclick="closeTokenModalOnBackdrop(event)" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(13,7,20,0.85); backdrop-filter:blur(14px); z-index:1000; align-items:center; justify-content:center; padding:20px;">
+  <div class="modal-dialog" style="max-width:540px; width:100%; background:#140b20; border:1px solid rgba(217,101,139,0.35); border-radius:18px; box-shadow:0 20px 60px rgba(0,0,0,0.8); overflow:hidden;">
+    <div class="modal-top" style="padding:22px 26px 16px; background:rgba(22,13,38,0.85); border-bottom:1px solid rgba(255,255,255,0.08); display:flex; justify-content:space-between; align-items:center;">
+      <div>
+        <span style="font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:#f4a4b8; background:rgba(217,101,139,0.15); padding:2px 8px; border-radius:4px;">Rate Limit Settings</span>
+        <h3 style="font-family:'Cinzel','Outfit',sans-serif; font-size:1.3rem; color:#ffffff; margin-top:4px;">GitHub API Token</h3>
+      </div>
+      <button class="modal-close-btn" onclick="closeTokenModal()" style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.15); color:#ffffff; width:30px; height:30px; border-radius:50%; cursor:pointer; font-size:1.1rem; display:flex; align-items:center; justify-content:center;">&times;</button>
+    </div>
+    <div class="modal-body" style="padding:24px 26px;">
+      <p style="font-size:0.86rem; color:#e2d9f3; line-height:1.55; margin-bottom:16px;">
+        Unauthenticated GitHub API requests are limited to <strong>60 requests/hr per IP</strong>. Adding a free Personal Access Token increases your quota to <strong>5,000 requests/hr</strong>.
+      </p>
+      <div style="background:rgba(0,0,0,0.35); border:1px solid rgba(255,255,255,0.08); border-left:3px solid #34d399; border-radius:0 8px 8px 0; padding:12px 14px; margin-bottom:18px; font-size:0.78rem; color:#cbd5e1; line-height:1.5;">
+        🔒 <strong>Client-Side Only:</strong> Your token is stored exclusively in your browser's <code style="color:#f4a4b8;">localStorage</code>. It is sent directly and only to <code style="color:#38bdf8;">api.github.com</code>.
+      </div>
+      <div style="margin-bottom:18px;">
+        <label style="display:block; font-size:0.8rem; font-weight:600; color:#fcd6d9; margin-bottom:8px;">Personal Access Token (classic or fine-grained)</label>
+        <input type="password" id="ghTokenInput" placeholder="ghp_... or github_pat_..." 
+          style="width:100%; background:rgba(18,9,30,0.9); border:1px solid rgba(217,101,139,0.35); border-radius:8px; padding:10px 14px; color:#ffffff; font-family:'JetBrains Mono',monospace; font-size:0.85rem; outline:none; box-sizing:border-box;">
+      </div>
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+        <button onclick="clearGhToken()" style="background:transparent; border:1px solid rgba(239,68,68,0.3); color:#fca5a5; padding:8px 16px; border-radius:6px; font-size:0.8rem; cursor:pointer;">
+          Clear Token
+        </button>
+        <div style="display:flex; gap:10px;">
+          <button onclick="testGhToken()" style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); color:#ffffff; padding:8px 16px; border-radius:6px; font-size:0.8rem; cursor:pointer;">
+            Test Quota
+          </button>
+          <button onclick="saveGhToken()" style="background:linear-gradient(135deg, #ffffff 0%, #fcd6d9 100%); color:#160a22; border:none; padding:8px 20px; border-radius:6px; font-weight:700; font-size:0.8rem; cursor:pointer;">
+            Save Token
+          </button>
+        </div>
+      </div>
+      <div id="tokenFeedback" style="margin-top:14px; font-size:0.8rem; display:none; padding:10px; border-radius:6px;"></div>
+    </div>
+  </div>
+</div>
 
   <footer>
     AREA 51 &mdash; Federated Intelligence &copy; 2026
@@ -2889,6 +2941,100 @@ function filterSource(source, btn) {
   }
 }
 
+
+/* ===== GitHub Token & Rate Limit Management ===== */
+function openTokenModal() {
+  const modal = document.getElementById('tokenModal');
+  modal.style.display = 'flex';
+  const savedToken = localStorage.getItem('area51_gh_token') || '';
+  document.getElementById('ghTokenInput').value = savedToken;
+  document.getElementById('tokenFeedback').style.display = 'none';
+}
+
+function closeTokenModal() {
+  document.getElementById('tokenModal').style.display = 'none';
+}
+
+function closeTokenModalOnBackdrop(e) {
+  if (e.target === document.getElementById('tokenModal')) {
+    closeTokenModal();
+  }
+}
+
+function saveGhToken() {
+  const token = document.getElementById('ghTokenInput').value.trim();
+  if (token) {
+    localStorage.setItem('area51_gh_token', token);
+    showTokenFeedback('Token saved securely in localStorage! Quota elevated to 5,000/hr.', true);
+    updateTokenBadgeState();
+    setTimeout(closeTokenModal, 1500);
+  } else {
+    clearGhToken();
+  }
+}
+
+function clearGhToken() {
+  localStorage.removeItem('area51_gh_token');
+  document.getElementById('ghTokenInput').value = '';
+  showTokenFeedback('Token cleared. Using standard public rate limit (60/hr).', false);
+  updateTokenBadgeState();
+}
+
+function showTokenFeedback(msg, isSuccess) {
+  const fb = document.getElementById('tokenFeedback');
+  fb.style.display = 'block';
+  fb.style.background = isSuccess ? 'rgba(52,211,153,0.1)' : 'rgba(239,68,68,0.1)';
+  fb.style.border = isSuccess ? '1px solid rgba(52,211,153,0.3)' : '1px solid rgba(239,68,68,0.3)';
+  fb.style.color = isSuccess ? '#6ee7b7' : '#fca5a5';
+  fb.innerHTML = msg;
+}
+
+async function testGhToken() {
+  const token = document.getElementById('ghTokenInput').value.trim();
+  showTokenFeedback('Testing GitHub API connection...', true);
+  try {
+    const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
+    const res = await fetch('https://api.github.com/rate_limit', { headers });
+    const data = await res.json();
+    if (res.ok && data.resources) {
+      const searchLimit = data.resources.search.limit;
+      const searchRemaining = data.resources.search.remaining;
+      const coreLimit = data.resources.core.limit;
+      showTokenFeedback(`Connection verified! Core Limit: ${coreLimit}/hr. Search Remaining: ${searchRemaining}/${searchLimit}.`, true);
+      updateRateLimitUI(searchRemaining, searchLimit);
+    } else {
+      showTokenFeedback('Authentication failed: ' + (data.message || 'Invalid Token'), false);
+    }
+  } catch (err) {
+    showTokenFeedback('Network error testing token: ' + err.message, false);
+  }
+}
+
+function updateTokenBadgeState() {
+  const token = localStorage.getItem('area51_gh_token');
+  const label = document.getElementById('tokenStatusLabel');
+  if (token) {
+    label.textContent = 'Token Active (5,000/hr)';
+    document.getElementById('ghRateText').textContent = 'GitHub API: Authenticated (5,000/hr)';
+    document.getElementById('ghStatusDot').style.background = '#34d399';
+  } else {
+    label.textContent = 'Configure GitHub Token';
+    document.getElementById('ghRateText').textContent = 'GitHub API: 60/hr public quota';
+    document.getElementById('ghStatusDot').style.background = '#fbbf24';
+  }
+}
+
+function updateRateLimitUI(remaining, limit) {
+  const text = document.getElementById('ghRateText');
+  const dot = document.getElementById('ghStatusDot');
+  if (text) text.textContent = `GitHub API Quota: ${remaining} / ${limit} remaining`;
+  if (dot) {
+    if (remaining < 5) dot.style.background = '#ef4444';
+    else if (remaining < 20) dot.style.background = '#fbbf24';
+    else dot.style.background = '#34d399';
+  }
+}
+
 function loadHistory() {
   const history = JSON.parse(localStorage.getItem('searchHistory') || '[]');
   const list = document.getElementById('historyList');
@@ -2966,11 +3112,29 @@ async function doSearch() {
   const ghContainer = document.getElementById('githubResults');
   ghContainer.innerHTML = '<div style="color:var(--text-muted);font-size:0.8rem;padding:8px;">Searching GitHub...</div>';
   try {
-    const gh = await fetch(`https://api.github.com/search/repositories?q=${encodeURIComponent(q)}&sort=stars&order=desc&per_page=10`);
+    const headers = {};
+    const token = localStorage.getItem('area51_gh_token');
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+    const gh = await fetch(`https://api.github.com/search/repositories?q=${encodeURIComponent(q)}&sort=stars&order=desc&per_page=10`, { headers });
+    
+    // Read and update live rate limit
+    const rem = gh.headers.get('x-ratelimit-remaining');
+    const lim = gh.headers.get('x-ratelimit-limit');
+    if (rem !== null && lim !== null) {
+      updateRateLimitUI(rem, lim);
+    }
+
     if (gh.status === 403) {
       ghContainer.innerHTML = `
-        <div style="background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3); padding:10px; border-radius:6px; font-size:0.8rem; color:#fca5a5;">
-          <strong>Rate limit reached:</strong> GitHub anonymous API allows 60 requests/hr. Please refer to Local Knowledge Mesh above.
+        <div style="background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3); padding:12px; border-radius:8px; font-size:0.82rem; color:#fca5a5; line-height:1.5;">
+          <strong>Rate limit reached:</strong> GitHub anonymous API limit is exhausted.
+          <div style="margin-top:8px;">
+            <button onclick="openTokenModal()" style="background:#fcd6d9; color:#160a22; border:none; padding:6px 14px; border-radius:6px; font-size:0.75rem; font-weight:700; cursor:pointer;">
+              ⚙️ Add Free GitHub Token to Unlock 5,000/hr
+            </button>
+          </div>
         </div>`;
       document.getElementById('ghCount').textContent = '0';
     } else {
@@ -3020,7 +3184,7 @@ async function doSearch() {
   }
 }
 
-document.addEventListener('DOMContentLoaded', loadHistory);
+document.addEventListener('DOMContentLoaded', () => { loadHistory(); updateTokenBadgeState(); });
 </script>
 </body>
 </html>
